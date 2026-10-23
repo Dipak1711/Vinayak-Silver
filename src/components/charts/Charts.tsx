@@ -27,8 +27,8 @@ export const CHART_PALETTE = [
   '#8f857a', // warm grey
 ]
 
-const AXIS = { fontSize: 11, fill: '#8f857a', fontWeight: 500 }
-const GRID = '#ebe6df'
+const AXIS = { fontSize: 11, fill: 'var(--color-silver-500)', fontWeight: 500 }
+const GRID = 'var(--color-silver-200)'
 
 interface TooltipEntry {
   name?: string
@@ -98,7 +98,7 @@ export function SalesTrendChart({
           width={62}
           tickFormatter={(value: number) => (value >= 100000 ? `${(value / 100000).toFixed(0)}L` : `${value / 1000}K`)}
         />
-        <Tooltip content={<ChartTooltip />} cursor={{ stroke: '#d9d2c8', strokeWidth: 1 }} />
+        <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'var(--color-silver-300)', strokeWidth: 1 }} />
         <Area
           type="monotone"
           dataKey="invoiced"
@@ -166,7 +166,7 @@ export function CategoryBarChart({
             <YAxis tick={AXIS} axisLine={false} tickLine={false} width={40} />
           </>
         )}
-        <Tooltip content={<ChartTooltip currency={currency} />} cursor={{ fill: '#f7f4f0' }} />
+        <Tooltip content={<ChartTooltip currency={currency} />} cursor={{ fill: 'var(--color-silver-100)' }} />
         <Bar
           dataKey="value"
           name="Value"

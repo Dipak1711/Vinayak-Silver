@@ -83,14 +83,14 @@ export function StatCard({
     <>
       {/* Tone-coloured light drifting behind the glass. */}
       <span
-        className="orb-drift pointer-events-none absolute -top-10 -right-8 h-28 w-28 rounded-full opacity-45 blur-2xl"
+        className="orb-drift pointer-events-none absolute -top-10 -right-8 h-28 w-28 rounded-full opacity-45 blur-2xl dark:opacity-70"
         style={{ background: spec.glow }}
         aria-hidden="true"
       />
       <span
         className="pointer-events-none absolute inset-0"
         style={{
-          backgroundImage: `linear-gradient(160deg, ${spec.glow}22 0%, ${spec.glow}0a 55%, transparent 100%)`,
+          backgroundImage: `linear-gradient(160deg, ${spec.glow}33 0%, ${spec.glow}12 55%, transparent 100%)`,
         }}
         aria-hidden="true"
       />

@@ -14,7 +14,7 @@ const ICON_TONE: Record<string, string> = {
   '/quotations': 'bg-violet-100 text-violet-700',
   '/invoices': 'bg-emerald-100 text-emerald-700',
   '/inventory': 'bg-amber-100 text-amber-700',
-  '/manufacturing': 'bg-[#fde3d3] text-[#b4501d]',
+  '/manufacturing': 'bg-[#fde3d3] text-[#b4501d] dark:bg-[#ed7333]/20 dark:text-[#f8aa77]',
   '/packaging': 'bg-rose-100 text-rose-700',
   '/dispatch': 'bg-cyan-100 text-cyan-700',
   '/customers': 'bg-blue-100 text-blue-700',
@@ -91,11 +91,11 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
                   onClick={() => setCollapsed((current) => ({ ...current, [group.id]: !current[group.id] }))}
                   aria-expanded={!isClosed}
                   className={cn(
-                    'pressable flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors hover:bg-[#fff4ec]',
+                    'pressable flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors hover:bg-[#fff4ec] dark:hover:bg-white/[0.06]',
                     mini && 'lg:hidden',
                   )}
                 >
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px] bg-linear-to-br from-[#fff1e8] to-[#fdd9c4] text-[#ed7333] ring-1 ring-inset ring-[#f9c9ad]">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px] bg-linear-to-br from-[#fff1e8] to-[#fdd9c4] text-[#ed7333] ring-1 ring-inset ring-[#f9c9ad] dark:from-[#3b2417] dark:to-[#2a1a12] dark:text-[#f8aa77] dark:ring-[#5d3822]">
                     <GroupIcon className="h-4.5 w-4.5" />
                   </span>
                   <span className="flex-1 truncate text-[14.5px] font-semibold text-navy-900">{group.title}</span>
@@ -136,7 +136,7 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
                                 'group relative flex items-center gap-2.5 rounded-xl px-1.5 py-1.5 text-[13.5px] font-medium transition-[background-color,color,translate,box-shadow] duration-200 ease-out',
                                 isActive
                                   ? 'bg-linear-to-r from-[#f58a4e] via-[#ed7333] to-[#d9622a] font-semibold text-white shadow-[0_10px_22px_-8px_rgba(237,115,51,0.7)]'
-                                  : 'text-silver-700 hover:translate-x-0.5 hover:bg-[#fff4ec] hover:text-navy-900',
+                                  : 'text-silver-700 hover:translate-x-0.5 hover:bg-[#fff4ec] dark:hover:bg-white/[0.06] hover:text-navy-900',
                                 mini && 'lg:h-11 lg:justify-center lg:px-0',
                               )
                             }
@@ -156,7 +156,7 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
                                   <span
                                     className={cn(
                                       'tnum rounded-full px-1.5 py-0.5 text-[10.5px] font-bold',
-                                      isActive ? 'bg-white/30 text-white' : 'bg-[#fde3d3] text-[#b4501d]',
+                                      isActive ? 'bg-white/30 text-white' : 'bg-[#fde3d3] text-[#b4501d] dark:bg-[#ed7333]/20 dark:text-[#f8aa77]',
                                       mini && 'lg:absolute lg:-top-1 lg:-right-1 lg:min-w-4 lg:px-1 lg:text-center',
                                     )}
                                   >

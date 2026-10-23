@@ -16,9 +16,9 @@ export function useClickOutside<T extends HTMLElement>(onOutside: () => void) {
 
 export type Theme = 'light' | 'dark'
 
-/* The theme lives on <html data-theme> so it can be applied before first
-   paint by the inline script in index.html; this hook just keeps React and
-   localStorage in step with it. */
+/* The theme lives on <html data-theme>. index.html always starts it as
+   light on load; this hook just keeps React in step and lets the toggle
+   switch it for the current visit only. */
 export function useTheme() {
   const [theme, setTheme] = useState<Theme>(() => {
     const current = document.documentElement.getAttribute('data-theme')
@@ -27,11 +27,6 @@ export function useTheme() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
-    try {
-      localStorage.setItem('vinayak.theme', theme)
-    } catch {
-      /* private mode — the preference just isn't remembered */
-    }
   }, [theme])
 
   const toggle = () => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))

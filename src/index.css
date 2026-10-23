@@ -621,6 +621,22 @@ body {
   background-attachment: fixed;
 }
 
+/* Dark canvas: a near-black espresso field with coloured ambient light,
+   so glass panels have something warm and cool to pick up. */
+:root[data-theme='dark'] .app-canvas {
+  background-image:
+    radial-gradient(900px 520px at 0% -8%, rgba(237, 115, 51, 0.22), transparent 66%),
+    radial-gradient(700px 480px at 100% -6%, rgba(245, 158, 11, 0.10), transparent 64%),
+    radial-gradient(700px 520px at 6% 104%, rgba(20, 184, 166, 0.14), transparent 68%),
+    radial-gradient(800px 560px at 98% 100%, rgba(139, 92, 246, 0.20), transparent 68%);
+}
+:root[data-theme='dark'] .sidebar-chrome {
+  background-image:
+    radial-gradient(360px 240px at 0% 0%, rgba(237, 115, 51, 0.20), transparent 70%),
+    radial-gradient(320px 260px at 100% 100%, rgba(139, 92, 246, 0.14), transparent 70%),
+    linear-gradient(180deg, #1a1410 0%, #120e0b 100%);
+}
+
 /* Numbers line up in tables, KPIs and money columns. */
 .tnum,
 table,
