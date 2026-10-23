@@ -30,6 +30,41 @@ import { cn } from '@/lib/utils'
 
 type Tab = 'materials' | 'movements'
 
+/** Copy for each movement, so the form only ever shows the action chosen. */
+const STOCK_META: Record<
+  MovementType,
+  { title: string; action: string; quantityHint: string; referencePlaceholder: string; notePlaceholder: string }
+> = {
+  Inward: {
+    title: 'Stock inward',
+    action: 'Record inward',
+    quantityHint: 'Adds the quantity to the current balance.',
+    referencePlaceholder: 'Purchase bill / GRN number',
+    notePlaceholder: 'Supplier, lot or receipt note',
+  },
+  Outward: {
+    title: 'Stock outward',
+    action: 'Record outward',
+    quantityHint: 'Stock-out is blocked if it would make the balance negative.',
+    referencePlaceholder: 'Job card / invoice reference',
+    notePlaceholder: 'Purpose of issue',
+  },
+  Adjustment: {
+    title: 'Stock adjustment',
+    action: 'Record adjustment',
+    quantityHint: 'Choose whether to add or reduce, then enter how many.',
+    referencePlaceholder: 'Stock count reference',
+    notePlaceholder: 'Why the count changed',
+  },
+}
+
+/** Specific reasons per action, so the store keeper picks instead of typing. */
+const STOCK_REASONS: Record<MovementType, string[]> = {
+  Inward: ['Purchase from supplier', 'Returned from production', 'Customer return', 'Opening stock', 'Other'],
+  Outward: ['Issued to production', 'Sent for job work', 'Sold / dispatched', 'Damaged / wastage', 'Other'],
+  Adjustment: ['Stock count correction', 'Damaged / wastage', 'Found extra stock', 'Lost / shortage', 'Other'],
+}
+
 export function InventoryPage() {
   const { db, mutate } = useData()
   const toast = useToast()
@@ -56,7 +91,7 @@ export function InventoryPage() {
 
   const [stockTarget, setStockTarget] = useState<RawMaterial | null>(null)
   const [stockType, setStockType] = useState<MovementType>('Inward')
-  const [stockForm, setStockForm] = useState({ quantity: '', reference: '', note: '', createdBy: 'Store Keeper' })
+  const [stockForm, setStockForm] = useState({ quantity: '', direction: 'add' as 'add' | 'reduce', reason: '', reference: '', note: '', createdBy: 'Store Keeper' })
   const [stockError, setStockError] = useState('')
 
   const filteredMaterials = useMemo(() => {
@@ -181,8 +216,10 @@ export function InventoryPage() {
     setStockType(type)
     setStockForm({
       quantity: '',
+      direction: 'add',
+      reason: STOCK_REASONS[type][0],
       reference: '',
-      note: type === 'Adjustment' ? 'Stock count correction' : '',
+      note: '',
       createdBy: 'Store Keeper',
     })
     setStockError('')
@@ -191,20 +228,30 @@ export function InventoryPage() {
   const submitStock = () => {
     if (!stockTarget) return
     const quantity = Number(stockForm.quantity)
-    if (stockForm.quantity === '' || Number.isNaN(quantity) || quantity === 0) {
-      setStockError('Enter a quantity. Use a negative value to reduce stock for an adjustment.')
+    if (stockForm.quantity === '' || Number.isNaN(quantity)) {
+      setStockError('Enter a quantity.')
       return
     }
+    if (quantity <= 0) {
+      setStockError('Enter a quantity greater than zero.')
+      return
+    }
+    if (stockForm.reason === 'Other' && !stockForm.note.trim()) {
+      setStockError('Please describe the reason in the note.')
+      return
+    }
+    const signed = stockForm.direction === 'reduce' ? -quantity : quantity
+    const noteText = [stockForm.reason === 'Other' ? '' : stockForm.reason, stockForm.note.trim()].filter(Boolean).join(' — ')
     const result = mutate((draft) =>
       applyStockMovement(
         draft,
         stockTarget.id,
         stockType,
-        Math.abs(quantity),
+        quantity,
         stockForm.reference.trim(),
-        stockForm.note.trim(),
+        noteText,
         stockForm.createdBy,
-        stockType === 'Adjustment' ? quantity : undefined,
+        stockType === 'Adjustment' ? signed : undefined,
       ),
     )
     if (!result.ok) {
@@ -492,48 +539,34 @@ export function InventoryPage() {
         open={Boolean(stockTarget)}
         onClose={() => setStockTarget(null)}
         size="sm"
-        title={`${stockType} · ${stockTarget?.name ?? ''}`}
+        title={`${STOCK_META[stockType].title} · ${stockTarget?.name ?? ''}`}
         subtitle={stockTarget ? `Current balance ${formatNumber(stockTarget.quantity)} ${stockTarget.unit}` : ''}
         footer={
           <>
             <Button variant="outline" onClick={() => setStockTarget(null)}>
               Cancel
             </Button>
-            <Button onClick={submitStock}>Record {stockType.toLowerCase()}</Button>
+            <Button onClick={submitStock}>{STOCK_META[stockType].action}</Button>
           </>
         }
       >
         <div className="flex flex-col gap-4">
-          <div className="flex gap-1.5 rounded-xl border border-silver-200 bg-silver-50 p-1.5">
-            {(['Inward', 'Outward', 'Adjustment'] as MovementType[]).map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => {
-                  setStockType(type)
-                  setStockError('')
-                }}
-                className={cn(
-                  'flex-1 rounded-lg px-2 py-1.5 text-xs font-semibold transition',
-                  stockType === type ? 'bg-surface text-navy-900 shadow-sm' : 'text-silver-600 hover:text-navy-800',
-                )}
+          {stockType === 'Adjustment' ? (
+            <Field label="What do you want to do?">
+              <Select
+                value={stockForm.direction}
+                onChange={(event) => setStockForm({ ...stockForm, direction: event.target.value as 'add' | 'reduce' })}
               >
-                {type}
-              </button>
-            ))}
-          </div>
-
+                <option value="add">Add to stock (found extra)</option>
+                <option value="reduce">Reduce stock (shortage / damage)</option>
+              </Select>
+            </Field>
+          ) : null}
           <Field
-            label={stockType === 'Adjustment' ? 'Adjustment quantity' : 'Quantity'}
+            label={stockType === 'Adjustment' ? 'Quantity to change' : `Quantity${stockTarget ? ` (${stockTarget.unit})` : ''}`}
             required
             error={stockError}
-            hint={
-              stockType === 'Adjustment'
-                ? 'Use a positive number to add stock, negative to reduce (e.g. -2 for a shortage).'
-                : stockType === 'Outward'
-                  ? 'Stock-out is blocked if it would make the balance negative.'
-                  : undefined
-            }
+            hint={STOCK_META[stockType].quantityHint}
           >
             <Input
               type="number"
@@ -546,11 +579,39 @@ export function InventoryPage() {
               placeholder="0"
             />
           </Field>
-          <Field label="Reference">
-            <Input value={stockForm.reference} onChange={(event) => setStockForm({ ...stockForm, reference: event.target.value })} placeholder="PB-2026-030 / MRJ-2026-0007" />
+          {stockTarget && Number(stockForm.quantity) > 0 ? (
+            <div className="rounded-lg border border-silver-200 bg-silver-50 px-3.5 py-2.5 text-xs text-silver-700">
+              New balance will be{' '}
+              <strong className="text-navy-800">
+                {formatNumber(
+                  stockTarget.quantity +
+                    (stockType === 'Outward' || (stockType === 'Adjustment' && stockForm.direction === 'reduce') ? -1 : 1) *
+                      Number(stockForm.quantity),
+                )}{' '}
+                {stockTarget.unit}
+              </strong>
+            </div>
+          ) : null}
+          <Field label="Reason" required>
+            <Select value={stockForm.reason} onChange={(event) => setStockForm({ ...stockForm, reason: event.target.value })}>
+              {STOCK_REASONS[stockType].map((reason) => (
+                <option key={reason}>{reason}</option>
+              ))}
+            </Select>
           </Field>
-          <Field label="Note">
-            <Textarea value={stockForm.note} onChange={(event) => setStockForm({ ...stockForm, note: event.target.value })} placeholder="Reason for the movement" />
+          <Field label="Reference" hint="Optional">
+            <Input
+              value={stockForm.reference}
+              onChange={(event) => setStockForm({ ...stockForm, reference: event.target.value })}
+              placeholder={STOCK_META[stockType].referencePlaceholder}
+            />
+          </Field>
+          <Field label={stockForm.reason === 'Other' ? 'Note' : 'Note (optional)'} required={stockForm.reason === 'Other'}>
+            <Textarea
+              value={stockForm.note}
+              onChange={(event) => setStockForm({ ...stockForm, note: event.target.value })}
+              placeholder={STOCK_META[stockType].notePlaceholder}
+            />
           </Field>
           <Field label="Recorded by">
             <Input value={stockForm.createdBy} onChange={(event) => setStockForm({ ...stockForm, createdBy: event.target.value })} />
