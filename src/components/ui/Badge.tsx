@@ -20,7 +20,7 @@ const TONES: Record<BadgeTone, string> = {
   danger: 'bg-rose-50 text-rose-800 ring-rose-200',
   purple: 'bg-violet-50 text-violet-800 ring-violet-200',
   silver: 'bg-silver-100 text-navy-700 ring-silver-300',
-  navy: 'bg-navy-900 text-white ring-navy-900',
+  navy: 'bg-ink text-white ring-ink',
   gold: 'bg-gold-50 text-gold-800 ring-gold-300',
 }
 

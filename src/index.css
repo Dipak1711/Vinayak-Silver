@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+/* `dark:` utilities follow the app theme attribute rather than the OS
+   setting, so both stay in agreement. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
 /* ==================================================================
    VINAYAK SILVER — DESIGN SYSTEM
    Visual language aligned to the reference product: a light, indigo-
@@ -45,6 +49,14 @@
   --color-navy-800: #1c2537;
   --color-navy-900: #0f172a;
   --color-navy-950: #080d17;
+
+  /* ---------------------------------------------------------------
+     Semantic surfaces. `surface` is the panel colour that flips with
+     the theme; `ink` is a fixed near-black reserved for elements that
+     must stay dark in both themes (printed marks, number dots).
+     --------------------------------------------------------------- */
+  --color-surface: #ffffff;
+  --color-ink: #0f172a;
 
   /* ---------------------------------------------------------------
      Primary — indigo. The reference action colour (#4f46e5).
@@ -208,6 +220,164 @@
 }
 
 /* ------------------------------------------------------------------ */
+/* Dark theme                                                         */
+/* Every semantic ramp is re-declared, so any component built from the */
+/* shared tokens adapts without a single `dark:` utility. Scoped to    */
+/* `screen` on purpose: printed documents always render on the light   */
+/* token set.                                                          */
+/* ------------------------------------------------------------------ */
+
+@media screen {
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+
+    --color-surface: #121826;
+    --color-ink: #0f172a;
+
+    /* neutrals — canvas, panels, hairlines, muted text */
+    --color-silver-50: #171f2f;
+    --color-silver-100: #0b0f19;
+    --color-silver-200: #232d42;
+    --color-silver-300: #33405c;
+    --color-silver-400: #4c5a78;
+    --color-silver-500: #7d889e;
+    --color-silver-600: #98a2b6;
+    --color-silver-700: #aeb7c9;
+    --color-silver-800: #cdd5e2;
+    --color-silver-900: #e4e9f2;
+    --color-silver-950: #f2f5fb;
+
+    /* ink chrome — headings and body text become light */
+    --color-navy-50: #1a2233;
+    --color-navy-100: #222c40;
+    --color-navy-200: #2c3850;
+    --color-navy-300: #46536b;
+    --color-navy-400: #6b7893;
+    --color-navy-500: #8b95a9;
+    --color-navy-600: #a9b2c4;
+    --color-navy-700: #c6cede;
+    --color-navy-800: #dde3ee;
+    --color-navy-900: #e9edf6;
+    --color-navy-950: #f3f6fc;
+
+    /* primary — solid steps hold, tints become translucent, ink steps lift */
+    --color-sapphire-50: rgba(99, 102, 241, 0.14);
+    --color-sapphire-100: rgba(99, 102, 241, 0.26);
+    --color-sapphire-200: rgba(99, 102, 241, 0.4);
+    --color-sapphire-300: #a5b4fc;
+    --color-sapphire-400: #818cf8;
+    --color-sapphire-500: #6366f1;
+    --color-sapphire-600: #4f46e5;
+    --color-sapphire-700: #818cf8;
+    --color-sapphire-800: #a5b4fc;
+    --color-sapphire-900: #c7d2fe;
+    --color-sapphire-950: #ddd6fe;
+
+    --color-blue-50: rgba(99, 102, 241, 0.14);
+    --color-blue-100: rgba(99, 102, 241, 0.26);
+    --color-blue-200: rgba(99, 102, 241, 0.4);
+    --color-blue-300: #a5b4fc;
+    --color-blue-400: #818cf8;
+    --color-blue-500: #6366f1;
+    --color-blue-600: #4f46e5;
+    --color-blue-700: #818cf8;
+    --color-blue-800: #a5b4fc;
+    --color-blue-900: #c7d2fe;
+    --color-blue-950: #ddd6fe;
+
+    /* accent — gold / amber */
+    --color-gold-50: rgba(245, 158, 11, 0.14);
+    --color-gold-100: rgba(245, 158, 11, 0.24);
+    --color-gold-200: rgba(245, 158, 11, 0.4);
+    --color-gold-300: #fcd34d;
+    --color-gold-400: #fbbf24;
+    --color-gold-500: #f59e0b;
+    --color-gold-600: #d97706;
+    --color-gold-700: #fbbf24;
+    --color-gold-800: #fcd34d;
+    --color-gold-900: #fde68a;
+
+    /* status ramps */
+    --color-emerald-50: rgba(16, 185, 129, 0.14);
+    --color-emerald-100: rgba(16, 185, 129, 0.22);
+    --color-emerald-200: rgba(16, 185, 129, 0.4);
+    --color-emerald-300: #6ee7b7;
+    --color-emerald-400: #34d399;
+    --color-emerald-500: #10b981;
+    --color-emerald-600: #059669;
+    --color-emerald-700: #34d399;
+    --color-emerald-800: #6ee7b7;
+    --color-emerald-900: #a7f3d0;
+    --color-emerald-950: #d1fae5;
+
+    --color-amber-50: rgba(245, 158, 11, 0.14);
+    --color-amber-100: rgba(245, 158, 11, 0.24);
+    --color-amber-200: rgba(245, 158, 11, 0.4);
+    --color-amber-300: #fcd34d;
+    --color-amber-400: #fbbf24;
+    --color-amber-500: #f59e0b;
+    --color-amber-600: #d97706;
+    --color-amber-700: #fbbf24;
+    --color-amber-800: #fcd34d;
+    --color-amber-900: #fde68a;
+    --color-amber-950: #fef3c7;
+
+    --color-rose-50: rgba(239, 68, 68, 0.14);
+    --color-rose-100: rgba(239, 68, 68, 0.22);
+    --color-rose-200: rgba(239, 68, 68, 0.4);
+    --color-rose-300: #fca5a5;
+    --color-rose-400: #f87171;
+    --color-rose-500: #ef4444;
+    --color-rose-600: #dc2626;
+    --color-rose-700: #f87171;
+    --color-rose-800: #fca5a5;
+    --color-rose-900: #fecaca;
+    --color-rose-950: #fee2e2;
+
+    --color-violet-50: rgba(139, 92, 246, 0.16);
+    --color-violet-100: rgba(139, 92, 246, 0.26);
+    --color-violet-200: rgba(139, 92, 246, 0.42);
+    --color-violet-300: #c4b5fd;
+    --color-violet-400: #a78bfa;
+    --color-violet-500: #8b5cf6;
+    --color-violet-600: #7c3aed;
+    --color-violet-700: #a78bfa;
+    --color-violet-800: #c4b5fd;
+    --color-violet-900: #ddd6fe;
+    --color-violet-950: #ede9fe;
+
+    --color-cyan-50: rgba(20, 184, 166, 0.14);
+    --color-cyan-100: rgba(20, 184, 166, 0.22);
+    --color-cyan-200: rgba(20, 184, 166, 0.4);
+    --color-cyan-300: #5eead4;
+    --color-cyan-400: #2dd4bf;
+    --color-cyan-500: #14b8a6;
+    --color-cyan-600: #0d9488;
+    --color-cyan-700: #2dd4bf;
+    --color-cyan-800: #5eead4;
+    --color-cyan-900: #99f6e4;
+    --color-cyan-950: #ccfbf1;
+
+    /* elevation — a light hairline and deeper shadow read as depth on dark */
+    --shadow-flat: 0 0 0 1px rgba(255, 255, 255, 0.06);
+    --shadow-card:
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 1px 2px -1px rgba(0, 0, 0, 0.5);
+    --shadow-lift:
+      0 0 0 1px rgba(255, 255, 255, 0.07),
+      0 4px 8px -2px rgba(0, 0, 0, 0.5),
+      0 12px 24px -10px rgba(0, 0, 0, 0.6);
+    --shadow-panel:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 10px 24px -8px rgba(0, 0, 0, 0.55),
+      0 20px 48px -16px rgba(0, 0, 0, 0.6);
+    --shadow-modal:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 30px 70px -20px rgba(0, 0, 0, 0.75);
+  }
+}
+
+/* ------------------------------------------------------------------ */
 /* Keyframes                                                          */
 /* ------------------------------------------------------------------ */
 
@@ -333,6 +503,10 @@
 /* ------------------------------------------------------------------ */
 /* Base                                                               */
 /* ------------------------------------------------------------------ */
+
+:root {
+  color-scheme: light;
+}
 
 * {
   border-color: var(--color-silver-200);

@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 /* 16px on small screens: anything below that makes iOS Safari zoom the
    viewport on focus, which breaks the layout mid-task. */
 const CONTROL =
-  'w-full rounded-[11px] border border-silver-300 bg-white px-3 text-[16px] text-navy-900 shadow-[inset_0_1px_2px_0_rgba(15,23,42,0.045)] transition-[border-color,box-shadow,background-color] duration-150 placeholder:text-silver-600 hover:border-silver-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none disabled:cursor-not-allowed disabled:bg-silver-50 disabled:text-silver-600 sm:text-sm'
+  'w-full rounded-[11px] border border-silver-300 bg-surface px-3 text-[16px] text-navy-900 shadow-[inset_0_1px_2px_0_rgba(15,23,42,0.045)] transition-[border-color,box-shadow,background-color] duration-150 placeholder:text-silver-600 hover:border-silver-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none disabled:cursor-not-allowed disabled:bg-silver-50 disabled:text-silver-600 sm:text-sm'
 
 export function Field({
   label,

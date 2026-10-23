@@ -11,7 +11,7 @@ function PrintHeader({ settings, title, documentNumber, meta }: {
     <div className="mb-6 flex items-start justify-between gap-8 border-b-2 border-navy-900 pb-5">
       <div>
         <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-navy-900 text-base font-black text-white">
+          <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-ink text-base font-black text-white">
             VS
           </span>
           <div>

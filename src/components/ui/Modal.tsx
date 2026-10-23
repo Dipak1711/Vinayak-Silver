@@ -112,7 +112,7 @@ export function Modal({ open, onClose, title, subtitle, size = 'md', footer, chi
       )}
     >
       <div
-        className="fixed inset-0 bg-navy-950/45 backdrop-blur-[3px]"
+        className="fixed inset-0 bg-black/50 backdrop-blur-[3px]"
         onClick={() => closeRef.current()}
         aria-hidden="true"
       />
@@ -123,12 +123,12 @@ export function Modal({ open, onClose, title, subtitle, size = 'md', footer, chi
         aria-labelledby={titleId}
         tabIndex={-1}
         className={cn(
-          'relative z-10 my-4 flex w-full flex-col overflow-hidden rounded-3xl bg-white shadow-modal outline-none sm:my-8',
+          'relative z-10 my-4 flex w-full flex-col overflow-hidden rounded-3xl bg-surface shadow-modal outline-none sm:my-8',
           open ? 'animate-slide-up' : 'animate-scale-out',
           SIZES[size],
         )}
       >
-        <header className="relative flex items-start justify-between gap-4 border-b border-silver-200 bg-linear-to-b from-silver-50/80 to-white px-5 py-4">
+        <header className="relative flex items-start justify-between gap-4 border-b border-silver-200 bg-linear-to-b from-silver-50/80 to-surface px-5 py-4">
           <div className="min-w-0">
             <h2 id={titleId} className="truncate text-[17px] font-bold tracking-[-0.02em] text-navy-900">
               {title}

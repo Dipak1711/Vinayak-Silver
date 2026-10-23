@@ -259,7 +259,7 @@ export function CustomersPage() {
                 <option key={city}>{city}</option>
               ))}
             </Select>
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-silver-300 bg-white px-3 py-2 text-xs font-semibold text-navy-800">
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-silver-300 bg-surface px-3 py-2 text-xs font-semibold text-navy-800">
               <input type="checkbox" className="h-4 w-4 rounded border-silver-300 text-blue-600" checked={outstandingOnly} onChange={(event) => setOutstandingOnly(event.target.checked)} />
               With outstanding only
             </label>
@@ -464,7 +464,7 @@ function CustomerDetail({ customer, tab, setTab }: { customer: Customer; tab: Le
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="divide-y divide-silver-100">
+        <div className="divide-y divide-silver-200">
           <DataRow label="Contact person" value={customer.contactPerson} />
           <DataRow
             label="Email"
@@ -508,7 +508,7 @@ function CustomerDetail({ customer, tab, setTab }: { customer: Customer; tab: Le
             onClick={() => setTab(item.key)}
             className={cn(
               'rounded-lg px-3 py-2 text-xs font-semibold transition',
-              tab === item.key ? 'bg-white text-navy-900 shadow-sm' : 'text-silver-600 hover:text-navy-800',
+              tab === item.key ? 'bg-surface text-navy-900 shadow-sm' : 'text-silver-600 hover:text-navy-800',
             )}
           >
             {item.label} ({item.count})

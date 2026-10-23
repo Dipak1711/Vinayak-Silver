@@ -217,7 +217,7 @@ export function SettingsPage() {
 
         <Card>
           <CardHeader title="Stored dataset" subtitle="Record counts currently persisted in this browser." />
-          <div className="mt-2 divide-y divide-silver-100">
+          <div className="mt-2 divide-y divide-silver-200">
             {records.map((record) => (
               <DataRow key={record.label} label={record.label} value={record.value} />
             ))}

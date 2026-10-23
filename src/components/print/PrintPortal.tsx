@@ -25,5 +25,5 @@ export function PrintPortal({
   }, [open, onDone])
 
   if (!open) return null
-  return createPortal(<div className="print-only bg-white text-navy-950">{children}</div>, document.body)
+  return createPortal(<div className="print-only bg-surface text-navy-950">{children}</div>, document.body)
 }

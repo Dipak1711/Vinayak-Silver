@@ -198,7 +198,7 @@ export function PackagingPage() {
             title="Completed production awaiting packaging"
             subtitle="These jobs finished production and need a packing record."
           />
-          <ul className="mt-3 divide-y divide-silver-100">
+          <ul className="mt-3 divide-y divide-silver-200">
             {awaitingPackaging.map((job) => (
               <li key={job.id} className="flex flex-wrap items-center justify-between gap-3 py-2.5">
                 <div>
@@ -228,7 +228,7 @@ export function PackagingPage() {
                 <option key={status}>{status}</option>
               ))}
             </Select>
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-silver-300 bg-white px-3 py-2 text-xs font-semibold text-navy-800">
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-silver-300 bg-surface px-3 py-2 text-xs font-semibold text-navy-800">
               <input type="checkbox" className="h-4 w-4 rounded border-silver-300 text-blue-600" checked={readyOnly} onChange={(event) => setReadyOnly(event.target.checked)} />
               Ready for dispatch only
             </label>
@@ -408,13 +408,13 @@ export function PackagingPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="divide-y divide-silver-100">
+              <div className="divide-y divide-silver-200">
                 <DataRow label="Customer" value={detail.customerId ? customerName(db, detail.customerId) : '—'} />
                 <DataRow label="Order reference" value={detail.orderRef} />
                 <DataRow label="Quantity to pack" value={formatNumber(detail.quantityToPack)} />
                 <DataRow label="Packed quantity" value={formatNumber(detail.packedQuantity)} />
               </div>
-              <div className="divide-y divide-silver-100">
+              <div className="divide-y divide-silver-200">
                 <DataRow label="Assigned to" value={detail.assignedTo || '—'} />
                 <DataRow label="Packing date" value={detail.packingDate ? formatDate(detail.packingDate) : '—'} />
                 <DataRow label="Created" value={formatDate(detail.createdAt)} />

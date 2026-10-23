@@ -59,7 +59,7 @@ export function SegmentedTabs<T extends string>({
       {indicator ? (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute rounded-lg bg-white shadow-card transition-[transform,width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+          className="pointer-events-none absolute rounded-lg bg-surface shadow-card transition-[transform,width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
           style={{
             transform: `translateX(${indicator.left}px)`,
             width: indicator.width,

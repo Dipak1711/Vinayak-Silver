@@ -22,7 +22,7 @@ const TONES: Record<StatTone, ToneSpec> = {
   amber: { tile: 'from-amber-500 to-amber-700', glow: '#f59e0b', spark: 'gold' },
   rose: { tile: 'from-rose-500 to-rose-700', glow: '#dc2626', spark: 'rose' },
   violet: { tile: 'from-violet-500 to-violet-700', glow: '#7c3aed', spark: 'violet' },
-  navy: { tile: 'from-navy-700 to-navy-950', glow: '#1c2537', spark: 'slate' },
+  navy: { tile: 'from-[#2b3445] to-[#0f172a]', glow: '#1c2537', spark: 'slate' },
   cyan: { tile: 'from-cyan-500 to-cyan-700', glow: '#0d9488', spark: 'sapphire' },
   gold: { tile: 'from-gold-400 to-gold-700', glow: '#d97706', spark: 'gold' },
 }
@@ -69,8 +69,17 @@ export function StatCard({
 
   const body = (
     <>
+      {/* A tone-tinted wash from the top-left corner, so each card carries
+          its own colour rather than every card reading as flat white. */}
       <span
-        className="pointer-events-none absolute -top-12 -right-10 h-28 w-28 rounded-full opacity-[0.09] blur-2xl"
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage: `linear-gradient(135deg, ${spec.glow}2b 0%, ${spec.glow}0d 40%, transparent 64%)`,
+        }}
+        aria-hidden="true"
+      />
+      <span
+        className="pointer-events-none absolute -top-14 -right-12 h-32 w-32 rounded-full opacity-[0.16] blur-2xl"
         style={{ background: spec.glow }}
         aria-hidden="true"
       />
@@ -126,7 +135,7 @@ export function StatCard({
   )
 
   const shell = cn(
-    'relative flex h-full w-full flex-col overflow-hidden rounded-2xl bg-white p-5 text-left shadow-card',
+    'relative flex h-full w-full flex-col overflow-hidden rounded-2xl bg-surface p-5 text-left shadow-card',
     onClick && 'lift pressable cursor-pointer',
     className,
   )

@@ -313,7 +313,7 @@ export function InventoryPage() {
                     <option key={category}>{category}</option>
                   ))}
                 </Select>
-                <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-silver-300 bg-white px-3 py-2 text-xs font-semibold text-navy-800">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-silver-300 bg-surface px-3 py-2 text-xs font-semibold text-navy-800">
                   <input type="checkbox" className="h-4 w-4 rounded border-silver-300 text-blue-600" checked={lowOnly} onChange={(event) => setLowOnly(event.target.checked)} />
                   Low stock only
                 </label>
@@ -515,7 +515,7 @@ export function InventoryPage() {
                 }}
                 className={cn(
                   'flex-1 rounded-lg px-2 py-1.5 text-xs font-semibold transition',
-                  stockType === type ? 'bg-white text-navy-900 shadow-sm' : 'text-silver-600 hover:text-navy-800',
+                  stockType === type ? 'bg-surface text-navy-900 shadow-sm' : 'text-silver-600 hover:text-navy-800',
                 )}
               >
                 {type}

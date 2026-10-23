@@ -211,7 +211,7 @@ export function DispatchPage() {
 
       {readyGroups.length > 0 ? (
         <Card padded={false}>
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-silver-200 bg-linear-to-r from-silver-50 to-white px-5 py-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-silver-200 bg-linear-to-r from-silver-50 to-surface px-5 py-4">
             <div>
               <h3 className="flex items-center gap-2 text-[13px] font-bold text-navy-900">
                 <span className="h-3.5 w-1 rounded-full bg-linear-to-b from-amber-400 to-amber-600" aria-hidden="true" />
@@ -223,7 +223,7 @@ export function DispatchPage() {
             </div>
             <Badge tone="warning">{readyGroups.length} waiting</Badge>
           </div>
-          <ul className="divide-y divide-silver-100">
+          <ul className="divide-y divide-silver-200">
             {readyGroups.map((group) => {
               const units = group.jobs.reduce((acc, job) => acc + job.packedQuantity, 0)
               return (
@@ -428,7 +428,7 @@ export function DispatchPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="divide-y divide-silver-100">
+              <div className="divide-y divide-silver-200">
                 <DataRow label="Courier" value={detail.courierName || '—'} />
                 <DataRow label="Tracking number" value={detail.trackingNumber || '—'} />
                 <DataRow label="Dispatch date" value={detail.dispatchDate ? formatDate(detail.dispatchDate) : '—'} />

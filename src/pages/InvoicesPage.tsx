@@ -399,7 +399,7 @@ export function InvoicesPage() {
                 type="button"
                 onClick={() => setCreateMode(tab.key)}
                 className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${
-                  createMode === tab.key ? 'bg-white text-navy-900 shadow-sm' : 'text-silver-600 hover:text-navy-800'
+                  createMode === tab.key ? 'bg-surface text-navy-900 shadow-sm' : 'text-silver-600 hover:text-navy-800'
                 }`}
               >
                 {tab.label}
@@ -523,7 +523,7 @@ export function InvoicesPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="divide-y divide-silver-100">
+              <div className="divide-y divide-silver-200">
                 <DataRow label="Invoice date" value={formatDate(detail.date)} />
                 <DataRow label="Due date" value={formatDate(detail.dueDate)} />
                 <DataRow label="Order reference" value={detail.orderRef} />
@@ -568,7 +568,7 @@ export function InvoicesPage() {
                   No payments recorded yet. Use “Record payment” to capture an advance or settlement.
                 </p>
               ) : (
-                <ul className="divide-y divide-silver-100 rounded-lg border border-silver-200">
+                <ul className="divide-y divide-silver-200 rounded-lg border border-silver-200">
                   {detail.payments.map((payment) => (
                     <li key={payment.id} className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm">
                       <div>

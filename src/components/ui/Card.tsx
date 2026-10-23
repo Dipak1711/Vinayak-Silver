@@ -10,14 +10,14 @@ import { cn } from '@/lib/utils'
 export type CardVariant = 'default' | 'raised' | 'flat' | 'dark' | 'interactive'
 
 const VARIANTS: Record<CardVariant, string> = {
-  default: 'bg-white shadow-card',
-  raised: 'bg-white shadow-lift',
+  default: 'bg-surface shadow-card',
+  raised: 'bg-surface shadow-lift',
   flat: 'bg-silver-50/80 shadow-flat',
   // Explicit base colour as well as the gradient, so the surface is dark
   // even if a background-image from elsewhere wins the cascade. The sheen
   // is layered as its own element below.
   dark: 'bg-blue-900 bg-linear-to-br from-blue-900 via-blue-700 to-blue-600 text-white shadow-panel',
-  interactive: 'bg-white shadow-card lift pressable cursor-pointer hover:shadow-lift',
+  interactive: 'bg-surface shadow-card lift pressable cursor-pointer hover:shadow-lift',
 }
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {

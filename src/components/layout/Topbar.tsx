@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bell, Command, Menu, Search, Sparkles } from 'lucide-react'
+import { Bell, Command, Menu, Moon, PanelLeftClose, PanelLeftOpen, Search, Sparkles, Sun } from 'lucide-react'
 import { useData } from '@/store/DataContext'
-import { useClickOutside } from '@/hooks'
+import { useClickOutside, useTheme } from '@/hooks'
 import { pendingTasks } from '@/lib/calc'
 import { cn, formatCurrency, formatDate, todayISO } from '@/lib/utils'
 
@@ -14,8 +14,17 @@ interface SearchResult {
   group: string
 }
 
-export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
+export function Topbar({
+  onMenuClick,
+  onToggleCollapse,
+  mini,
+}: {
+  onMenuClick: () => void
+  onToggleCollapse: () => void
+  mini: boolean
+}) {
   const { db } = useData()
+  const { theme, toggle: toggleTheme } = useTheme()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [searchOpen, setSearchOpen] = useState(false)
@@ -126,14 +135,24 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   }
 
   return (
-    <header className="no-print sticky top-0 z-20 flex h-[68px] items-center gap-3 border-b border-silver-200 bg-white/85 px-4 backdrop-blur-xl lg:px-9">
+    <header className="no-print sticky top-0 z-20 flex h-[68px] items-center gap-3 border-b border-silver-200 bg-surface/85 px-4 backdrop-blur-xl lg:px-9">
       <button
         type="button"
         onClick={onMenuClick}
-        className="hit pressable grid h-10 w-10 shrink-0 place-items-center rounded-full border border-silver-200 bg-white text-navy-700 shadow-flat transition-colors hover:bg-silver-50 lg:hidden"
+        className="hit pressable grid h-10 w-10 shrink-0 place-items-center rounded-full border border-silver-200 bg-surface text-navy-700 shadow-flat transition-colors hover:bg-silver-50 lg:hidden"
         aria-label="Open navigation"
       >
         <Menu className="h-5 w-5" />
+      </button>
+
+      <button
+        type="button"
+        onClick={onToggleCollapse}
+        className="hit pressable hidden h-10 w-10 shrink-0 place-items-center rounded-full border border-silver-200 bg-surface text-navy-700 shadow-flat transition-colors hover:bg-silver-50 lg:grid"
+        aria-label={mini ? 'Expand sidebar' : 'Collapse sidebar'}
+        title={mini ? 'Expand sidebar' : 'Collapse sidebar'}
+      >
+        {mini ? <PanelLeftOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
       </button>
 
       <div ref={searchRef} className="relative w-full max-w-md">
@@ -156,9 +175,9 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           onFocus={() => setSearchOpen(true)}
           onKeyDown={onSearchKeyDown}
           placeholder="Search customers, quotations, invoices…"
-          className="h-11 w-full rounded-[14px] border border-silver-200 bg-silver-50 pr-16 pl-10 text-[16px] text-navy-900 transition-[border-color,box-shadow,background-color] duration-150 placeholder:text-silver-600 hover:border-silver-300 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 focus:outline-none sm:text-sm"
+          className="h-11 w-full rounded-[14px] border border-silver-200 bg-silver-50 pr-16 pl-10 text-[16px] text-navy-900 transition-[border-color,box-shadow,background-color] duration-150 placeholder:text-silver-600 hover:border-silver-300 focus:border-blue-500 focus:bg-surface focus:ring-2 focus:ring-blue-100 focus:outline-none sm:text-sm"
         />
-        <kbd className="pointer-events-none absolute top-1/2 right-2.5 hidden -translate-y-1/2 items-center gap-0.5 rounded-md border border-silver-200 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-silver-600 sm:flex">
+        <kbd className="pointer-events-none absolute top-1/2 right-2.5 hidden -translate-y-1/2 items-center gap-0.5 rounded-md border border-silver-200 bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-silver-600 sm:flex">
           <Command className="h-2.5 w-2.5" />K
         </kbd>
 
@@ -166,12 +185,12 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           <div
             id="topbar-search-results"
             role="listbox"
-            className="animate-pop-in absolute inset-x-0 top-12 z-30 origin-top overflow-hidden rounded-xl bg-white shadow-panel"
+            className="animate-pop-in absolute inset-x-0 top-12 z-30 origin-top overflow-hidden rounded-xl bg-surface shadow-panel"
           >
             {results.length === 0 ? (
               <p className="px-4 py-6 text-center text-sm text-silver-600">No matching records found.</p>
             ) : (
-              <ul className="max-h-80 divide-y divide-silver-100 overflow-y-auto">
+              <ul className="max-h-80 divide-y divide-silver-200 overflow-y-auto">
                 {results.map((result, i) => (
                   <li key={`${result.group}-${result.id}`} role="option" aria-selected={i === activeIndex}>
                     <button
@@ -205,6 +224,16 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           Demo mode · data saved locally
         </span>
 
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="hit pressable grid h-10 w-10 place-items-center rounded-full border border-silver-200 bg-surface text-navy-700 shadow-flat transition-colors hover:bg-silver-50"
+          aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+        </button>
+
         <div ref={bellRef} className="relative">
           <button
             type="button"
@@ -212,19 +241,19 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
             aria-expanded={bellOpen}
             aria-label={`Pending tasks: ${tasks.length}`}
             className={cn(
-              'hit pressable relative grid h-10 w-10 place-items-center rounded-full border border-silver-200 bg-white text-navy-700 shadow-flat transition-colors hover:bg-silver-50',
+              'hit pressable relative grid h-10 w-10 place-items-center rounded-full border border-silver-200 bg-surface text-navy-700 shadow-flat transition-colors hover:bg-silver-50',
               urgentCount > 0 && !bellOpen && 'animate-pulse-ring',
             )}
           >
             <Bell className="h-5 w-5" />
             {tasks.length > 0 ? (
-              <span className="tnum absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-linear-to-b from-rose-500 to-rose-600 px-1 text-[10px] font-bold text-white ring-2 ring-white">
+              <span className="tnum absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-linear-to-b from-rose-500 to-rose-600 px-1 text-[10px] font-bold text-white ring-2 ring-surface">
                 {tasks.length > 9 ? '9+' : tasks.length}
               </span>
             ) : null}
           </button>
           {bellOpen ? (
-            <div className="animate-pop-in absolute right-0 top-12 z-30 w-[min(360px,calc(100vw-2rem))] origin-top-right overflow-hidden rounded-xl bg-white shadow-panel">
+            <div className="animate-pop-in absolute right-0 top-12 z-30 w-[min(360px,calc(100vw-2rem))] origin-top-right overflow-hidden rounded-xl bg-surface shadow-panel">
               <div className="flex items-center justify-between border-b border-silver-100 bg-silver-50/70 px-4 py-3">
                 <p className="text-[13px] font-bold text-navy-900">Pending tasks</p>
                 <span className="text-xs text-silver-600">{formatDate(todayISO())}</span>
@@ -232,7 +261,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
               {tasks.length === 0 ? (
                 <p className="px-4 py-6 text-center text-sm text-silver-600">Nothing pending. All caught up.</p>
               ) : (
-                <ul className="max-h-80 divide-y divide-silver-100 overflow-y-auto">
+                <ul className="max-h-80 divide-y divide-silver-200 overflow-y-auto">
                   {tasks.slice(0, 6).map((task) => (
                     <li key={task.id}>
                       <Link
@@ -273,7 +302,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           ) : null}
         </div>
 
-        <div className="flex items-center gap-2.5 rounded-full border border-silver-200 bg-white py-1 pr-3.5 pl-1 shadow-flat">
+        <div className="flex items-center gap-2.5 rounded-full border border-silver-200 bg-surface py-1 pr-3.5 pl-1 shadow-flat">
           <span className="grid h-8 w-8 place-items-center rounded-full bg-linear-to-br from-blue-500 to-blue-700 text-[10.5px] font-bold text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)]">
             PS
           </span>

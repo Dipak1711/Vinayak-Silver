@@ -23,3 +23,27 @@ export function useDebounced<T>(value: T, delay = 200): T {
   }, [value, delay])
   return debounced
 }
+
+export type Theme = 'light' | 'dark'
+
+/* The theme lives on <html data-theme> so it can be applied before first
+   paint by the inline script in index.html; this hook just keeps React and
+   localStorage in step with it. */
+export function useTheme() {
+  const [theme, setTheme] = useState<Theme>(() => {
+    const current = document.documentElement.getAttribute('data-theme')
+    return current === 'dark' ? 'dark' : 'light'
+  })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    try {
+      localStorage.setItem('vinayak.theme', theme)
+    } catch {
+      /* private mode — the preference just isn't remembered */
+    }
+  }, [theme])
+
+  const toggle = () => setTheme((current) => (current === 'dark' ? 'light' : 'dark'))
+  return { theme, setTheme, toggle }
+}

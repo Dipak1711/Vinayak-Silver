@@ -503,7 +503,7 @@ export function QuotationsPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="divide-y divide-silver-100">
+              <div className="divide-y divide-silver-200">
                 <DataRow label="Customer" value={customerName(db, detail.customerId)} />
                 <DataRow label="Quotation date" value={formatDate(detail.date)} />
                 <DataRow label="Valid until" value={formatDate(detail.validUntil)} />

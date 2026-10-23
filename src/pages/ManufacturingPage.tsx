@@ -327,7 +327,7 @@ export function ManufacturingPage() {
                       ? 'bg-emerald-100 text-emerald-700'
                       : index === activeIndex
                         ? 'bg-blue-600 text-white shadow-sm'
-                        : 'bg-white text-silver-600 hover:text-navy-800',
+                        : 'bg-surface text-silver-600 hover:text-navy-800',
                   )}
                 >
                   {stage}
@@ -480,13 +480,13 @@ export function ManufacturingPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="divide-y divide-silver-100">
+              <div className="divide-y divide-silver-200">
                 <DataRow label="Customer" value={detail.customerId ? customerName(db, detail.customerId) : '—'} />
                 <DataRow label="Order reference" value={detail.orderRef} />
                 <DataRow label="Quantity" value={formatNumber(detail.quantity)} />
                 <DataRow label="Assigned to" value={detail.assignedTo || '—'} />
               </div>
-              <div className="divide-y divide-silver-100">
+              <div className="divide-y divide-silver-200">
                 <DataRow label="Planned start" value={formatDate(detail.plannedStart)} />
                 <DataRow label="Planned end" value={formatDate(detail.plannedEnd)} />
                 <DataRow label="Completed on" value={detail.completedAt ? formatDate(detail.completedAt) : '—'} />

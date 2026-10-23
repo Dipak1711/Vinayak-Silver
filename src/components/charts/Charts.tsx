@@ -50,7 +50,7 @@ function ChartTooltip({
 }) {
   if (!active || !payload || payload.length === 0) return null
   return (
-    <div className="animate-pop-in rounded-xl border border-silver-200 bg-white/95 px-3 py-2 shadow-panel backdrop-blur">
+    <div className="animate-pop-in rounded-xl border border-silver-200 bg-surface/95 px-3 py-2 shadow-panel backdrop-blur">
       {label !== undefined && label !== '' ? (
         <p className="mb-1.5 text-[11px] font-bold tracking-[0.06em] text-silver-600 uppercase">{label}</p>
       ) : null}

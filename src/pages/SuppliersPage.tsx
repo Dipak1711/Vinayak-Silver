@@ -304,7 +304,7 @@ export function SuppliersPage() {
         <Toolbar className="justify-between">
           <div className="flex flex-1 flex-wrap items-center gap-2">
             <SearchInput value={search} onChange={setSearch} placeholder="Search supplier, contact or material…" className="w-full sm:w-72" />
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-silver-300 bg-white px-3 py-2 text-xs font-semibold text-navy-800">
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-silver-300 bg-surface px-3 py-2 text-xs font-semibold text-navy-800">
               <input type="checkbox" className="h-4 w-4 rounded border-silver-300 text-blue-600" checked={payableOnly} onChange={(event) => setPayableOnly(event.target.checked)} />
               With outstanding only
             </label>
@@ -454,7 +454,7 @@ export function SuppliersPage() {
                 }}
                 className={cn(
                   'flex-1 rounded-lg px-3 py-1.5 text-xs font-semibold transition',
-                  txMode === mode ? 'bg-white text-navy-900 shadow-sm' : 'text-silver-600 hover:text-navy-800',
+                  txMode === mode ? 'bg-surface text-navy-900 shadow-sm' : 'text-silver-600 hover:text-navy-800',
                 )}
               >
                 {mode === 'Purchase' ? 'Purchase / inward' : 'Payment'}
@@ -573,7 +573,7 @@ function SupplierDetail({ supplier }: { supplier: Supplier }) {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="divide-y divide-silver-100">
+        <div className="divide-y divide-silver-200">
           <DataRow label="Contact person" value={supplier.contactPerson} />
           <DataRow
             label="Email"

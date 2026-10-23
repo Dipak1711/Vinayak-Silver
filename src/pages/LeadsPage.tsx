@@ -331,7 +331,7 @@ export function LeadsPage() {
                 setDragOver(null)
               }}
               className={cn(
-                'flex w-[286px] shrink-0 flex-col overflow-hidden rounded-2xl bg-white/70 shadow-flat transition-[background-color,box-shadow] duration-150',
+                'flex w-[286px] shrink-0 flex-col overflow-hidden rounded-2xl bg-surface/70 shadow-flat transition-[background-color,box-shadow] duration-150',
                 dragOver === stage && 'bg-blue-50/80 ring-2 ring-blue-400 ring-inset',
               )}
             >
@@ -358,7 +358,7 @@ export function LeadsPage() {
                     }}
                     onClick={() => setDetailId(lead.id)}
                     className={cn(
-                      'group cursor-grab rounded-xl bg-white p-3 shadow-card transition-[transform,box-shadow,opacity] duration-150 hover:shadow-lift active:cursor-grabbing',
+                      'group cursor-grab rounded-xl bg-surface p-3 shadow-card transition-[transform,box-shadow,opacity] duration-150 hover:shadow-lift active:cursor-grabbing',
                       dragging === lead.id && 'scale-[0.97] rotate-1 opacity-45 shadow-lift',
                     )}
                   >
@@ -515,7 +515,7 @@ export function LeadsPage() {
               </div>
             </div>
 
-            <div className="divide-y divide-silver-100">
+            <div className="divide-y divide-silver-200">
               <DataRow label="Contact person" value={detail.name} />
               <DataRow label="Stage" value={<Badge tone="info" dot>{detail.stage}</Badge>} />
               <DataRow label="Assigned to" value={detail.assignedTo} />

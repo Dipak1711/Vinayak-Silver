@@ -97,7 +97,7 @@ export function DashboardPage() {
         description={`Live position across sales, production and fulfilment · FY ${db.settings.financialYear}`}
         actions={
           <>
-            <div className="mr-1 hidden items-center gap-2 rounded-xl border border-silver-200 bg-white px-3 py-1.5 shadow-flat lg:flex">
+            <div className="mr-1 hidden items-center gap-2 rounded-xl border border-silver-200 bg-surface px-3 py-1.5 shadow-flat lg:flex">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
@@ -134,9 +134,9 @@ export function DashboardPage() {
                 Revenue and fulfilment at a glance
               </h2>
             </div>
-            <div className="flex items-center gap-2 rounded-xl border border-white/12 bg-white/8 px-3 py-2 backdrop-blur">
+            <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2 backdrop-blur">
               <IndianRupee className="h-4 w-4 text-gold-300" aria-hidden="true" />
-              <span className="text-xs font-semibold text-silver-100">
+              <span className="text-xs font-semibold text-white/90">
                 {metrics.totalInvoices} invoices · {metrics.pendingOrders} orders open
               </span>
             </div>
@@ -144,7 +144,7 @@ export function DashboardPage() {
 
           <div className="relative mt-5">
             <div className="flex items-center justify-between gap-3">
-              <span className="text-[11px] font-bold tracking-[0.08em] text-silver-300 uppercase">Collection rate</span>
+              <span className="text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">Collection rate</span>
               <span className="tnum text-[11px] font-bold text-emerald-300">{collectedRate}% realised</span>
             </div>
             <ProgressBar value={collectedRate} tone="emerald" track="bg-white/25" className="mt-2" />
@@ -152,7 +152,7 @@ export function DashboardPage() {
 
           <div className="relative mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-3">
             <div className="min-w-0">
-              <p className="text-[11px] font-bold tracking-[0.08em] text-silver-300 uppercase">Invoiced value</p>
+              <p className="text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">Invoiced value</p>
               <div className="mt-1.5 flex flex-wrap items-baseline gap-2">
                 <span className="tnum text-[30px] leading-none font-bold tracking-[-0.03em] text-white">
                   <AnimatedNumber value={metrics.invoiceValue} format={(value) => formatCurrency(value, true)} />
@@ -160,18 +160,18 @@ export function DashboardPage() {
                 <span
                   className={cn(
                     'tnum rounded-full px-1.5 py-0.5 text-[10.5px] font-bold',
-                    invoicedTrend >= 0 ? 'bg-emerald-400/20 text-emerald-200' : 'bg-rose-400/20 text-rose-200',
+                    invoicedTrend >= 0 ? 'bg-emerald-400/20 text-emerald-300' : 'bg-rose-400/20 text-rose-300',
                   )}
                 >
                   {invoicedTrend >= 0 ? '+' : ''}
                   {invoicedTrend.toFixed(1)}%
                 </span>
               </div>
-              <p className="mt-1.5 text-[11px] text-silver-500">vs previous month</p>
+              <p className="mt-1.5 text-[11px] text-white/55">vs previous month</p>
             </div>
 
             <div className="min-w-0">
-              <p className="text-[11px] font-bold tracking-[0.08em] text-silver-300 uppercase">Collected</p>
+              <p className="text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">Collected</p>
               <div className="mt-1.5 flex flex-wrap items-baseline gap-2">
                 <span className="tnum text-[30px] leading-none font-bold tracking-[-0.03em] text-emerald-300">
                   <AnimatedNumber value={metrics.amountCollected} format={(value) => formatCurrency(value, true)} />
@@ -179,18 +179,18 @@ export function DashboardPage() {
                 <span
                   className={cn(
                     'tnum rounded-full px-1.5 py-0.5 text-[10.5px] font-bold',
-                    collectedTrend >= 0 ? 'bg-emerald-400/20 text-emerald-200' : 'bg-rose-400/20 text-rose-200',
+                    collectedTrend >= 0 ? 'bg-emerald-400/20 text-emerald-300' : 'bg-rose-400/20 text-rose-300',
                   )}
                 >
                   {collectedTrend >= 0 ? '+' : ''}
                   {collectedTrend.toFixed(1)}%
                 </span>
               </div>
-              <p className="mt-1.5 text-[11px] text-silver-500">cash actually received</p>
+              <p className="mt-1.5 text-[11px] text-white/55">cash actually received</p>
             </div>
 
             <div className="min-w-0">
-              <p className="text-[11px] font-bold tracking-[0.08em] text-silver-300 uppercase">Outstanding</p>
+              <p className="text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">Outstanding</p>
               <div className="mt-1.5 flex flex-wrap items-baseline gap-2">
                 <span className="tnum text-[30px] leading-none font-bold tracking-[-0.03em] text-gold-300">
                   <AnimatedNumber value={metrics.outstanding} format={(value) => formatCurrency(value, true)} />
@@ -198,13 +198,13 @@ export function DashboardPage() {
                 <span
                   className={cn(
                     'tnum rounded-full px-1.5 py-0.5 text-[10.5px] font-bold',
-                    overdueInvoices > 0 ? 'bg-rose-400/20 text-rose-200' : 'bg-emerald-400/20 text-emerald-200',
+                    overdueInvoices > 0 ? 'bg-rose-400/20 text-rose-300' : 'bg-emerald-400/20 text-emerald-300',
                   )}
                 >
                   {overdueInvoices > 0 ? `${overdueInvoices} overdue` : 'current'}
                 </span>
               </div>
-              <p className="mt-1.5 text-[11px] text-silver-500">balance still receivable</p>
+              <p className="mt-1.5 text-[11px] text-white/55">balance still receivable</p>
             </div>
           </div>
         </div>
@@ -287,7 +287,7 @@ export function DashboardPage() {
 
       {/* ---------------- Workflow strip ---------------- */}
       <Card padded={false} className="overflow-hidden">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-silver-200 bg-linear-to-r from-silver-50 to-white px-5 py-3.5">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-silver-200 bg-linear-to-r from-silver-50 to-surface px-5 py-3.5">
           <h3 className="text-[13px] font-bold tracking-[-0.01em] text-navy-900">Order workflow</h3>
           <span className="hidden text-xs text-silver-500 sm:inline">·</span>
           <p className="text-xs text-silver-600">
@@ -302,11 +302,11 @@ export function DashboardPage() {
                 key={step.label}
                 type="button"
                 onClick={() => navigate(step.to)}
-                className="lift group flex items-center gap-2.5 rounded-xl border border-silver-200 bg-white px-3 py-2.5 text-left shadow-flat transition-colors hover:border-blue-300"
+                className="lift group flex items-center gap-2.5 rounded-xl border border-silver-200 bg-surface px-3 py-2.5 text-left shadow-flat transition-colors hover:border-blue-300"
               >
                 <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-silver-100 to-silver-200 text-navy-700 ring-1 ring-silver-200 ring-inset transition-colors group-hover:from-blue-50 group-hover:to-blue-100 group-hover:text-blue-700 group-hover:ring-blue-200">
                   <Icon className="h-4 w-4" />
-                  <span className="tnum absolute -top-2 -left-2 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-navy-900 text-[10px] font-bold text-white ring-2 ring-white">
+                  <span className="tnum absolute -top-2 -left-2 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-ink text-[10px] font-bold text-white ring-2 ring-surface">
                     {index + 1}
                   </span>
                 </span>
@@ -385,7 +385,7 @@ export function DashboardPage() {
                 description="All follow-ups, stock levels and shipments are on track."
               />
             ) : (
-              <ul className="divide-y divide-silver-100">
+              <ul className="divide-y divide-silver-200">
                 {tasks.slice(0, 8).map((task) => (
                   <li key={task.id} className="flex items-start gap-3 py-2.5">
                     <span
@@ -429,7 +429,7 @@ export function DashboardPage() {
                 description="No material has dropped below its minimum level."
               />
             ) : (
-              <ul className="divide-y divide-silver-100">
+              <ul className="divide-y divide-silver-200">
                 {lowStock.map((material) => {
                   const fill = material.minStock > 0 ? Math.min((material.quantity / material.minStock) * 100, 100) : 0
                   return (
@@ -464,7 +464,7 @@ export function DashboardPage() {
               <li key={activity.id} className="relative flex gap-3">
                 <span
                   className={cn(
-                    'relative z-10 mt-1 h-2.5 w-2.5 shrink-0 rounded-full ring-4 ring-white',
+                    'relative z-10 mt-1 h-2.5 w-2.5 shrink-0 rounded-full ring-4 ring-surface',
                     index === 0 ? 'bg-blue-600' : 'bg-silver-300',
                   )}
                   aria-hidden="true"
@@ -527,7 +527,7 @@ export function DashboardPage() {
             ].map((item) => (
               <div
                 key={item.label}
-                className="rounded-xl border border-silver-200 bg-linear-to-b from-silver-50 to-white px-3 py-2 shadow-flat"
+                className="rounded-xl border border-silver-200 bg-linear-to-b from-silver-50 to-surface px-3 py-2 shadow-flat"
               >
                 <p className="text-[10px] font-bold tracking-[0.06em] text-silver-600 uppercase">{item.label}</p>
                 <p className="tnum text-lg leading-tight font-bold text-navy-900">{item.value}</p>
@@ -543,7 +543,7 @@ export function DashboardPage() {
       </div>
 
       {metrics.lowStockCount > 0 ? (
-        <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-linear-to-r from-amber-50 to-white px-4 py-3 text-xs text-amber-900 shadow-flat">
+        <div className="flex items-start gap-2.5 rounded-xl border border-amber-200 bg-linear-to-r from-amber-50 to-surface px-4 py-3 text-xs text-amber-900 shadow-flat">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" aria-hidden="true" />
           <p>
             <span className="font-semibold">Stock attention needed.</span> {metrics.lowStockCount} material(s) are at or

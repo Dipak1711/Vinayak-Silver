@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 
 export function TableShell({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn('overflow-hidden rounded-2xl bg-white shadow-card', className)}>
+    <div className={cn('overflow-hidden rounded-2xl bg-surface shadow-card', className)}>
       <div className="overflow-x-auto">{children}</div>
     </div>
   )
@@ -23,7 +23,7 @@ export function THead({ children }: { children: ReactNode }) {
 }
 
 export function TBody({ children }: { children: ReactNode }) {
-  return <tbody className="divide-y divide-silver-100">{children}</tbody>
+  return <tbody className="divide-y divide-silver-200">{children}</tbody>
 }
 
 export function TR({
