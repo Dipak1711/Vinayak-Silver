@@ -23,8 +23,7 @@ import { Modal, ConfirmDialog } from '@/components/ui/Modal'
 import { StatCard } from '@/components/ui/StatCard'
 import { TBody, THead, Td, Th, TR, Table, TableEmptyRow, TableShell } from '@/components/ui/Table'
 import { LineItemEditor, newLineItem } from '@/components/LineItemEditor'
-import { PrintPortal } from '@/components/print/PrintPortal'
-import { QuotationDocument } from '@/components/print/Documents'
+import { openQuotationDocument } from '@/lib/printDocument'
 import { useData } from '@/store/DataContext'
 import { useToast } from '@/store/ToastContext'
 import { buildLineItem, computeTotals, customerName, type LineItemInput } from '@/lib/calc'
@@ -45,7 +44,6 @@ export function QuotationsPage() {
   const [editing, setEditing] = useState<Quotation | null>(null)
   const [detailId, setDetailId] = useState<string | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
-  const [printId, setPrintId] = useState<string | null>(null)
 
   const [customerId, setCustomerId] = useState('')
   const [date, setDate] = useState(() => todayISO())
@@ -73,7 +71,13 @@ export function QuotationsPage() {
   }, [db, search, statusFilter, customerFilter])
 
   const detail = db.quotations.find((quotation) => quotation.id === detailId) ?? null
-  const printQuotation = db.quotations.find((quotation) => quotation.id === printId) ?? null
+
+  const openDocument = (quotation: Quotation) =>
+    openQuotationDocument(
+      quotation,
+      db.customers.find((customer) => customer.id === quotation.customerId),
+      db.settings,
+    )
 
   const totals = useMemo(() => computeTotals(items.map(buildLineItem)), [items])
 
@@ -366,7 +370,7 @@ export function QuotationsPage() {
                   </Td>
                   <Td align="right">
                     <div className="flex items-center justify-end gap-1.5" onClick={(event) => event.stopPropagation()}>
-                      <Button size="icon" variant="ghost" title="Print" onClick={() => setPrintId(quotation.id)}>
+                      <Button size="icon" variant="ghost" title="Open / print" onClick={() => openDocument(quotation)}>
                         <Printer className="h-4 w-4" />
                       </Button>
                       <Button size="icon" variant="ghost" title="Edit" onClick={() => openEdit(quotation)}>
@@ -477,7 +481,7 @@ export function QuotationsPage() {
                 Delete
               </Button>
               <div className="ml-auto flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" icon={<Printer className="h-4 w-4" />} onClick={() => setPrintId(detail.id)}>
+                <Button variant="outline" size="sm" icon={<Printer className="h-4 w-4" />} onClick={() => openDocument(detail)}>
                   Print
                 </Button>
                 <Button variant="outline" size="sm" icon={<Pencil className="h-4 w-4" />} onClick={() => { setDetailId(null); openEdit(detail) }}>
@@ -636,16 +640,6 @@ export function QuotationsPage() {
         onCancel={() => setDeleteId(null)}
         onConfirm={confirmDelete}
       />
-
-      <PrintPortal open={Boolean(printQuotation)} onDone={() => setPrintId(null)}>
-        {printQuotation ? (
-          <QuotationDocument
-            quotation={printQuotation}
-            customer={db.customers.find((customer) => customer.id === printQuotation.customerId)}
-            settings={db.settings}
-          />
-        ) : null}
-      </PrintPortal>
 
       {db.quotations.length === 0 ? (
         <EmptyState

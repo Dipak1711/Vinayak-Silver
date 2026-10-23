@@ -565,19 +565,12 @@ input[type='number'] {
 /* Print                                                              */
 /* ------------------------------------------------------------------ */
 
-.print-only {
-  display: none;
-}
-
 @media print {
   body {
     background: #fff;
   }
   .no-print {
     display: none !important;
-  }
-  .print-only {
-    display: block !important;
   }
   @page {
     margin: 14mm;

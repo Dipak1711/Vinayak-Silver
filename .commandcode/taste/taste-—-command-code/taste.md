@@ -19,4 +19,5 @@
 - When a real external integration cannot be included in a demo (e.g. courier API / live tracking), wants it represented by a clearly labelled mock/simulated integration plus realistic sample data, never a real connection. Confidence: 0.65
 - Treats any separate reference project as off-limits: read/reference only, never modified. Confidence: 0.7
 - After UI changes, wants a clear walkthrough of where in the app to see each change (which page/route, which screen element), rather than just what was changed in code. Confidence: 0.7
+- Expects client-facing documents (printed/PDF invoices, quotations and similar) to come out fully populated with every field a real client needs — company/party details, document numbers, dates, line items, totals and terms — never blank pages or empty/placeholder sections. Confidence: 0.6
 - Does not want the app labelled as a demo/prototype/sample: remove any "demo project", "demo mode", "fictional", "sample data" badges, banners, footers, card labels, hints, toasts and comments from the UI and code, so the product reads as a real, finished application. Confidence: 0.7

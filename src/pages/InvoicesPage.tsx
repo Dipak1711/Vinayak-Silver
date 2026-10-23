@@ -22,8 +22,7 @@ import { Modal, ConfirmDialog } from '@/components/ui/Modal'
 import { StatCard } from '@/components/ui/StatCard'
 import { TBody, THead, Td, Th, TR, Table, TableEmptyRow, TableShell } from '@/components/ui/Table'
 import { LineItemEditor, newLineItem } from '@/components/LineItemEditor'
-import { PrintPortal } from '@/components/print/PrintPortal'
-import { InvoiceDocument } from '@/components/print/Documents'
+import { openInvoiceDocument } from '@/lib/printDocument'
 import { useData } from '@/store/DataContext'
 import { useToast } from '@/store/ToastContext'
 import {
@@ -58,7 +57,6 @@ export function InvoicesPage() {
   const [customerFilter, setCustomerFilter] = useState('all')
   const [detailId, setDetailId] = useState<string | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
-  const [printId, setPrintId] = useState<string | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [createMode, setCreateMode] = useState<CreateMode>('quotation')
 
@@ -113,7 +111,16 @@ export function InvoicesPage() {
   }, [db, search, statusFilter, customerFilter])
 
   const detail = db.invoices.find((invoice) => invoice.id === detailId) ?? null
-  const printInvoice = db.invoices.find((invoice) => invoice.id === printId) ?? null
+
+  const openDocument = (invoice: Invoice) =>
+    openInvoiceDocument(
+      invoice,
+      db.customers.find((customer) => customer.id === invoice.customerId),
+      db.settings,
+      invoice.quotationId
+        ? db.quotations.find((quotation) => quotation.id === invoice.quotationId)?.number
+        : undefined,
+    )
   const paymentInvoice = db.invoices.find((invoice) => invoice.id === paymentInvoiceId) ?? null
 
   const eligibleQuotations = useMemo(
@@ -480,7 +487,7 @@ export function InvoicesPage() {
                         <Button size="icon" variant="ghost" title="Record payment" onClick={() => openPayment(invoice)} disabled={balance <= 0}>
                           <Wallet className="h-4 w-4" />
                         </Button>
-                        <Button size="icon" variant="ghost" title="Print" onClick={() => setPrintId(invoice.id)}>
+                        <Button size="icon" variant="ghost" title="Open / print" onClick={() => openDocument(invoice)}>
                           <Printer className="h-4 w-4" />
                         </Button>
                       </div>
@@ -595,7 +602,7 @@ export function InvoicesPage() {
                 Delete
               </Button>
               <div className="ml-auto flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" icon={<Printer className="h-4 w-4" />} onClick={() => setPrintId(detail.id)}>
+                <Button variant="outline" size="sm" icon={<Printer className="h-4 w-4" />} onClick={() => openDocument(detail)}>
                   Print
                 </Button>
                 {!detail.orderConfirmed ? (
@@ -863,16 +870,6 @@ export function InvoicesPage() {
         onCancel={() => setDeleteId(null)}
         onConfirm={confirmDelete}
       />
-
-      <PrintPortal open={Boolean(printInvoice)} onDone={() => setPrintId(null)}>
-        {printInvoice ? (
-          <InvoiceDocument
-            invoice={printInvoice}
-            customer={db.customers.find((customer) => customer.id === printInvoice.customerId)}
-            settings={db.settings}
-          />
-        ) : null}
-      </PrintPortal>
 
       {db.invoices.length === 0 ? (
         <EmptyState icon={<Receipt className="h-5 w-5" />} title="No invoices yet" description="Convert an approved quotation or raise a direct order invoice." />
