@@ -515,6 +515,39 @@
   }
 }
 
+@keyframes orb-drift {
+  from {
+    transform: translate(0, 0) scale(1);
+  }
+  to {
+    transform: translate(-14px, 12px) scale(1.25);
+  }
+}
+
+@keyframes hero-shift {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 100% 100%;
+  }
+}
+
+@keyframes hero-sweep {
+  0% {
+    transform: translateX(0) skewX(-12deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  55%,
+  100% {
+    transform: translateX(560%) skewX(-12deg);
+    opacity: 0;
+  }
+}
+
 @keyframes badge-ping {
   0% {
     transform: scale(1);
@@ -580,9 +613,10 @@ body {
 .app-canvas {
   background-color: var(--color-silver-100);
   background-image:
-    radial-gradient(1000px 560px at 0% -10%, rgba(237, 115, 51, 0.14), transparent 68%),
-    radial-gradient(800px 520px at 100% -8%, rgba(237, 115, 51, 0.10), transparent 66%),
-    radial-gradient(900px 500px at 50% 115%, rgba(245, 158, 11, 0.07), transparent 70%);
+    radial-gradient(900px 520px at 0% -8%, rgba(237, 115, 51, 0.20), transparent 66%),
+    radial-gradient(760px 480px at 100% -6%, rgba(245, 158, 11, 0.16), transparent 64%),
+    radial-gradient(700px 520px at 8% 105%, rgba(20, 184, 166, 0.12), transparent 68%),
+    radial-gradient(760px 520px at 96% 100%, rgba(139, 92, 246, 0.11), transparent 68%);
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
@@ -800,6 +834,18 @@ input[type='number'] {
   }
   .field-error {
     animation: fade-up 220ms var(--ease-out-expo) both;
+  }
+  /* Coloured light drifting slowly behind glass cards. */
+  .orb-drift {
+    animation: orb-drift 9s ease-in-out infinite alternate;
+  }
+  /* The hero gradient breathes, and a band of light crosses it now and then. */
+  .hero-animated {
+    background-size: 160% 160%;
+    animation: hero-shift 14s ease-in-out infinite alternate;
+  }
+  .hero-sweep {
+    animation: hero-sweep 7s var(--ease-out-quart) 1.5s infinite;
   }
   .badge-ping {
     animation: badge-ping 1800ms var(--ease-out-quart) infinite;

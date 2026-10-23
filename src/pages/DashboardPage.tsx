@@ -205,6 +205,8 @@ export function DashboardPage() {
               faint rupee mark, so the band reads as a surface, not a flat fill. */}
           <div className="pointer-events-none absolute -top-24 -right-16 h-72 w-72 rounded-full bg-white/30 blur-3xl" aria-hidden="true" />
           <div className="pointer-events-none absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-rose-500/30 blur-3xl" aria-hidden="true" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(520px_240px_at_100%_100%,rgba(122,46,14,0.45),transparent_70%)]" aria-hidden="true" />
+          <span className="hero-sweep pointer-events-none absolute inset-y-0 -left-1/3 w-1/4 -skew-x-12 bg-linear-to-r from-transparent via-white/25 to-transparent blur-md" aria-hidden="true" />
           <IndianRupee className="pointer-events-none absolute -right-6 -bottom-10 h-56 w-56 -rotate-12 text-white/[0.045]" aria-hidden="true" />
 
           <div className="relative grid items-center gap-6 lg:grid-cols-[auto_1fr] lg:gap-8">

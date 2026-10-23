@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { MouseEvent, ReactNode } from 'react'
 import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { Sparkline, type SparkTone } from '@/components/ui/Sparkline'
@@ -71,15 +71,36 @@ export function StatCard({
 
   const hasFooter = Boolean(trend || hint || (spark && spark.length > 1) || footer)
 
+  // Cursor position drives the hover spotlight through CSS variables, so
+  // moving the mouse never re-renders the card.
+  const track = (event: MouseEvent<HTMLElement>) => {
+    const box = event.currentTarget.getBoundingClientRect()
+    event.currentTarget.style.setProperty('--mx', `${event.clientX - box.left}px`)
+    event.currentTarget.style.setProperty('--my', `${event.clientY - box.top}px`)
+  }
+
   const body = (
     <>
+      {/* Tone-coloured light drifting behind the glass. */}
+      <span
+        className="orb-drift pointer-events-none absolute -top-10 -right-8 h-28 w-28 rounded-full opacity-45 blur-2xl"
+        style={{ background: spec.glow }}
+        aria-hidden="true"
+      />
       <span
         className="pointer-events-none absolute inset-0"
         style={{
-          backgroundImage: `linear-gradient(180deg, ${spec.glow}26 0%, ${spec.glow}0f 50%, transparent 100%)`,
+          backgroundImage: `linear-gradient(160deg, ${spec.glow}22 0%, ${spec.glow}0a 55%, transparent 100%)`,
         }}
         aria-hidden="true"
       />
+      {/* Soft spotlight that follows the pointer. */}
+      <span
+        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{ backgroundImage: `radial-gradient(180px circle at var(--mx, 50%) var(--my, 50%), ${spec.glow}30, transparent 70%)` }}
+        aria-hidden="true"
+      />
+      <span className="pointer-events-none absolute inset-x-4 top-0 h-px bg-linear-to-r from-transparent via-white/90 to-transparent" aria-hidden="true" />
       <div className="relative flex items-center gap-3.5">
         {icon ? (
           <span className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', spec.tile)}>
@@ -125,7 +146,7 @@ export function StatCard({
   )
 
   const shell = cn(
-    'relative flex h-full w-full flex-col overflow-hidden rounded-2xl bg-surface p-4 text-left shadow-card',
+    'group relative flex h-full w-full flex-col overflow-hidden rounded-2xl bg-surface/60 p-4 text-left shadow-card ring-1 ring-white/70 backdrop-blur-xl dark:ring-white/10',
     'lift',
     onClick && 'pressable cursor-pointer',
     className,
@@ -133,11 +154,15 @@ export function StatCard({
 
   if (onClick) {
     return (
-      <button type="button" onClick={onClick} className={shell}>
+      <button type="button" onClick={onClick} onMouseMove={track} className={shell}>
         {body}
       </button>
     )
   }
 
-  return <div className={shell}>{body}</div>
+  return (
+    <div onMouseMove={track} className={shell}>
+      {body}
+    </div>
+  )
 }

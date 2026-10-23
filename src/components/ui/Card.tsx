@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils'
 export type CardVariant = 'default' | 'raised' | 'flat' | 'dark' | 'sunset' | 'interactive'
 
 const VARIANTS: Record<CardVariant, string> = {
-  default: 'bg-surface shadow-card',
+  default: 'bg-surface/75 shadow-card ring-1 ring-white/60 backdrop-blur-xl dark:ring-white/10',
   raised: 'bg-surface shadow-lift',
   flat: 'bg-silver-50/80 shadow-flat',
   // Explicit base colour as well as the gradient, so the surface is dark
@@ -18,7 +18,7 @@ const VARIANTS: Record<CardVariant, string> = {
   // is layered as its own element below.
   dark: 'bg-[#5a2710] bg-linear-to-br from-[#5a2710] via-[#c4531c] to-[#d6581e] text-white shadow-panel',
   // Warm amber-to-orange hero surface.
-  sunset: 'bg-[#ed7333] bg-linear-to-br from-[#f58a4e] via-[#ed7333] to-[#d9622a] text-white shadow-[0_24px_48px_-20px_rgba(237,115,51,0.6)]',
+  sunset: 'bg-[#ed7333] bg-linear-to-br from-[#f58a4e] via-[#ed7333] to-[#c24a16] hero-animated text-white shadow-[0_24px_48px_-20px_rgba(237,115,51,0.6)]',
   interactive: 'bg-surface shadow-card lift pressable cursor-pointer hover:shadow-lift',
 }
 
