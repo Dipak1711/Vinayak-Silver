@@ -51,9 +51,9 @@ function li(
 }
 
 let paySeq = 0
-function pay(amount: number, mode: PaymentMode, daysAgo: number, reference: string): Payment {
+function pay(amount: number, mode: PaymentMode, daysAgo: number, reference: string, kind?: Payment['kind']): Payment {
   paySeq += 1
-  return { id: `pay-${paySeq}`, amount, mode, date: iso(-daysAgo), reference }
+  return { id: `pay-${paySeq}`, amount, mode, date: iso(-daysAgo), reference, kind }
 }
 
 /* ------------------------------------------------------------------ */
@@ -240,6 +240,13 @@ const quotations: Quotation[] = [
   }),
 ]
 
+// Each quotation belongs to a deal: the originating lead when the customer
+// came from one, otherwise the customer itself.
+const customerById = new Map(customers.map((customer) => [customer.id, customer]))
+quotations.forEach((quotationItem) => {
+  quotationItem.dealId = customerById.get(quotationItem.customerId)?.leadId ?? quotationItem.customerId
+})
+
 /* ----------------------------- Invoices ---------------------------- */
 
 function invoice(
@@ -280,10 +287,10 @@ const inv1 = invoice('inv-1', `INV-${YEAR}-0001`, `QT-${YEAR}-0001`, 'cust-1', 7
   notes: '50% advance against order confirmation.',
 })
 const inv1Totals = computeTotals(qt1Items)
-const inv1Advance = pay(Math.round(inv1Totals.total * 0.5), 'Bank Transfer', 68, 'NEFT/HSBC/88213')
+const inv1Advance = pay(Math.round(inv1Totals.total * 0.5), 'Bank Transfer', 68, 'NEFT/HSBC/88213', 'Advance')
 inv1.payments = [inv1Advance]
 inv1.amountPaid = inv1Advance.amount
-inv1.status = 'Partial'
+inv1.status = 'Advance'
 
 const inv2 = invoice('inv-2', `INV-${YEAR}-0002`, `QT-${YEAR}-0002`, 'cust-4', 55, 45, qt2Items, {
   quotationId: 'qt-2',
@@ -314,10 +321,10 @@ const inv4 = invoice('inv-4', `INV-${YEAR}-0004`, `QT-${YEAR}-0005`, 'cust-3', 3
   notes: 'Hallmark certificate enclosed with dispatch.',
 })
 const inv4Totals = computeTotals(qt5Items)
-const inv4Advance = pay(Math.round(inv4Totals.total * 0.3), 'Cheque', 30, 'CHQ/441209')
+const inv4Advance = pay(Math.round(inv4Totals.total * 0.3), 'Cheque', 30, 'CHQ/441209', 'Advance')
 inv4.payments = [inv4Advance]
 inv4.amountPaid = inv4Advance.amount
-inv4.status = 'Partial'
+inv4.status = 'Advance'
 
 const inv5Items = [
   li('Corporate Diwali Hamper', 400, 1620, 10, 18, 'prod-10'),
@@ -441,6 +448,8 @@ const manufacturingJobs: ManufacturingJob[] = [
       { id: 'mrj-5-h3', stage: 'Cleaning', at: ts(-6), note: 'Delayed due to packaging material shortage' },
     ],
     notes: 'Blocked on velvet box replenishment from supplier.',
+    delayReason: 'Material shortage',
+    delayedAtStage: 'Cleaning',
   }),
   mfgJob('mrj-6', 6, `QT-${YEAR}-0001`, 'inv-1', 'cust-1', 'Silver Pooja Thali Set', 25, 'Quality Check', 'Completed', 100, 'Suresh Kamble', -55, -30, {
     completedAt: ts(-30),
@@ -618,6 +627,7 @@ export function createSeedDatabase(): Database {
     packagingJobs,
     dispatches,
     supplierTransactions,
+    advances: [],
     activities,
     settings: {
       name: 'Vinayak Silver',

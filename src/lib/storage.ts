@@ -17,6 +17,7 @@ const COLLECTION_KEYS: Array<keyof Database> = [
   'packagingJobs',
   'dispatches',
   'supplierTransactions',
+  'advances',
   'activities',
 ]
 

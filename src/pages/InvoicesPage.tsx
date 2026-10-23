@@ -11,7 +11,7 @@ import {
   Trash2,
   Wallet,
 } from 'lucide-react'
-import type { Invoice, PaymentMode } from '@/types'
+import type { Invoice, PaymentKind, PaymentMode } from '@/types'
 import { PAYMENT_MODES } from '@/types'
 import { PageHeader, EmptyState, SearchInput, Toolbar, DataRow } from '@/components/ui/Layout'
 import { Card, CardHeader } from '@/components/ui/Card'
@@ -32,9 +32,18 @@ import {
   customerName,
   invoiceBalance,
   isOrderDelivered,
+  unappliedAdvancesFor,
   type LineItemInput,
 } from '@/lib/calc'
-import { confirmOrder, convertQuotationToInvoice, createOrderInvoice, pushActivity, recordPayment } from '@/lib/workflow'
+import {
+  applyAdvancesToInvoice,
+  confirmOrder,
+  convertQuotationToInvoice,
+  createOrderInvoice,
+  pushActivity,
+  recordAdvance,
+  recordPayment,
+} from '@/lib/workflow'
 import { downloadCSV, formatCurrency, formatDate, todayISO } from '@/lib/utils'
 
 type CreateMode = 'quotation' | 'direct'
@@ -69,8 +78,22 @@ export function InvoicesPage() {
     mode: 'Bank Transfer' as PaymentMode,
     date: todayISO(),
     reference: '',
+    kind: 'Advance' as PaymentKind,
   }))
   const [paymentError, setPaymentError] = useState('')
+
+  // advance received before an invoice exists
+  const [advanceOpen, setAdvanceOpen] = useState(false)
+  const [advanceForm, setAdvanceForm] = useState(() => ({
+    customerId: '',
+    orderRef: '',
+    amount: '',
+    mode: 'Bank Transfer' as PaymentMode,
+    date: todayISO(),
+    reference: '',
+    notes: '',
+  }))
+  const [advanceError, setAdvanceError] = useState('')
 
   useEffect(() => {
     const focusId = (location.state as { focusId?: string } | null)?.focusId
@@ -115,6 +138,12 @@ export function InvoicesPage() {
   }, [db.invoices])
 
   const directTotals = useMemo(() => computeTotals(items.map(buildLineItem)), [items])
+
+  /** Unapplied advances that could be applied to a given invoice. */
+  const advancesFor = (invoice: Invoice) =>
+    unappliedAdvancesFor(db, invoice.customerId).filter(
+      (advance) => !advance.orderRef || advance.orderRef === invoice.orderRef,
+    )
 
   const resetCreate = () => {
     setCreateMode('quotation')
@@ -179,7 +208,14 @@ export function InvoicesPage() {
 
   const openPayment = (invoice: Invoice) => {
     setPaymentInvoiceId(invoice.id)
-    setPaymentForm({ amount: String(invoiceBalance(invoice)), mode: 'Bank Transfer', date: todayISO(), reference: '' })
+    setPaymentForm({
+      amount: String(invoiceBalance(invoice)),
+      mode: 'Bank Transfer',
+      date: todayISO(),
+      reference: '',
+      // First receipt against an unpaid invoice is treated as an advance.
+      kind: invoice.amountPaid <= 0 ? 'Advance' : 'Partial',
+    })
     setPaymentError('')
   }
 
@@ -200,6 +236,7 @@ export function InvoicesPage() {
         mode: paymentForm.mode,
         date: paymentForm.date,
         reference: paymentForm.reference.trim(),
+        kind: paymentForm.kind,
       }),
     )
     if (!result.ok) {
@@ -208,6 +245,63 @@ export function InvoicesPage() {
     }
     toast.success('Payment recorded successfully.')
     setPaymentInvoiceId(null)
+  }
+
+  const openAdvance = () => {
+    setAdvanceForm({
+      customerId: '',
+      orderRef: '',
+      amount: '',
+      mode: 'Bank Transfer',
+      date: todayISO(),
+      reference: '',
+      notes: '',
+    })
+    setAdvanceError('')
+    setAdvanceOpen(true)
+  }
+
+  const submitAdvance = () => {
+    const amount = Number(advanceForm.amount)
+    if (!advanceForm.customerId) {
+      setAdvanceError('Select the customer this advance belongs to.')
+      return
+    }
+    if (!amount || amount <= 0) {
+      setAdvanceError('Enter an advance amount greater than zero.')
+      return
+    }
+    const result = mutate((draft) =>
+      recordAdvance(draft, {
+        customerId: advanceForm.customerId,
+        orderRef: advanceForm.orderRef.trim() || undefined,
+        amount,
+        mode: advanceForm.mode,
+        date: advanceForm.date,
+        reference: advanceForm.reference.trim(),
+        notes: advanceForm.notes.trim(),
+      }),
+    )
+    if (!result.ok) {
+      setAdvanceError(result.error ?? 'Could not record the advance.')
+      return
+    }
+    toast.success('Advance recorded. It will be applied automatically to the invoice for this customer.')
+    setAdvanceOpen(false)
+  }
+
+  /** Apply any held advances to an existing invoice (for advances received after it was raised). */
+  const applyAdvances = (invoice: Invoice) => {
+    const applied = mutate((draft) => {
+      const target = draft.invoices.find((item) => item.id === invoice.id)
+      if (!target) return 0
+      return applyAdvancesToInvoice(draft, target)
+    })
+    if (applied > 0) {
+      toast.success(`${formatCurrency(applied)} of advances applied to ${invoice.number}.`)
+    } else {
+      toast.notify('No advances available to apply to this invoice.')
+    }
   }
 
   const confirmDelete = () => {
@@ -259,6 +353,9 @@ export function InvoicesPage() {
             <Button variant="outline" icon={<IndianRupee className="h-4 w-4" />} onClick={exportCSV}>
               Export CSV
             </Button>
+            <Button variant="outline" icon={<Wallet className="h-4 w-4" />} onClick={openAdvance}>
+              Record advance
+            </Button>
             <Button
               icon={<Plus className="h-4 w-4" />}
               onClick={() => {
@@ -278,6 +375,35 @@ export function InvoicesPage() {
         <StatCard label="Outstanding" value={formatCurrency(stats.outstanding, true)} hint={`${stats.overdueCount} invoices overdue`} icon={<CircleDollarSign className="h-4.5 w-4.5" />} tone="amber" />
         <StatCard label="Awaiting confirmation" value={stats.unconfirmed} hint="Confirm to start production" icon={<BadgeCheck className="h-4.5 w-4.5" />} tone="violet" />
       </div>
+
+      {(db.advances ?? []).length > 0 ? (
+        <Card padded={false}>
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-silver-200 px-5 py-3.5">
+            <div>
+              <h3 className="text-[13px] font-bold text-navy-900">Advances on account</h3>
+              <p className="mt-0.5 text-xs text-silver-600">
+                Money received before an invoice exists. Applied automatically when the invoice is raised.
+              </p>
+            </div>
+            <Badge tone="info">{(db.advances ?? []).length} held</Badge>
+          </div>
+          <ul className="divide-y divide-silver-200">
+            {(db.advances ?? []).map((advance) => (
+              <li key={advance.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 text-sm">
+                <div>
+                  <p className="font-medium text-navy-900">{customerName(db, advance.customerId)}</p>
+                  <p className="text-xs text-silver-600">
+                    {formatDate(advance.date)} · {advance.mode}
+                    {advance.reference ? ` · ${advance.reference}` : ''}
+                    {advance.orderRef ? ` · order ${advance.orderRef}` : ''}
+                  </p>
+                </div>
+                <span className="font-semibold text-navy-900">{formatCurrency(advance.amount)}</span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      ) : null}
 
       <Card>
         <Toolbar className="justify-between">
@@ -480,6 +606,11 @@ export function InvoicesPage() {
                     Confirm order
                   </Button>
                 ) : null}
+                {advancesFor(detail).length > 0 && invoiceBalance(detail) > 0 ? (
+                  <Button size="sm" variant="outline" icon={<IndianRupee className="h-4 w-4" />} onClick={() => applyAdvances(detail)}>
+                    Apply advances
+                  </Button>
+                ) : null}
                 <Button size="sm" icon={<Wallet className="h-4 w-4" />} onClick={() => openPayment(detail)} disabled={invoiceBalance(detail) <= 0}>
                   Record payment
                 </Button>
@@ -579,7 +710,7 @@ export function InvoicesPage() {
                           {formatDate(payment.date)} {payment.reference ? `· ${payment.reference}` : ''}
                         </p>
                       </div>
-                      <Badge tone="success">Received</Badge>
+                      <Badge tone={payment.kind === 'Advance' ? 'info' : 'success'}>{payment.kind ?? 'Received'}</Badge>
                     </li>
                   ))}
                 </ul>
@@ -624,6 +755,16 @@ export function InvoicesPage() {
               invalid={Boolean(paymentError)}
             />
           </Field>
+          <Field label="Payment type" hint="Advance is received before fulfilment; Settlement clears the balance">
+            <Select
+              value={paymentForm.kind}
+              onChange={(event) => setPaymentForm({ ...paymentForm, kind: event.target.value as PaymentKind })}
+            >
+              {(['Advance', 'Partial', 'Final'] as PaymentKind[]).map((kind) => (
+                <option key={kind}>{kind}</option>
+              ))}
+            </Select>
+          </Field>
           <Field label="Payment mode">
             <Select
               value={paymentForm.mode}
@@ -639,6 +780,83 @@ export function InvoicesPage() {
           </Field>
           <Field label="Reference" hint="Cheque number, UPI transaction id, NEFT reference…">
             <Input value={paymentForm.reference} onChange={(event) => setPaymentForm({ ...paymentForm, reference: event.target.value })} />
+          </Field>
+        </div>
+      </Modal>
+
+      <Modal
+        open={advanceOpen}
+        onClose={() => setAdvanceOpen(false)}
+        size="sm"
+        title="Record advance"
+        subtitle="Money received before an invoice exists. It is applied when the invoice is raised."
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setAdvanceOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={submitAdvance}>Save advance</Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <Field label="Customer" required error={advanceError}>
+            <Select
+              value={advanceForm.customerId}
+              onChange={(event) => {
+                setAdvanceForm({ ...advanceForm, customerId: event.target.value })
+                setAdvanceError('')
+              }}
+              invalid={Boolean(advanceError)}
+            >
+              <option value="">Select customer…</option>
+              {db.customers.map((customer) => (
+                <option key={customer.id} value={customer.id}>
+                  {customer.code} · {customer.companyName}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="Amount (₹)" required error={advanceError}>
+            <Input
+              type="number"
+              min={0}
+              value={advanceForm.amount}
+              onChange={(event) => {
+                setAdvanceForm({ ...advanceForm, amount: event.target.value })
+                setAdvanceError('')
+              }}
+              invalid={Boolean(advanceError)}
+            />
+          </Field>
+          <Field label="Order reference (optional)" hint="Leave blank for a general advance on the customer's account">
+            <Input
+              list="advance-order-refs"
+              value={advanceForm.orderRef}
+              onChange={(event) => setAdvanceForm({ ...advanceForm, orderRef: event.target.value })}
+              placeholder="QT-… or ORD-…"
+            />
+            <datalist id="advance-order-refs">
+              {[...new Set([...db.quotations.map((quotation) => quotation.number), ...db.invoices.map((invoice) => invoice.orderRef)])].map((ref) => (
+                <option key={ref} value={ref} />
+              ))}
+            </datalist>
+          </Field>
+          <Field label="Payment mode">
+            <Select value={advanceForm.mode} onChange={(event) => setAdvanceForm({ ...advanceForm, mode: event.target.value as PaymentMode })}>
+              {PAYMENT_MODES.map((mode) => (
+                <option key={mode}>{mode}</option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="Received on">
+            <Input type="date" value={advanceForm.date} onChange={(event) => setAdvanceForm({ ...advanceForm, date: event.target.value })} />
+          </Field>
+          <Field label="Reference" hint="Cheque number, UPI transaction id, NEFT reference…">
+            <Input value={advanceForm.reference} onChange={(event) => setAdvanceForm({ ...advanceForm, reference: event.target.value })} />
+          </Field>
+          <Field label="Notes">
+            <Textarea value={advanceForm.notes} onChange={(event) => setAdvanceForm({ ...advanceForm, notes: event.target.value })} placeholder="Order value, balance terms…" />
           </Field>
         </div>
       </Modal>

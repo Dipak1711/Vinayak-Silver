@@ -1,5 +1,6 @@
 import type {
   ActivityModule,
+  AdvancePayment,
   Customer,
   Database,
   DispatchRecord,
@@ -10,6 +11,7 @@ import type {
   MfgStage,
   PackagingJob,
   Payment,
+  PaymentKind,
   PaymentMode,
   Product,
   Quotation,
@@ -21,6 +23,7 @@ import {
   buildLineItem,
   codeNumber,
   computeTotals,
+  customerName,
   documentNumber,
   findProduct,
   invoiceBalance,
@@ -28,6 +31,8 @@ import {
   paymentStatusFor,
   type LineItemInput,
 } from '@/lib/calc'
+import { dealIdForCustomer, supersedeSiblingQuotations } from '@/lib/deals'
+import { fetchMockTracking, type MockTrackingStep } from '@/lib/mockCourier'
 import { uid } from '@/lib/utils'
 
 /* ------------------------------------------------------------------ */
@@ -180,6 +185,7 @@ export function createQuotation(db: Database, input: {
   createdBy: string
   revision?: number
   parentId?: ID
+  dealId?: ID
 }): Quotation {
   const items = input.items.map(buildLineItem)
   const totals = computeTotals(items)
@@ -187,6 +193,9 @@ export function createQuotation(db: Database, input: {
     id: uid('qt'),
     number: createQuotationNumber(db),
     customerId: input.customerId,
+    // Belongs to the customer's deal (its originating lead, else the customer),
+    // so several quotations for one opportunity stay grouped.
+    dealId: input.dealId ?? dealIdForCustomer(db, input.customerId),
     date: input.date,
     validUntil: input.validUntil,
     items,
@@ -269,7 +278,11 @@ function buildInvoice(
   }
 }
 
-export function convertQuotationToInvoice(db: Database, quotationId: ID, dueDays = 30): { invoice?: Invoice; error?: string } {
+export function convertQuotationToInvoice(
+  db: Database,
+  quotationId: ID,
+  dueDays = 30,
+): { invoice?: Invoice; error?: string; superseded?: number } {
   const quotation = db.quotations.find((item) => item.id === quotationId)
   if (!quotation) return { error: 'Quotation not found.' }
   if (quotation.convertedInvoiceId) {
@@ -295,8 +308,20 @@ export function convertQuotationToInvoice(db: Database, quotationId: ID, dueDays
   })
   db.invoices.push(invoice)
   quotation.convertedInvoiceId = invoice.id
+  // Apply any advance held for this customer/order, then close the other open
+  // quotations of the same deal. Order matters: the confirmed quotation must
+  // be flagged before siblings are superseded.
+  applyAdvancesToInvoice(db, invoice)
+  const superseded = supersedeSiblingQuotations(db, quotation)
   pushActivity(db, 'Invoice', `Invoice ${invoice.number} created from quotation ${quotation.number}`)
-  return { invoice }
+  if (superseded.length > 0) {
+    pushActivity(
+      db,
+      'Quotation',
+      `${superseded.length} other quotation(s) for this deal marked Superseded`,
+    )
+  }
+  return { invoice, superseded: superseded.length }
 }
 
 export function createOrderInvoice(
@@ -317,6 +342,7 @@ export function createOrderInvoice(
     createdBy: input.createdBy,
   })
   db.invoices.push(invoice)
+  applyAdvancesToInvoice(db, invoice)
   pushActivity(db, 'Invoice', `Direct order invoice ${invoice.number} created`)
   return invoice
 }
@@ -324,7 +350,7 @@ export function createOrderInvoice(
 export function recordPayment(
   db: Database,
   invoiceId: ID,
-  payment: { amount: number; mode: PaymentMode; date: string; reference: string },
+  payment: { amount: number; mode: PaymentMode; date: string; reference: string; kind?: PaymentKind },
 ): { ok: boolean; error?: string } {
   const invoice = db.invoices.find((item) => item.id === invoiceId)
   if (!invoice) return { ok: false, error: 'Invoice not found.' }
@@ -339,12 +365,97 @@ export function recordPayment(
     mode: payment.mode,
     date: payment.date,
     reference: payment.reference,
+    kind: payment.kind ?? 'Partial',
   }
   invoice.payments.push(entry)
   invoice.amountPaid = Math.round((invoice.amountPaid + payment.amount) * 100) / 100
-  invoice.status = paymentStatusFor(invoice.total, invoice.amountPaid)
+  invoice.status = paymentStatusFor(invoice.total, invoice.amountPaid, invoice.payments)
   pushActivity(db, 'Invoice', `Payment of ₹${payment.amount} recorded on ${invoice.number} (${invoice.status})`)
   return { ok: true }
+}
+
+/**
+ * Record money received against a customer / deal / order before an invoice
+ * exists. It is stored separately and applied automatically to the invoice
+ * raised for that customer (and order reference, when given).
+ */
+export function recordAdvance(
+  db: Database,
+  input: {
+    customerId: ID
+    dealId?: ID
+    orderRef?: string
+    amount: number
+    mode: PaymentMode
+    date: string
+    reference: string
+    notes?: string
+  },
+): { ok: boolean; error?: string; advance?: AdvancePayment } {
+  if (!input.customerId) return { ok: false, error: 'Select a customer.' }
+  if (!input.amount || input.amount <= 0) return { ok: false, error: 'Advance amount must be greater than zero.' }
+  if (!Array.isArray(db.advances)) db.advances = []
+  const advance: AdvancePayment = {
+    id: uid('adv'),
+    customerId: input.customerId,
+    dealId: input.dealId ?? dealIdForCustomer(db, input.customerId),
+    orderRef: input.orderRef?.trim() || undefined,
+    date: input.date,
+    amount: Math.round(input.amount * 100) / 100,
+    mode: input.mode,
+    reference: input.reference.trim(),
+    notes: input.notes?.trim() || undefined,
+  }
+  db.advances.push(advance)
+  pushActivity(db, 'Invoice', `Advance of ₹${advance.amount} recorded for ${customerName(db, input.customerId)}`)
+  return { ok: true, advance }
+}
+
+/**
+ * Move any held advances onto an invoice, oldest first, up to the balance
+ * still due. A part-used advance keeps its remainder on account. Because the
+ * advance is *moved* (not copied) it can never be counted twice in the ledger.
+ */
+export function applyAdvancesToInvoice(db: Database, invoice: Invoice): number {
+  if (!Array.isArray(db.advances) || db.advances.length === 0) return 0
+  let remaining = invoiceBalance(invoice)
+  if (remaining <= 0.001) return 0
+
+  const candidates = db.advances
+    .filter((advance) => advance.customerId === invoice.customerId)
+    .filter((advance) => !advance.orderRef || advance.orderRef === invoice.orderRef)
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
+
+  let applied = 0
+  candidates.forEach((advance) => {
+    if (remaining <= 0.001) return
+    const amount = Math.min(advance.amount, remaining)
+    invoice.payments.push({
+      id: uid('pay'),
+      date: advance.date,
+      amount: Math.round(amount * 100) / 100,
+      mode: advance.mode,
+      reference: advance.reference,
+      kind: 'Advance',
+    })
+    invoice.amountPaid = Math.round((invoice.amountPaid + amount) * 100) / 100
+    remaining = Math.round((remaining - amount) * 100) / 100
+    applied += amount
+
+    const rest = Math.round((advance.amount - amount) * 100) / 100
+    if (rest <= 0.001) {
+      db.advances = db.advances.filter((item) => item.id !== advance.id)
+    } else {
+      const target = db.advances.find((item) => item.id === advance.id)
+      if (target) target.amount = rest
+    }
+  })
+
+  if (applied > 0) {
+    invoice.status = paymentStatusFor(invoice.total, invoice.amountPaid, invoice.payments)
+    pushActivity(db, 'Invoice', `Advance of ₹${applied} applied to ${invoice.number}`)
+  }
+  return applied
 }
 
 /* ------------------------------------------------------------------ */
@@ -467,11 +578,23 @@ export function confirmOrder(db: Database, invoiceId: ID): { ok: boolean; error?
 export function advanceManufacturing(
   db: Database,
   jobId: ID,
-  input: { stage: MfgStage; progress: number; status: ManufacturingJob['status']; note: string; assignedTo: string },
+  input: {
+    stage: MfgStage
+    progress: number
+    status: ManufacturingJob['status']
+    note: string
+    assignedTo: string
+    delayReason?: string
+  },
 ): { ok: boolean; error?: string } {
   const job = db.manufacturingJobs.find((item) => item.id === jobId)
   if (!job) return { ok: false, error: 'Production job not found.' }
   const progress = Math.max(0, Math.min(100, input.progress))
+  const delayReason = input.delayReason?.trim() ?? ''
+
+  if (input.status === 'Delayed' && !delayReason) {
+    return { ok: false, error: 'A delay reason is required when a job is marked Delayed.' }
+  }
 
   if (input.stage !== job.stage || progress !== job.progress || input.note) {
     job.history.push({
@@ -482,10 +605,30 @@ export function advanceManufacturing(
     })
   }
 
+  // Capture the structured reason (and where) in the stage history too.
+  const enteringDelay = job.status !== 'Delayed' && input.status === 'Delayed'
+  const reasonChanged = input.status === 'Delayed' && delayReason !== (job.delayReason ?? '')
+  if (enteringDelay || reasonChanged) {
+    job.history.push({
+      id: uid('sh'),
+      stage: input.stage,
+      at: new Date().toISOString(),
+      note: `Delayed at ${input.stage} — ${delayReason}`,
+    })
+  }
+
   job.stage = input.stage
   job.progress = progress
   job.status = input.status
   job.assignedTo = input.assignedTo || job.assignedTo
+  if (input.status === 'Delayed') {
+    job.delayReason = delayReason
+    job.delayedAtStage = input.stage
+  } else {
+    // Leaving Delayed clears the live reason; the history keeps the record.
+    job.delayReason = undefined
+    job.delayedAtStage = undefined
+  }
 
   if (input.status === 'Completed') {
     job.progress = 100
@@ -650,6 +793,28 @@ export function updateDispatchStatus(
 }
 
 type DispatchStatusValue = DispatchRecord['status']
+
+/**
+ * Simulated courier tracking. Pulls the next realistic milestone from the
+ * mock tracker and records it. It never calls a real courier API and never
+ * alters the courier, tracking number or delivery ETA.
+ */
+export function fetchDispatchTracking(
+  db: Database,
+  dispatchId: ID,
+): { ok: boolean; error?: string; step?: MockTrackingStep } {
+  const record = db.dispatches.find((item) => item.id === dispatchId)
+  if (!record) return { ok: false, error: 'Dispatch record not found.' }
+  const step = fetchMockTracking(record)
+  if (!step) return { ok: false, error: 'This shipment is already delivered.' }
+  record.events.push({ id: uid('de'), at: step.at, status: step.status, note: step.note })
+  record.status = step.status
+  if (step.status === 'Dispatched' && !record.dispatchDate) {
+    record.dispatchDate = new Date().toISOString().slice(0, 10)
+  }
+  pushActivity(db, 'Dispatch', `${record.number} tracking refreshed (simulated) · ${step.status}`)
+  return { ok: true, step }
+}
 
 /* ------------------------------------------------------------------ */
 /* Suppliers                                                           */

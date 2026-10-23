@@ -29,6 +29,7 @@ import { useData } from '@/store/DataContext'
 import { useToast } from '@/store/ToastContext'
 import { buildLineItem, computeTotals, customerName, type LineItemInput } from '@/lib/calc'
 import { convertQuotationToInvoice, createQuotation, duplicateQuotation, pushActivity } from '@/lib/workflow'
+import { dealIdOf, dealSummary } from '@/lib/deals'
 import { addDaysISO, downloadCSV, formatCurrency, formatDate, todayISO } from '@/lib/utils'
 
 export function QuotationsPage() {
@@ -75,6 +76,30 @@ export function QuotationsPage() {
   const printQuotation = db.quotations.find((quotation) => quotation.id === printId) ?? null
 
   const totals = useMemo(() => computeTotals(items.map(buildLineItem)), [items])
+
+  // Group quotations into their deal so the several quotations raised for one
+  // opportunity are visible together. Derived, so records without a stored
+  // dealId still group by the customer's originating lead.
+  const dealQuotations = useMemo(() => {
+    const map = new Map<string, Quotation[]>()
+    db.quotations.forEach((quotation) => {
+      const key = dealIdOf(db, quotation)
+      const list = map.get(key) ?? []
+      list.push(quotation)
+      map.set(key, list)
+    })
+    return map
+  }, [db])
+
+  const siblingsOf = (quotation: Quotation) =>
+    (dealQuotations.get(dealIdOf(db, quotation)) ?? []).filter((item) => item.id !== quotation.id)
+
+  const openCreateForDeal = (quotation: Quotation) => {
+    setEditing(null)
+    resetForm()
+    setCustomerId(quotation.customerId)
+    setFormOpen(true)
+  }
 
   const stats = useMemo(() => {
     const approved = db.quotations.filter((quotation) => quotation.status === 'Approved')
@@ -198,7 +223,11 @@ export function QuotationsPage() {
       toast.error(result.error)
       return
     }
-    toast.success('Quotation converted into an invoice. Confirm the order to start production.')
+    toast.success(
+      result.superseded
+        ? `Quotation converted. ${result.superseded} other quotation(s) for this deal marked Superseded.`
+        : 'Quotation converted into an invoice. Confirm the order to start production.',
+    )
     setDetailId(null)
     if (result.invoice) navigate('/invoices', { state: { focusId: result.invoice.id } })
   }
@@ -320,7 +349,14 @@ export function QuotationsPage() {
                     </div>
                     <p className="text-xs text-silver-600">{quotation.createdBy}</p>
                   </Td>
-                  <Td>{customerName(db, quotation.customerId)}</Td>
+                  <Td>
+                    <p className="text-navy-800">{customerName(db, quotation.customerId)}</p>
+                    {siblingsOf(quotation).length > 0 ? (
+                      <p className="text-xs text-silver-600">
+                        Deal · {(dealQuotations.get(dealIdOf(db, quotation)) ?? []).length} quotations
+                      </p>
+                    ) : null}
+                  </Td>
                   <Td className="whitespace-nowrap">{formatDate(quotation.date)}</Td>
                   <Td className="whitespace-nowrap">{formatDate(quotation.validUntil)}</Td>
                   <Td align="right">{quotation.items.length}</Td>
@@ -526,6 +562,51 @@ export function QuotationsPage() {
                   <span className="font-semibold text-navy-900">Grand total</span>
                   <span className="text-lg font-bold text-navy-900">{formatCurrency(detail.total)}</span>
                 </div>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-silver-200 bg-silver-50 p-4">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div>
+                  <p className="text-[11px] font-semibold tracking-wide text-silver-600 uppercase">Deal</p>
+                  <p className="mt-0.5 text-sm font-semibold text-navy-900">{dealSummary(db, dealIdOf(db, detail)).title}</p>
+                  <p className="text-xs text-silver-600">{dealSummary(db, dealIdOf(db, detail)).subtitle}</p>
+                </div>
+                <Badge tone="neutral">{(dealQuotations.get(dealIdOf(db, detail)) ?? []).length} quotations</Badge>
+              </div>
+
+              {siblingsOf(detail).length > 0 ? (
+                <>
+                  <p className="mt-3 text-[11px] font-semibold tracking-wide text-silver-600 uppercase">
+                    Other quotations in this deal
+                  </p>
+                  <ul className="mt-2 flex flex-col gap-1.5">
+                    {siblingsOf(detail).map((sibling) => (
+                      <li
+                        key={sibling.id}
+                        className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-silver-200 bg-surface px-3 py-2"
+                      >
+                        <button type="button" className="text-left" onClick={() => setDetailId(sibling.id)}>
+                          <span className="text-[13px] font-semibold text-navy-900">{sibling.number}</span>
+                          <span className="ml-2 text-xs text-silver-600">
+                            {sibling.revision > 1 ? `Rev ${sibling.revision} · ` : ''}
+                            {formatDate(sibling.date)}
+                          </span>
+                        </button>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-navy-800">{formatCurrency(sibling.total)}</span>
+                          <StatusBadge status={sibling.status} />
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : null}
+
+              <div className="mt-3">
+                <Button size="sm" variant="outline" icon={<Plus className="h-4 w-4" />} onClick={() => openCreateForDeal(detail)}>
+                  New quotation for this deal
+                </Button>
               </div>
             </div>
 

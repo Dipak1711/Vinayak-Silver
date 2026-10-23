@@ -13,4 +13,8 @@
 - Treats a referenced project as a design reference only (never a source of business logic, features or replacement code), and wants its visual style replicated faithfully — palette, typography, spacing, radii, shadows and states — rather than merely choosing similar colors. Confidence: 0.6
 - Wants a design change applied consistently across every module/page, with the result responsive and usable at different screen sizes. Confidence: 0.6
 - Expects the project's own type check and production build (and linter) to be run after changes, with any errors introduced fixed, and improvements visually verified rather than just claimed. Confidence: 0.7
-- Prefers a brief plan up front — which elements will be reused and which files will change — before implementation begins. Confidence: 0.55
+- For non-trivial work, wants a read-only analysis/plan first and explicit approval before any files are modified; typically a requirement-by-requirement gap analysis (per-requirement verdict/status, relevant file names, current vs missing behaviour) followed by a prioritized implementation plan. Confidence: 0.75
+- Tracks requirements strictly against the brief: clearly separates confirmed requirements from assumptions and open questions needing client clarification, and does not want extra/invented requirements added. Confidence: 0.7
+- When reworking an existing app, must not delete or reset its existing demo/sample data — treat persisted demo data as something to preserve. Confidence: 0.7
+- When a real external integration cannot be included in a demo (e.g. courier API / live tracking), wants it represented by a clearly labelled mock/simulated integration plus realistic sample data, never a real connection. Confidence: 0.65
+- Treats any separate reference project as off-limits: read/reference only, never modified. Confidence: 0.7

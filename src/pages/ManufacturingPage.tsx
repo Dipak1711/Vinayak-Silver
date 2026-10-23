@@ -28,6 +28,23 @@ import { addDaysISO, cn, downloadCSV, formatDate, formatDateTime, formatNumber, 
 
 const STATUSES: MfgStatus[] = ['Pending', 'In Progress', 'Completed', 'Delayed']
 
+/** Structured reasons offered when a job is marked Delayed. */
+const DELAY_REASONS = [
+  'Material shortage',
+  'Machine breakdown',
+  'Outsourced job delay',
+  'Labour shortage',
+  'Quality hold',
+  'Customer approval pending',
+  'Other',
+]
+
+function reasonFromValue(value?: string): { reason: string; other: string } {
+  if (!value) return { reason: '', other: '' }
+  if (DELAY_REASONS.includes(value)) return { reason: value, other: '' }
+  return { reason: 'Other', other: value }
+}
+
 export function ManufacturingPage() {
   const { db, mutate } = useData()
   const toast = useToast()
@@ -40,12 +57,22 @@ export function ManufacturingPage() {
   const [updateId, setUpdateId] = useState<string | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
 
-  const [updateForm, setUpdateForm] = useState<{ stage: MfgStage; progress: number; status: MfgStatus; note: string; assignedTo: string }>({
+  const [updateForm, setUpdateForm] = useState<{
+    stage: MfgStage
+    progress: number
+    status: MfgStatus
+    note: string
+    assignedTo: string
+    delayReason: string
+    delayReasonOther: string
+  }>({
     stage: 'Material Procurement',
     progress: 0,
     status: 'Pending',
     note: '',
     assignedTo: '',
+    delayReason: '',
+    delayReasonOther: '',
   })
 
   const [createForm, setCreateForm] = useState(() => ({
@@ -93,6 +120,7 @@ export function ManufacturingPage() {
   }, [db.manufacturingJobs])
 
   const openUpdate = (job: ManufacturingJob) => {
+    const { reason, other } = reasonFromValue(job.delayReason)
     setUpdateId(job.id)
     setUpdateForm({
       stage: job.stage,
@@ -100,12 +128,29 @@ export function ManufacturingPage() {
       status: job.status,
       note: '',
       assignedTo: job.assignedTo,
+      delayReason: reason,
+      delayReasonOther: other,
     })
   }
 
   const submitUpdate = () => {
     if (!updateId) return
-    const result = mutate((draft) => advanceManufacturing(draft, updateId, updateForm))
+    const delayReason =
+      updateForm.delayReason === 'Other' ? updateForm.delayReasonOther.trim() : updateForm.delayReason.trim()
+    if (updateForm.status === 'Delayed' && !delayReason) {
+      toast.error('Select a delay reason (or enter one) before saving.')
+      return
+    }
+    const result = mutate((draft) =>
+      advanceManufacturing(draft, updateId, {
+        stage: updateForm.stage,
+        progress: updateForm.progress,
+        status: updateForm.status,
+        note: updateForm.note,
+        assignedTo: updateForm.assignedTo,
+        delayReason,
+      }),
+    )
     if (!result.ok) {
       toast.error(result.error ?? 'Could not update the job.')
       return
@@ -177,7 +222,7 @@ export function ManufacturingPage() {
               onClick={() => {
                 downloadCSV(
                   'production-jobs.csv',
-                  ['Job', 'Order ref', 'Product', 'Qty', 'Stage', 'Progress', 'Status', 'Assigned', 'Planned start', 'Planned end', 'Outsourced'],
+                  ['Job', 'Order ref', 'Product', 'Qty', 'Stage', 'Progress', 'Status', 'Delay reason', 'Assigned', 'Planned start', 'Planned end', 'Outsourced'],
                   filtered.map((job) => [
                     job.jobNumber,
                     job.orderRef,
@@ -186,6 +231,7 @@ export function ManufacturingPage() {
                     job.stage,
                     `${job.progress}%`,
                     job.status,
+                    job.delayReason ?? '',
                     job.assignedTo,
                     job.plannedStart,
                     job.plannedEnd,
@@ -280,6 +326,12 @@ export function ManufacturingPage() {
                     </Td>
                     <Td>
                       <StatusBadge status={job.status} />
+                      {job.delayReason ? (
+                        <p className="mt-1 max-w-[180px] text-[11px] leading-snug text-rose-600">
+                          {job.delayReason}
+                          {job.delayedAtStage ? ` · ${job.delayedAtStage}` : ''}
+                        </p>
+                      ) : null}
                     </Td>
                     <Td align="right">
                       <div className="flex items-center justify-end gap-1.5" onClick={(event) => event.stopPropagation()}>
@@ -352,6 +404,31 @@ export function ManufacturingPage() {
               </Select>
             </Field>
           </div>
+
+          {updateForm.status === 'Delayed' ? (
+            <div className="flex flex-col gap-3 rounded-xl border border-rose-200 bg-rose-50 p-3.5">
+              <Field label="Delay reason" required hint="Recorded in the stage history and shown on the order">
+                <Select
+                  value={updateForm.delayReason}
+                  onChange={(event) => setUpdateForm({ ...updateForm, delayReason: event.target.value })}
+                >
+                  <option value="">Select a reason…</option>
+                  {DELAY_REASONS.map((reason) => (
+                    <option key={reason}>{reason}</option>
+                  ))}
+                </Select>
+              </Field>
+              {updateForm.delayReason === 'Other' ? (
+                <Field label="Specify reason">
+                  <Input
+                    value={updateForm.delayReasonOther}
+                    onChange={(event) => setUpdateForm({ ...updateForm, delayReasonOther: event.target.value })}
+                    placeholder="e.g. Power outage at the vendor"
+                  />
+                </Field>
+              ) : null}
+            </div>
+          ) : null}
 
           <Field label={`Progress · ${updateForm.progress}%`}>
             <input
@@ -470,6 +547,18 @@ export function ManufacturingPage() {
               <Badge tone="silver">{detail.stage}</Badge>
               {detail.outsourced ? <Badge tone="purple">Outsourced · {detail.vendor || 'vendor'}</Badge> : <Badge tone="info">In-house</Badge>}
             </div>
+
+            {detail.delayReason ? (
+              <div className="flex items-start gap-2.5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-800">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                <div>
+                  <p className="text-[13px] font-semibold">
+                    Delayed{detail.delayedAtStage ? ` at ${detail.delayedAtStage}` : ''}
+                  </p>
+                  <p className="mt-0.5 text-[13px]">Reason: {detail.delayReason}</p>
+                </div>
+              </div>
+            ) : null}
 
             <div>
               <div className="mb-1.5 flex items-center justify-between text-xs">

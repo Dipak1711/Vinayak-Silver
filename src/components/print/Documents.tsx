@@ -249,7 +249,10 @@ export function InvoiceDocument({
               {invoice.payments.map((payment) => (
                 <tr key={payment.id}>
                   <td className="border border-silver-300 px-2.5 py-1.5">{formatDate(payment.date)}</td>
-                  <td className="border border-silver-300 px-2.5 py-1.5">{payment.mode}</td>
+                  <td className="border border-silver-300 px-2.5 py-1.5">
+                    {payment.mode}
+                    {payment.kind ? ` · ${payment.kind}` : ''}
+                  </td>
                   <td className="border border-silver-300 px-2.5 py-1.5">{payment.reference || '—'}</td>
                   <td className="border border-silver-300 px-2.5 py-1.5 text-right">{formatCurrency(payment.amount)}</td>
                 </tr>

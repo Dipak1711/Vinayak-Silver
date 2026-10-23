@@ -65,6 +65,7 @@ const STATUS_TONES: Record<string, BadgeTone> = {
   Sent: 'info',
   Approved: 'success',
   Rejected: 'danger',
+  Superseded: 'neutral',
   // Invoices / payments
   Unpaid: 'danger',
   Advance: 'info',

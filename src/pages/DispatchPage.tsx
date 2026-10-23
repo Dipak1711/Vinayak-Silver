@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AlertTriangle, CheckCircle2, Info, MapPin, PackageCheck, Plus, Trash2, Truck } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Info, MapPin, PackageCheck, Plus, RefreshCw, Trash2, Truck } from 'lucide-react'
 import type { DispatchRecord, DispatchStatus } from '@/types'
 import { DISPATCH_STATUSES } from '@/types'
 import { PageHeader, EmptyState, SearchInput, Toolbar, DataRow } from '@/components/ui/Layout'
@@ -12,7 +12,8 @@ import { StatCard } from '@/components/ui/StatCard'
 import { TBody, THead, Td, Th, TR, Table, TableEmptyRow, TableShell } from '@/components/ui/Table'
 import { useData } from '@/store/DataContext'
 import { useToast } from '@/store/ToastContext'
-import { createDispatch, pushActivity, updateDispatchStatus } from '@/lib/workflow'
+import { createDispatch, fetchDispatchTracking, pushActivity, updateDispatchStatus } from '@/lib/workflow'
+import { MOCK_COURIER_LABEL } from '@/lib/mockCourier'
 import { customerName } from '@/lib/calc'
 import { addDaysISO, cn, downloadCSV, formatDate, formatDateTime, formatNumber, todayISO } from '@/lib/utils'
 
@@ -150,6 +151,20 @@ export function DispatchPage() {
     setTrackId(null)
   }
 
+  /**
+   * Simulated courier tracking. Generates the next realistic tracking event and
+   * status. No real courier API is called; courier, tracking number and ETA are
+   * left exactly as entered.
+   */
+  const fetchTracking = (record: DispatchRecord) => {
+    const result = mutate((draft) => fetchDispatchTracking(draft, record.id))
+    if (!result.ok) {
+      toast.error(result.error ?? 'Could not fetch tracking.')
+      return
+    }
+    toast.success(`Tracking refreshed (${MOCK_COURIER_LABEL}) · now ${result.step?.status}.`)
+  }
+
   const confirmDelete = () => {
     if (!deleteId) return
     mutate((draft) => {
@@ -168,7 +183,7 @@ export function DispatchPage() {
         eyebrow="Logistics"
         icon={<Truck className="h-5 w-5" />}
         title="Dispatch"
-        description="Move packed orders out of the warehouse and track courier movement manually."
+        description="Move packed orders out of the warehouse and track courier movement with a labelled simulated integration."
         actions={
           <Button
             variant="outline"
@@ -203,10 +218,15 @@ export function DispatchPage() {
         <StatCard label="Delayed" value={stats.delayed} hint="Flagged with courier issues" icon={<AlertTriangle className="h-4.5 w-4.5" />} tone={stats.delayed > 0 ? 'rose' : 'navy'} />
       </div>
 
-      <div className="flex items-start gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-xs text-blue-800">
+      <div className="flex flex-wrap items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-        Tracking is updated manually in this demo. No live courier API is connected, so courier and tracking details are
-        stored exactly as entered.
+        <p className="flex-1">
+          Courier tracking in this demo is <span className="font-semibold">{MOCK_COURIER_LABEL}</span>. The
+          <span className="font-semibold"> Fetch tracking </span>
+          action generates realistic sample events locally; no real courier API is contacted, and the courier, tracking
+          number and delivery ETA are never changed.
+        </p>
+        <Badge tone="warning">{MOCK_COURIER_LABEL}</Badge>
       </div>
 
       {readyGroups.length > 0 ? (
@@ -317,6 +337,16 @@ export function DispatchPage() {
                     </Td>
                     <Td align="right">
                       <div className="flex items-center justify-end gap-1.5" onClick={(event) => event.stopPropagation()}>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          icon={<RefreshCw className="h-3.5 w-3.5" />}
+                          onClick={() => fetchTracking(record)}
+                          disabled={record.status === 'Delivered'}
+                          title={`${MOCK_COURIER_LABEL} — generate the next sample tracking event`}
+                        >
+                          Fetch tracking
+                        </Button>
                         <Button size="sm" variant="outline" onClick={() => openTrack(record)} disabled={record.status === 'Delivered'}>
                           Update tracking
                         </Button>
@@ -410,7 +440,16 @@ export function DispatchPage() {
               <Button variant="danger" size="sm" icon={<Trash2 className="h-4 w-4" />} onClick={() => setDeleteId(detail.id)}>
                 Delete
               </Button>
-              <div className="ml-auto">
+              <div className="ml-auto flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  icon={<RefreshCw className="h-4 w-4" />}
+                  onClick={() => fetchTracking(detail)}
+                  disabled={detail.status === 'Delivered'}
+                >
+                  Fetch tracking
+                </Button>
                 <Button size="sm" onClick={() => { setDetailId(null); openTrack(detail) }} disabled={detail.status === 'Delivered'}>
                   Update tracking
                 </Button>
@@ -450,7 +489,10 @@ export function DispatchPage() {
             ) : null}
 
             <div>
-              <p className="mb-2 text-xs font-semibold text-navy-800">Tracking timeline</p>
+              <div className="mb-2 flex flex-wrap items-center gap-2">
+                <p className="text-xs font-semibold text-navy-800">Tracking timeline</p>
+                <Badge tone="warning">{MOCK_COURIER_LABEL}</Badge>
+              </div>
               <ol className="relative flex flex-col gap-3 border-l border-silver-200 pl-5">
                 {[...detail.events].reverse().map((event) => (
                   <li key={event.id} className="relative">

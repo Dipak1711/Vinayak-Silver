@@ -1,4 +1,5 @@
 import type {
+  AdvancePayment,
   Customer,
   Database,
   DispatchRecord,
@@ -9,6 +10,7 @@ import type {
   ManufacturingJob,
   MaterialCategory,
   PackagingJob,
+  Payment,
   Product,
   Quotation,
   RawMaterial,
@@ -145,16 +147,31 @@ export function invoiceBalance(invoice: Invoice): number {
   return Math.max(invoice.total - invoice.amountPaid, 0)
 }
 
-export function paymentStatusFor(total: number, paid: number): Invoice['status'] {
+/**
+ * An invoice is 'Advance' while money has been received but the balance is
+ * still open and every receipt so far was an advance; 'Partial' once a
+ * non-advance part payment is recorded; 'Paid' when settled. `payments` is
+ * optional so callers that only have the totals keep working.
+ */
+export function paymentStatusFor(total: number, paid: number, payments: Payment[] = []): Invoice['status'] {
   if (paid <= 0) return 'Unpaid'
   if (paid + 0.001 >= total) return 'Paid'
-  return 'Partial'
+  return payments.some((payment) => payment.kind === 'Advance') ? 'Advance' : 'Partial'
+}
+
+/** Advances received for a customer that have not yet been applied to an invoice. */
+export function unappliedAdvancesFor(db: Database, customerId: ID): AdvancePayment[] {
+  return (db.advances ?? []).filter((advance) => advance.customerId === customerId)
 }
 
 export function customerOutstanding(db: Database, customerId: ID): number {
-  return db.invoices
+  const billed = db.invoices
     .filter((invoice) => invoice.customerId === customerId)
     .reduce((acc, invoice) => acc + invoiceBalance(invoice), 0)
+  // Money already received on account reduces what the customer still owes, so
+  // the outstanding figure always agrees with the ledger's closing balance.
+  const advances = unappliedAdvancesFor(db, customerId).reduce((acc, advance) => acc + advance.amount, 0)
+  return billed - advances
 }
 
 export function customerBilled(db: Database, customerId: ID): number {
@@ -211,12 +228,26 @@ export function buildCustomerLedger(db: Database, customerId: ID): LedgerEntry[]
           id: payment.id,
           date: payment.date,
           reference: `${invoice.number} / ${payment.mode}`,
-          description: `Payment received${payment.reference ? ` · ${payment.reference}` : ''}`,
+          description: `${payment.kind === 'Advance' ? 'Advance received' : 'Payment received'}${payment.reference ? ` · ${payment.reference}` : ''}`,
           debit: 0,
           credit: payment.amount,
         })
       })
     })
+
+  // Advances received before an invoice exists appear as credits here; once an
+  // invoice is raised they move into invoice.payments, so they are never
+  // counted twice.
+  unappliedAdvancesFor(db, customerId).forEach((advance) => {
+    rows.push({
+      id: `adv_${advance.id}`,
+      date: advance.date,
+      reference: advance.reference || 'Advance',
+      description: `Advance received${advance.orderRef ? ` · order ${advance.orderRef}` : ''}`,
+      debit: 0,
+      credit: advance.amount,
+    })
+  })
 
   rows.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
 
@@ -458,7 +489,7 @@ export function pendingTasks(db: Database): PendingTask[] {
       tasks.push({
         id: `task_mfg_${job.id}`,
         label: `Production delayed · ${job.jobNumber}`,
-        detail: `${job.productName} planned to finish by ${job.plannedEnd}`,
+        detail: `${job.productName} planned to finish by ${job.plannedEnd}${job.delayReason ? ` · ${job.delayReason}` : ''}`,
         module: 'Manufacturing',
         to: '/manufacturing',
         severity: 'high',

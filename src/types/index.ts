@@ -241,19 +241,26 @@ export interface LineItem {
   total: number;
 }
 
-export type QuotationStatus = 'Draft' | 'Sent' | 'Approved' | 'Rejected';
+export type QuotationStatus = 'Draft' | 'Sent' | 'Approved' | 'Rejected' | 'Superseded';
 
 export const QUOTATION_STATUSES: QuotationStatus[] = [
   'Draft',
   'Sent',
   'Approved',
   'Rejected',
+  'Superseded',
 ];
 
 export interface Quotation {
   id: ID;
   number: string;
   customerId: ID;
+  /**
+   * Deal / opportunity this quotation belongs to. Groups the several
+   * quotations issued for one deal. Optional so existing records (which
+   * predate it) keep working — the deal is derived when it is missing.
+   */
+  dealId?: ID;
   date: string;
   validUntil: string;
   items: LineItem[];
@@ -285,12 +292,37 @@ export const PAYMENT_MODES: PaymentMode[] = [
   'Card',
 ];
 
+/** Nature of a money receipt against an order/invoice. */
+export type PaymentKind = 'Advance' | 'Partial' | 'Final';
+
 export interface Payment {
   id: ID;
   date: string;
   amount: number;
   mode: PaymentMode;
   reference: string;
+  /** Optional so payments recorded before this field existed stay valid. */
+  kind?: PaymentKind;
+}
+
+/**
+ * Money received against a customer / deal / order *before* an invoice
+ * exists. It is applied to the invoice automatically when one is raised for
+ * the same customer (and order reference, when given), so it is never
+ * counted twice.
+ */
+export interface AdvancePayment {
+  id: ID;
+  customerId: ID;
+  /** Deal / opportunity the advance belongs to, when known. */
+  dealId?: ID;
+  /** Order reference (quotation number or ORD-…) when the advance is order-specific. */
+  orderRef?: string;
+  date: string;
+  amount: number;
+  mode: PaymentMode;
+  reference: string;
+  notes?: string;
 }
 
 export interface Invoice {
@@ -367,6 +399,10 @@ export interface ManufacturingJob {
   vendor: string;
   notes: string;
   history: StageLog[];
+  /** Structured reason captured when the job is marked Delayed. */
+  delayReason?: string;
+  /** Stage the job was on when it was marked Delayed. */
+  delayedAtStage?: MfgStage;
   createdAt: string;
 }
 
@@ -457,6 +493,8 @@ export interface Database {
   packagingJobs: PackagingJob[];
   dispatches: DispatchRecord[];
   supplierTransactions: SupplierTransaction[];
+  /** Advances received before an invoice exists; applied to invoices on creation. */
+  advances: AdvancePayment[];
   activities: Activity[];
   settings: CompanySettings;
   counters: Record<string, number>;
@@ -475,4 +513,5 @@ export type CollectionKey =
   | 'packagingJobs'
   | 'dispatches'
   | 'supplierTransactions'
+  | 'advances'
   | 'activities';
