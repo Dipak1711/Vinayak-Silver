@@ -14,16 +14,6 @@ export function useClickOutside<T extends HTMLElement>(onOutside: () => void) {
   return ref
 }
 
-/** Simple debounce hook for search inputs. */
-export function useDebounced<T>(value: T, delay = 200): T {
-  const [debounced, setDebounced] = useState(value)
-  useEffect(() => {
-    const timer = window.setTimeout(() => setDebounced(value), delay)
-    return () => window.clearTimeout(timer)
-  }, [value, delay])
-  return debounced
-}
-
 export type Theme = 'light' | 'dark'
 
 /* The theme lives on <html data-theme> so it can be applied before first

@@ -11,18 +11,6 @@ export function uid(prefix = 'id'): string {
   return `${prefix}_${Date.now().toString(36)}${idCounter.toString(36)}${rand}`;
 }
 
-export function sum(values: number[]): number {
-  return values.reduce((acc, value) => acc + value, 0)
-}
-
-export function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max)
-}
-
-export function round2(value: number): number {
-  return Math.round((value + Number.EPSILON) * 100) / 100
-}
-
 /* ------------------------------------------------------------------ */
 /* Dates                                                               */
 /* ------------------------------------------------------------------ */
@@ -31,20 +19,10 @@ export function todayISO(): string {
   return new Date().toISOString().slice(0, 10)
 }
 
-export function nowISO(): string {
-  return new Date().toISOString()
-}
-
 export function addDaysISO(iso: string, days: number): string {
   const date = new Date(`${iso}T00:00:00`)
   date.setDate(date.getDate() + days)
   return date.toISOString().slice(0, 10)
-}
-
-export function daysBetween(fromISO: string, toISO: string): number {
-  const from = new Date(`${fromISO}T00:00:00`).getTime()
-  const to = new Date(`${toISO}T00:00:00`).getTime()
-  return Math.round((to - from) / 86_400_000)
 }
 
 export function formatDate(iso?: string): string {
@@ -75,12 +53,6 @@ export function monthKey(iso: string): string {
   return iso.slice(0, 7)
 }
 
-export function monthLabel(key: string): string {
-  const [year, month] = key.split('-')
-  const date = new Date(Number(year), Number(month) - 1, 1)
-  return date.toLocaleDateString('en-IN', { month: 'short', year: '2-digit' })
-}
-
 /* ------------------------------------------------------------------ */
 /* Numbers & currency                                                  */
 /* ------------------------------------------------------------------ */
@@ -107,15 +79,6 @@ export function formatNumber(value: number): string {
 /* ------------------------------------------------------------------ */
 /* Misc                                                                */
 /* ------------------------------------------------------------------ */
-
-export function initials(name: string): string {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
-    .join('')
-}
 
 export function downloadCSV(filename: string, headers: string[], rows: Array<Array<string | number>>): void {
   const escape = (value: string | number) => {

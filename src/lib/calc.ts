@@ -8,15 +8,12 @@ import type {
   Lead,
   LineItem,
   ManufacturingJob,
-  MaterialCategory,
   PackagingJob,
   Payment,
   Product,
-  Quotation,
   RawMaterial,
-  Supplier,
 } from '@/types'
-import { daysBetween, monthKey, todayISO } from '@/lib/utils'
+import { monthKey, todayISO } from '@/lib/utils'
 
 /* ------------------------------------------------------------------ */
 /* Line items & totals                                                 */
@@ -75,19 +72,7 @@ export function computeTotals(items: LineItem[]): Totals {
 /* Numbering                                                           */
 /* ------------------------------------------------------------------ */
 
-export const NUMBER_PREFIX = {
-  quotation: 'QT',
-  invoice: 'INV',
-  order: 'ORD',
-  manufacturing: 'MRJ',
-  packaging: 'PKJ',
-  dispatch: 'DSP',
-  customer: 'CUST',
-  supplier: 'SUP',
-  product: 'VS',
-  material: 'RM',
-} as const
-
+/** Take the next value from a persisted counter (mutates the draft). */
 export function nextSeq(db: Database, key: string): number {
   const next = (db.counters[key] ?? 0) + 1
   db.counters[key] = next
@@ -110,33 +95,12 @@ export function findCustomer(db: Database, id?: ID): Customer | undefined {
   return db.customers.find((customer) => customer.id === id)
 }
 
-export function findSupplier(db: Database, id?: ID): Supplier | undefined {
-  return db.suppliers.find((supplier) => supplier.id === id)
-}
-
 export function findProduct(db: Database, id?: ID): Product | undefined {
   return db.products.find((product) => product.id === id)
 }
 
-export function findMaterial(db: Database, id?: ID): RawMaterial | undefined {
-  return db.rawMaterials.find((material) => material.id === id)
-}
-
-export function findQuotation(db: Database, id?: ID): Quotation | undefined {
-  return db.quotations.find((quotation) => quotation.id === id)
-}
-
-export function findInvoice(db: Database, id?: ID): Invoice | undefined {
-  return db.invoices.find((invoice) => invoice.id === id)
-}
-
 export function customerName(db: Database, id?: ID): string {
   return findCustomer(db, id)?.companyName ?? 'Unknown customer'
-}
-
-export function customerLabel(db: Database, id: ID): { companyName: string; city: string } {
-  const customer = findCustomer(db, id)
-  return { companyName: customer?.companyName ?? 'Unknown customer', city: customer?.city ?? '' }
 }
 
 export interface OrderRefs {
@@ -336,14 +300,6 @@ export function stockValue(db: Database): number {
   return db.rawMaterials.reduce((acc, material) => acc + material.quantity * material.cost, 0)
 }
 
-export function categoryCounts(db: Database): Array<{ category: MaterialCategory; count: number }> {
-  const map = new Map<MaterialCategory, number>()
-  db.rawMaterials.forEach((material) => {
-    map.set(material.category, (map.get(material.category) ?? 0) + 1)
-  })
-  return [...map.entries()].map(([category, count]) => ({ category, count }))
-}
-
 /* ------------------------------------------------------------------ */
 /* Dashboard metrics                                                   */
 /* ------------------------------------------------------------------ */
@@ -413,11 +369,6 @@ export function dashboardMetrics(db: Database): DashboardMetrics {
     deliveredDispatches: db.dispatches.filter((dispatch) => dispatch.status === 'Delivered').length,
     packagingPending: db.packagingJobs.filter((job) => job.status !== 'Packed').length,
   }
-}
-
-export interface ChartPoint {
-  name: string
-  value: number
 }
 
 export function monthlySalesSeries(db: Database, months = 6): Array<{ name: string; invoiced: number; collected: number }> {
@@ -562,53 +513,4 @@ export function pendingTasks(db: Database): PendingTask[] {
 
   const rank: Record<TaskSeverity, number> = { high: 0, medium: 1, low: 2 }
   return tasks.sort((a, b) => rank[a.severity] - rank[b.severity])
-}
-
-/* ------------------------------------------------------------------ */
-/* Workflow helpers                                                    */
-/* ------------------------------------------------------------------ */
-
-export function orderProgress(db: Database, orderRef: string): {
-  stages: Array<{ label: string; state: 'done' | 'active' | 'pending' }>
-} {
-  const invoice = db.invoices.find((item) => item.orderRef === orderRef)
-  const jobs = db.manufacturingJobs.filter((job) => job.orderRef === orderRef)
-  const packagingJobs = db.packagingJobs.filter((job) => job.orderRef === orderRef)
-  const dispatches = db.dispatches.filter((dispatch) => dispatch.orderRef === orderRef)
-
-  const manufacturingDone = jobs.length > 0 && jobs.every((job) => job.status === 'Completed')
-  const packagingStarted = packagingJobs.length > 0
-  const packagingDone = packagingJobs.length > 0 && packagingJobs.every((job) => job.readyForDispatch)
-  const dispatchStarted = dispatches.some((dispatch) => dispatch.status !== 'Ready to Dispatch')
-  const delivered = dispatches.length > 0 && dispatches.every((dispatch) => dispatch.status === 'Delivered')
-
-  const done = {
-    order: Boolean(invoice),
-    manufacturing: jobs.length === 0 ? true : manufacturingDone,
-    packaging: packagingDone,
-    dispatch: delivered,
-  }
-
-  const order: Array<{ label: string; state: 'done' | 'active' | 'pending' }> = [
-    { label: 'Order confirmed', state: done.order ? 'done' : 'pending' },
-    {
-      label: jobs.length === 0 ? 'Manufacturing (not required)' : 'Manufacturing',
-      state: done.manufacturing ? 'done' : 'active',
-    },
-    {
-      label: 'Packaging',
-      state: packagingDone ? 'done' : packagingStarted ? 'active' : 'pending',
-    },
-    {
-      label: 'Dispatch',
-      state: delivered ? 'done' : dispatchStarted ? 'active' : 'pending',
-    },
-  ]
-  return { stages: order }
-}
-
-export function overdueDays(dueDate: string): number {
-  const today = todayISO()
-  if (dueDate >= today) return 0
-  return Math.abs(daysBetween(dueDate, today))
 }

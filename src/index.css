@@ -185,7 +185,6 @@
   --shadow-modal:
     0 0 0 1px rgba(15, 23, 42, 0.08),
     0 30px 70px -20px rgba(15, 23, 42, 0.4);
-  --shadow-inset-top: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
 
   /* ---------------------------------------------------------------
      Radii — 16px panels, 12px controls, 20px dialogs.
@@ -202,16 +201,10 @@
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-settle: cubic-bezier(0.34, 1.28, 0.64, 1);
 
   --animate-fade-in: fade-in 200ms var(--ease-out-quart) both;
-  --animate-fade-up: fade-up 260ms var(--ease-out-quint) both;
   --animate-slide-up: rise 240ms var(--ease-out-expo) both;
-  --animate-slide-in-right: slide-in-right 260ms var(--ease-out-expo) both;
   --animate-pop-in: pop-in 200ms var(--ease-out-expo) both;
-  --animate-scale-in: scale-in 180ms var(--ease-out-quart) both;
-  --animate-shimmer: shimmer 1600ms linear infinite;
-  --animate-drawer: drawer 280ms var(--ease-out-expo) both;
   --animate-pulse-ring: pulse-ring 2000ms var(--ease-out-quart) infinite;
   /* Exits run shorter than entrances: the user already understands the
      object by the time it leaves. */
@@ -417,17 +410,6 @@
   }
 }
 
-@keyframes slide-in-right {
-  from {
-    opacity: 0;
-    transform: translateX(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 @keyframes pop-in {
   from {
     opacity: 0;
@@ -436,35 +418,6 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes drawer {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-@keyframes shimmer {
-  from {
-    background-position: -200% 0;
-  }
-  to {
-    background-position: 200% 0;
   }
 }
 
@@ -580,16 +533,6 @@ input[type='number'] {
   background-clip: content-box;
 }
 
-.dark-scroll::-webkit-scrollbar-thumb {
-  background: rgba(15, 23, 42, 0.16);
-  background-clip: content-box;
-  border: 3px solid transparent;
-}
-.dark-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(15, 23, 42, 0.28);
-  background-clip: content-box;
-}
-
 /* Charts should not draw a focus box when clicked. */
 .recharts-wrapper:focus,
 .recharts-surface:focus {
@@ -603,16 +546,6 @@ input[type='number'] {
   background-image:
     radial-gradient(120% 140% at 0% 0%, rgba(255, 255, 255, 0.16) 0%, transparent 55%),
     radial-gradient(100% 100% at 100% 0%, rgba(99, 102, 241, 0.35) 0%, transparent 60%);
-}
-
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    var(--color-silver-200) 25%,
-    var(--color-silver-100) 37%,
-    var(--color-silver-200) 63%
-  );
-  background-size: 200% 100%;
 }
 
 /* Touch targets are physical: the visual control can stay compact while
@@ -645,16 +578,6 @@ input[type='number'] {
   }
   .print-only {
     display: block !important;
-  }
-  .print-area {
-    box-shadow: none !important;
-    border: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    max-width: 100% !important;
-  }
-  .print-scroll {
-    overflow: visible !important;
   }
   @page {
     margin: 14mm;

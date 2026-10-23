@@ -64,9 +64,6 @@ The sidebar contains the following modules, in order:
 | 10 | **Supplier** | Supplier master, purchase / payment records and payable balances |
 | 11 | **Report and Ledger** | Sales, quotation, invoice, inventory, manufacturing, packaging and dispatch reports plus customer and supplier ledgers, with date filters, search, summary totals and CSV export |
 
-Plus **Settings** at the bottom of the sidebar: company profile used on printed documents,
-demo-data reset (with confirmation), JSON backup export / import, and storage information.
-
 ---
 
 ## The connected workflow
@@ -124,7 +121,6 @@ src/
 - Missing, partial or corrupt data is repaired against defaults; schema-version mismatches
   rebuild the sample dataset instead of crashing.
 - IDs are stable and unique; quotation / invoice / job numbers come from a counter table.
-- **Settings → Reset demo data** restores the original sample dataset after confirmation.
 
 ---
 

@@ -23,7 +23,6 @@ import type {
 import { buildLineItem, computeTotals } from '@/lib/calc'
 
 export const DB_VERSION = 1
-export const SEED_FLAG = 'vinayak_silver_erp_version'
 
 const YEAR = new Date().getFullYear()
 
@@ -730,7 +729,6 @@ export function createSeedDatabase(): Database {
       bankName: 'HDFC Bank',
       bankAccount: '50200 4471 88910',
       ifsc: 'HDFC0001284',
-      currency: 'INR',
       defaultTaxRate: 18,
       financialYear: `${YEAR}-${String((YEAR + 1) % 100).padStart(2, '0')}`,
     },

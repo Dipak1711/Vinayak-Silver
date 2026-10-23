@@ -37,7 +37,6 @@ export interface CompanySettings {
   bankName: string;
   bankAccount: string;
   ifsc: string;
-  currency: string;
   defaultTaxRate: number;
   financialYear: string;
 }
@@ -322,7 +321,6 @@ export interface AdvancePayment {
   amount: number;
   mode: PaymentMode;
   reference: string;
-  notes?: string;
 }
 
 export interface Invoice {
@@ -401,7 +399,6 @@ export interface JobStage {
   vendor?: string;
   /** Planned completion for the stage. */
   plannedDate?: string;
-  startedAt?: string;
   completedAt?: string;
   /** How many pieces came off this stage. */
   completedQuantity?: number;
@@ -447,8 +444,6 @@ export interface ManufacturingJob {
   stockFulfilledQuantity?: number;
   /** Quantity reported complete across the stages. */
   completedQuantity?: number;
-  /** Actual production start (first stage moved off Pending). */
-  startedAt?: string;
   createdAt: string;
 }
 
@@ -545,19 +540,3 @@ export interface Database {
   settings: CompanySettings;
   counters: Record<string, number>;
 }
-
-export type CollectionKey =
-  | 'leads'
-  | 'customers'
-  | 'suppliers'
-  | 'products'
-  | 'rawMaterials'
-  | 'stockMovements'
-  | 'quotations'
-  | 'invoices'
-  | 'manufacturingJobs'
-  | 'packagingJobs'
-  | 'dispatches'
-  | 'supplierTransactions'
-  | 'advances'
-  | 'activities';

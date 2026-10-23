@@ -91,7 +91,6 @@ export function InvoicesPage() {
     mode: 'Bank Transfer' as PaymentMode,
     date: todayISO(),
     reference: '',
-    notes: '',
   }))
   const [advanceError, setAdvanceError] = useState('')
 
@@ -255,7 +254,6 @@ export function InvoicesPage() {
       mode: 'Bank Transfer',
       date: todayISO(),
       reference: '',
-      notes: '',
     })
     setAdvanceError('')
     setAdvanceOpen(true)
@@ -279,7 +277,6 @@ export function InvoicesPage() {
         mode: advanceForm.mode,
         date: advanceForm.date,
         reference: advanceForm.reference.trim(),
-        notes: advanceForm.notes.trim(),
       }),
     )
     if (!result.ok) {
@@ -854,9 +851,6 @@ export function InvoicesPage() {
           </Field>
           <Field label="Reference" hint="Cheque number, UPI transaction id, NEFT reference…">
             <Input value={advanceForm.reference} onChange={(event) => setAdvanceForm({ ...advanceForm, reference: event.target.value })} />
-          </Field>
-          <Field label="Notes">
-            <Textarea value={advanceForm.notes} onChange={(event) => setAdvanceForm({ ...advanceForm, notes: event.target.value })} placeholder="Order value, balance terms…" />
           </Field>
         </div>
       </Modal>

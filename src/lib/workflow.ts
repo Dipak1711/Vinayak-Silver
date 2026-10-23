@@ -14,7 +14,6 @@ import type {
   Payment,
   PaymentKind,
   PaymentMode,
-  Product,
   Quotation,
   RawMaterial,
   SupplierTransaction,
@@ -113,14 +112,6 @@ export function createCustomer(db: Database, input: Omit<Customer, 'id' | 'code'
 /* ------------------------------------------------------------------ */
 /* Products & raw materials                                            */
 /* ------------------------------------------------------------------ */
-
-export function createProduct(db: Database, input: Omit<Product, 'id'>): Product {
-  const product: Product = { ...input, id: uid('prod') }
-  if (!product.sku) product.sku = codeNumber('VS', nextSeq(db, 'product'))
-  db.products.push(product)
-  pushActivity(db, 'Inventory', `Product ${product.name} added to catalogue`)
-  return product
-}
 
 export function createMaterial(db: Database, input: Omit<RawMaterial, 'id'>): RawMaterial {
   const material: RawMaterial = { ...input, id: uid('mat') }
@@ -397,7 +388,6 @@ export function recordAdvance(
     mode: PaymentMode
     date: string
     reference: string
-    notes?: string
   },
 ): { ok: boolean; error?: string; advance?: AdvancePayment } {
   if (!input.customerId) return { ok: false, error: 'Select a customer.' }
@@ -412,7 +402,6 @@ export function recordAdvance(
     amount: Math.round(input.amount * 100) / 100,
     mode: input.mode,
     reference: input.reference.trim(),
-    notes: input.notes?.trim() || undefined,
   }
   db.advances.push(advance)
   pushActivity(db, 'Invoice', `Advance of ₹${advance.amount} recorded for ${customerName(db, input.customerId)}`)
@@ -671,7 +660,6 @@ export function updateJobStage(
   stage.plannedDate = input.plannedDate || stage.plannedDate
   stage.remarks = input.remarks?.trim() || undefined
   stage.completedQuantity = input.status === 'Completed' ? qty || job.quantity : qty || stage.completedQuantity
-  if (input.status !== 'Pending' && !stage.startedAt) stage.startedAt = now
   if (input.status === 'Completed') {
     stage.completedAt = now
     stage.delayReason = undefined
@@ -679,7 +667,6 @@ export function updateJobStage(
     stage.completedAt = undefined
     stage.delayReason = input.status === 'Delayed' ? delayReason : undefined
   }
-  if (!job.startedAt && input.status !== 'Pending') job.startedAt = now
 
   const noteParts = [`${stage.stage} · ${input.status}`]
   if (stage.completedQuantity) noteParts.push(`${stage.completedQuantity}/${job.quantity} pcs`)

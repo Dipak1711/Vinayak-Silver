@@ -52,16 +52,6 @@ export function dealSummary(db: Database, dealId: ID): DealSummary {
   }
 }
 
-/** True once any quotation of the deal has been converted into an invoice. */
-export function isDealConfirmed(db: Database, dealId: ID): boolean {
-  return quotationsForDeal(db, dealId).some((quotation) => Boolean(quotation.convertedInvoiceId))
-}
-
-/** The quotation of a deal that was confirmed (converted), if any. */
-export function confirmedQuotationOf(db: Database, dealId: ID): Quotation | undefined {
-  return quotationsForDeal(db, dealId).find((quotation) => Boolean(quotation.convertedInvoiceId))
-}
-
 /**
  * When one quotation of a deal is confirmed, every other still-open quotation
  * of the *same* deal is marked `Superseded` — never deleted, and never

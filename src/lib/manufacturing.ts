@@ -54,12 +54,6 @@ export function jobStages(job: ManufacturingJob): JobStage[] {
   })
 }
 
-/** The stage the job is working on: the first not yet completed. */
-export function currentStageOf(job: ManufacturingJob): JobStage {
-  const stages = jobStages(job)
-  return stages.find((stage) => stage.status !== 'Completed') ?? stages[stages.length - 1]
-}
-
 /** Overall status derived from the stage plan. */
 export function deriveJobStatus(job: ManufacturingJob): MfgStatus {
   const stages = jobStages(job)
