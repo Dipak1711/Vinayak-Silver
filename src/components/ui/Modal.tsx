@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { AlertTriangle, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/Button'
@@ -104,7 +105,10 @@ export function Modal({ open, onClose, title, subtitle, size = 'md', footer, chi
 
   if (!mounted) return null
 
-  return (
+  // Portalled to <body>: any animating ancestor (e.g. the page-enter wrapper,
+  // whose transform makes it a containing block) would otherwise trap these
+  // `fixed` layers inside the content column and leave an undimmed strip.
+  return createPortal(
     <div
       className={cn(
         'no-print fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 sm:items-center',
@@ -153,7 +157,8 @@ export function Modal({ open, onClose, title, subtitle, size = 'md', footer, chi
           </footer>
         ) : null}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
