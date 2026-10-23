@@ -9,6 +9,7 @@ import type {
   LineItem,
   ManufacturingJob,
   MfgStage,
+  MfgStatus,
   PackagingJob,
   Payment,
   PaymentKind,
@@ -18,7 +19,14 @@ import type {
   RawMaterial,
   SupplierTransaction,
 } from '@/types'
-import { MFG_STAGES } from '@/types'
+import {
+  DEFAULT_JOB_STAGES,
+  deriveJobStatus,
+  jobCompletedQuantity,
+  jobProgress,
+  jobStages,
+  makeJobStage,
+} from '@/lib/manufacturing'
 import {
   buildLineItem,
   codeNumber,
@@ -532,6 +540,12 @@ export function confirmOrder(db: Database, invoiceId: ID): { ok: boolean; error?
     const start = today.toISOString().slice(0, 10)
     const end = new Date(today)
     end.setDate(end.getDate() + 14)
+    const endDate = end.toISOString().slice(0, 10)
+    const quotationRef = invoice.quotationId
+      ? db.quotations.find((quotation) => quotation.id === invoice.quotationId)?.number
+      : undefined
+    const stages = DEFAULT_JOB_STAGES.map((stage) => makeJobStage(stage, endDate))
+    const stockFulfilled = product && product.type === 'Finished' ? Math.max(item.quantity - shortfall, 0) : 0
     const job: ManufacturingJob = {
       id: uid('mrj'),
       jobNumber: documentNumber('MRJ', nextSeq(db, 'manufacturing')),
@@ -540,10 +554,10 @@ export function confirmOrder(db: Database, invoiceId: ID): { ok: boolean; error?
       customerId: invoice.customerId,
       productName: label,
       quantity: shortfall,
-      stage: MFG_STAGES[0],
+      stage: stages[0].stage,
       status: 'Pending',
       plannedStart: start,
-      plannedEnd: end.toISOString().slice(0, 10),
+      plannedEnd: endDate,
       assignedTo: '',
       progress: 0,
       outsourced: false,
@@ -552,9 +566,21 @@ export function confirmOrder(db: Database, invoiceId: ID): { ok: boolean; error?
         ? `Auto-generated while confirming order ${invoice.number}.`
         : `Custom item on order ${invoice.number}.`,
       history: [
-        { id: uid('sh'), stage: MFG_STAGES[0], at: new Date().toISOString(), note: 'Job created from order confirmation' },
+        {
+          id: uid('sh'),
+          stage: stages[0].stage,
+          at: new Date().toISOString(),
+          note: `Job created from order confirmation${stockFulfilled > 0 ? ` · ${stockFulfilled} of ${item.quantity} taken from finished stock` : ''}`,
+          status: 'Pending',
+        },
       ],
       createdAt: new Date().toISOString(),
+      stages,
+      quotationRef,
+      orderNumber: invoice.number,
+      orderQuantity: item.quantity,
+      stockFulfilledQuantity: stockFulfilled,
+      completedQuantity: 0,
     }
     db.manufacturingJobs.push(job)
     manufacturing += 1
@@ -575,77 +601,120 @@ export function confirmOrder(db: Database, invoiceId: ID): { ok: boolean; error?
 /* Manufacturing                                                       */
 /* ------------------------------------------------------------------ */
 
-export function advanceManufacturing(
+/** Recompute the job's headline fields (current stage, status, progress) from its plan. */
+function syncJobFromStages(db: Database, job: ManufacturingJob): void {
+  const stages = jobStages(job)
+  const current = stages.find((stage) => stage.status !== 'Completed') ?? stages[stages.length - 1]
+  job.stage = current?.stage ?? job.stage
+  job.status = deriveJobStatus(job)
+  job.progress = jobProgress(job)
+  job.completedQuantity = jobCompletedQuantity(job)
+  job.assignedTo = current?.assignedTo || job.assignedTo
+  const delayed = stages.find((stage) => stage.status === 'Delayed')
+  job.delayReason = delayed?.delayReason
+  job.delayedAtStage = delayed?.stage
+  const stageVendor = stages.find((stage) => stage.vendor)?.vendor
+  if (stageVendor) {
+    job.outsourced = true
+    job.vendor = stageVendor
+  }
+
+  if (job.status === 'Completed') {
+    if (!job.completedAt) job.completedAt = new Date().toISOString()
+    ensurePackagingJob(db, {
+      orderRef: job.orderRef,
+      invoiceId: job.invoiceId,
+      customerId: job.customerId,
+      productName: job.productName,
+      quantity: jobCompletedQuantity(job) || job.quantity,
+      productionJobId: job.id,
+    })
+  } else {
+    job.completedAt = undefined
+  }
+}
+
+export interface JobStageUpdate {
+  status: MfgStatus
+  completedQuantity?: number
+  assignedTo: string
+  vendor?: string
+  plannedDate?: string
+  remarks?: string
+  delayReason?: string
+}
+
+/** Update one stage of a job's plan. */
+export function updateJobStage(
   db: Database,
   jobId: ID,
-  input: {
-    stage: MfgStage
-    progress: number
-    status: ManufacturingJob['status']
-    note: string
-    assignedTo: string
-    delayReason?: string
-  },
+  stageId: ID,
+  input: JobStageUpdate,
 ): { ok: boolean; error?: string } {
   const job = db.manufacturingJobs.find((item) => item.id === jobId)
   if (!job) return { ok: false, error: 'Production job not found.' }
-  const progress = Math.max(0, Math.min(100, input.progress))
+  if (!Array.isArray(job.stages) || job.stages.length === 0) job.stages = jobStages(job)
+  const stage = job.stages.find((item) => item.id === stageId)
+  if (!stage) return { ok: false, error: 'Stage not found on this job.' }
+
   const delayReason = input.delayReason?.trim() ?? ''
-
   if (input.status === 'Delayed' && !delayReason) {
-    return { ok: false, error: 'A delay reason is required when a job is marked Delayed.' }
+    return { ok: false, error: 'A delay reason is required when a stage is marked Delayed.' }
   }
 
-  if (input.stage !== job.stage || progress !== job.progress || input.note) {
-    job.history.push({
-      id: uid('sh'),
-      stage: input.stage,
-      at: new Date().toISOString(),
-      note: input.note || `Stage updated to ${input.stage} (${progress}%)`,
-    })
-  }
+  const now = new Date().toISOString()
+  const qty = Math.max(0, Math.min(job.quantity, Math.round(input.completedQuantity ?? stage.completedQuantity ?? 0)))
 
-  // Capture the structured reason (and where) in the stage history too.
-  const enteringDelay = job.status !== 'Delayed' && input.status === 'Delayed'
-  const reasonChanged = input.status === 'Delayed' && delayReason !== (job.delayReason ?? '')
-  if (enteringDelay || reasonChanged) {
-    job.history.push({
-      id: uid('sh'),
-      stage: input.stage,
-      at: new Date().toISOString(),
-      note: `Delayed at ${input.stage} — ${delayReason}`,
-    })
-  }
-
-  job.stage = input.stage
-  job.progress = progress
-  job.status = input.status
-  job.assignedTo = input.assignedTo || job.assignedTo
-  if (input.status === 'Delayed') {
-    job.delayReason = delayReason
-    job.delayedAtStage = input.stage
-  } else {
-    // Leaving Delayed clears the live reason; the history keeps the record.
-    job.delayReason = undefined
-    job.delayedAtStage = undefined
-  }
-
+  stage.status = input.status
+  stage.assignedTo = input.assignedTo.trim() || stage.assignedTo
+  stage.vendor = input.vendor?.trim() || undefined
+  stage.plannedDate = input.plannedDate || stage.plannedDate
+  stage.remarks = input.remarks?.trim() || undefined
+  stage.completedQuantity = input.status === 'Completed' ? qty || job.quantity : qty || stage.completedQuantity
+  if (input.status !== 'Pending' && !stage.startedAt) stage.startedAt = now
   if (input.status === 'Completed') {
-    job.progress = 100
-    job.stage = MFG_STAGES[MFG_STAGES.length - 1]
-    job.completedAt = new Date().toISOString()
-    const jobRecord = job
-    ensurePackagingJob(db, {
-      orderRef: jobRecord.orderRef,
-      invoiceId: jobRecord.invoiceId,
-      customerId: jobRecord.customerId,
-      productName: jobRecord.productName,
-      quantity: jobRecord.quantity,
-      productionJobId: jobRecord.id,
-    })
+    stage.completedAt = now
+    stage.delayReason = undefined
+  } else {
+    stage.completedAt = undefined
+    stage.delayReason = input.status === 'Delayed' ? delayReason : undefined
   }
+  if (!job.startedAt && input.status !== 'Pending') job.startedAt = now
 
-  pushActivity(db, 'Manufacturing', `${job.jobNumber} updated · ${job.stage} (${job.progress}%) · ${job.status}`)
+  const noteParts = [`${stage.stage} · ${input.status}`]
+  if (stage.completedQuantity) noteParts.push(`${stage.completedQuantity}/${job.quantity} pcs`)
+  if (stage.remarks) noteParts.push(stage.remarks)
+  if (input.status === 'Delayed') noteParts.push(`Delayed — ${delayReason}`)
+  job.history.push({
+    id: uid('sh'),
+    stage: stage.stage,
+    at: now,
+    note: noteParts.join(' · '),
+    status: input.status,
+    completedQuantity: stage.completedQuantity,
+    delayReason: input.status === 'Delayed' ? delayReason : undefined,
+  })
+
+  syncJobFromStages(db, job)
+  pushActivity(
+    db,
+    'Manufacturing',
+    `${job.jobNumber} · ${stage.stage} ${input.status}${input.status === 'Delayed' ? ` (${delayReason})` : ''}`,
+  )
+  return { ok: true }
+}
+
+/** Append a stage to a job's plan (e.g. an extra finishing step). */
+export function addJobStage(db: Database, jobId: ID, stageName: MfgStage): { ok: boolean; error?: string } {
+  const job = db.manufacturingJobs.find((item) => item.id === jobId)
+  if (!job) return { ok: false, error: 'Production job not found.' }
+  if (!Array.isArray(job.stages) || job.stages.length === 0) job.stages = jobStages(job)
+  if (job.stages.some((stage) => stage.stage === stageName)) {
+    return { ok: false, error: 'That stage is already part of this job.' }
+  }
+  job.stages.push(makeJobStage(stageName, job.plannedEnd))
+  syncJobFromStages(db, job)
+  pushActivity(db, 'Manufacturing', `${job.jobNumber} · ${stageName} stage added`)
   return { ok: true }
 }
 
@@ -656,15 +725,28 @@ export function createManufacturingJob(
     invoiceId?: ID
     customerId?: ID
     productName: string
+    /** Quantity on the order for this product. */
+    orderQuantity: number
+    /** Quantity this job must manufacture. */
     quantity: number
+    /** Ordered list of required stages (selectable per job). */
+    stages: MfgStage[]
     assignedTo: string
     plannedStart: string
     plannedEnd: string
     outsourced: boolean
     vendor: string
     notes: string
+    quotationRef?: string
+    orderNumber?: string
+    stockFulfilledQuantity?: number
   },
 ): ManufacturingJob {
+  const requested = input.stages.length > 0 ? input.stages : DEFAULT_JOB_STAGES
+  const stages = requested.map((stage) => makeJobStage(stage, input.plannedEnd))
+  stages[0].assignedTo = input.assignedTo
+  if (input.outsourced && input.vendor) stages[0].vendor = input.vendor
+
   const job: ManufacturingJob = {
     id: uid('mrj'),
     jobNumber: documentNumber('MRJ', nextSeq(db, 'manufacturing')),
@@ -673,7 +755,7 @@ export function createManufacturingJob(
     customerId: input.customerId,
     productName: input.productName,
     quantity: input.quantity,
-    stage: MFG_STAGES[0],
+    stage: stages[0].stage,
     status: 'Pending',
     plannedStart: input.plannedStart,
     plannedEnd: input.plannedEnd,
@@ -682,8 +764,16 @@ export function createManufacturingJob(
     outsourced: input.outsourced,
     vendor: input.vendor,
     notes: input.notes,
-    history: [{ id: uid('sh'), stage: MFG_STAGES[0], at: new Date().toISOString(), note: 'Job created' }],
+    history: [
+      { id: uid('sh'), stage: stages[0].stage, at: new Date().toISOString(), note: 'Job created', status: 'Pending' },
+    ],
     createdAt: new Date().toISOString(),
+    stages,
+    quotationRef: input.quotationRef,
+    orderNumber: input.orderNumber,
+    orderQuantity: input.orderQuantity,
+    stockFulfilledQuantity: input.stockFulfilledQuantity,
+    completedQuantity: 0,
   }
   db.manufacturingJobs.push(job)
   pushActivity(db, 'Manufacturing', `Production job ${job.jobNumber} created for ${job.productName}`)

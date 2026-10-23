@@ -378,6 +378,36 @@ export interface StageLog {
   stage: MfgStage;
   at: string;
   note: string;
+  /** Status recorded with this entry, when it came from a stage update. */
+  status?: MfgStatus;
+  /** Completed quantity recorded against the stage. */
+  completedQuantity?: number;
+  /** Reason, when the entry records a delay. */
+  delayReason?: string;
+}
+
+/**
+ * One required process on a job. A job carries its own ordered list of these,
+ * so different orders run different routes (not every order through every
+ * stage). `stage` is the process name; the order comes from the list.
+ */
+export interface JobStage {
+  id: ID;
+  stage: MfgStage;
+  status: MfgStatus;
+  /** Person or vendor responsible for this stage. */
+  assignedTo: string;
+  /** Vendor name when this stage is outsourced (job work). */
+  vendor?: string;
+  /** Planned completion for the stage. */
+  plannedDate?: string;
+  startedAt?: string;
+  completedAt?: string;
+  /** How many pieces came off this stage. */
+  completedQuantity?: number;
+  remarks?: string;
+  /** Required when status is Delayed. */
+  delayReason?: string;
 }
 
 export interface ManufacturingJob {
@@ -403,6 +433,22 @@ export interface ManufacturingJob {
   delayReason?: string;
   /** Stage the job was on when it was marked Delayed. */
   delayedAtStage?: MfgStage;
+  /* ------- Order-based planning (all optional for older records) ------- */
+  /** The job's own ordered list of required stages. A single-stage plan is
+   *  derived for records created before per-job stage plans existed. */
+  stages?: JobStage[];
+  /** Quotation number this job fulfils, when the order came from one. */
+  quotationRef?: string;
+  /** Invoice / order number this job fulfils. */
+  orderNumber?: string;
+  /** Quantity on the order for this product (stock + manufactured). */
+  orderQuantity?: number;
+  /** How much of the order was met from finished stock (no manufacturing). */
+  stockFulfilledQuantity?: number;
+  /** Quantity reported complete across the stages. */
+  completedQuantity?: number;
+  /** Actual production start (first stage moved off Pending). */
+  startedAt?: string;
   createdAt: string;
 }
 

@@ -4,9 +4,12 @@ import type {
   Database,
   DispatchRecord,
   Invoice,
+  JobStage,
   Lead,
   LineItem,
   ManufacturingJob,
+  MfgStage,
+  MfgStatus,
   PackagingJob,
   Payment,
   PaymentMode,
@@ -407,6 +410,21 @@ function mfgJob(
   }
 }
 
+/** Build a per-job stage plan from [stage, status] pairs. */
+function stagePlan(jobId: string, quantity: number, steps: Array<[MfgStage, MfgStatus]>): JobStage[] {
+  return steps.map(([stage, status], index) => {
+    const done = status === 'Completed'
+    return {
+      id: `${jobId}-stg-${index}`,
+      stage,
+      status,
+      assignedTo: '',
+      completedQuantity: done ? quantity : 0,
+      completedAt: done ? ts(-1) : undefined,
+    }
+  })
+}
+
 const manufacturingJobs: ManufacturingJob[] = [
   mfgJob('mrj-1', 1, `QT-${YEAR}-0001`, 'inv-1', 'cust-1', 'Silver Idol · Lakshmi 4 inch', 20, 'Laser Cutting', 'In Progress', 55, 'Ramesh Patil', -40, 6, {
     history: [
@@ -416,6 +434,14 @@ const manufacturingJobs: ManufacturingJob[] = [
       { id: 'mrj-1-h4', stage: 'Laser Cutting', at: ts(-10), note: 'Fine detailing in progress' },
     ],
     notes: 'Detailing as per approved design sheet DS-114.',
+    stages: stagePlan('mrj-1', 20, [
+      ['Material Procurement', 'Completed'],
+      ['Cutting', 'Completed'],
+      ['Assembly', 'Completed'],
+      ['Laser Cutting', 'In Progress'],
+      ['Cleaning', 'Pending'],
+      ['Quality Check', 'Pending'],
+    ]),
   }),
   mfgJob('mrj-2', 2, `QT-${YEAR}-0002`, 'inv-2', 'cust-4', 'Executive Gift Box · Pen & Card Holder', 300, 'Assembly', 'In Progress', 40, 'Sunita Deshmukh', -30, 12, {
     outsourced: true,
@@ -425,12 +451,26 @@ const manufacturingJobs: ManufacturingJob[] = [
       { id: 'mrj-2-h2', stage: 'Assembly', at: ts(-14), note: 'Logo embossing started' },
     ],
     notes: 'Outsourced finishing; in-house QC before packing.',
+    stages: stagePlan('mrj-2', 300, [
+      ['Material Procurement', 'Completed'],
+      ['Cutting', 'Completed'],
+      ['Assembly', 'In Progress'],
+      ['Cleaning', 'Pending'],
+      ['Quality Check', 'Pending'],
+    ]),
   }),
   mfgJob('mrj-3', 3, `QT-${YEAR}-0005`, 'inv-4', 'cust-3', 'Silver Dinner Set (6 pc)', 6, 'Cutting', 'In Progress', 30, 'Ganesh Shinde', -18, 14, {
     history: [
       { id: 'mrj-3-h1', stage: 'Material Procurement', at: ts(-18), note: 'Silver sheet 1mm issued' },
       { id: 'mrj-3-h2', stage: 'Cutting', at: ts(-6), note: 'Plate blanks cut' },
     ],
+    stages: stagePlan('mrj-3', 6, [
+      ['Material Procurement', 'Completed'],
+      ['Cutting', 'In Progress'],
+      ['Assembly', 'Pending'],
+      ['Cleaning', 'Pending'],
+      ['Quality Check', 'Pending'],
+    ]),
   }),
   mfgJob('mrj-4', 4, `QT-${YEAR}-0005`, 'inv-4', 'cust-3', 'Silver Coin 10g (999)', 50, 'Quality Check', 'Completed', 100, 'Ganesh Shinde', -26, -4, {
     completedAt: ts(-4),
@@ -440,6 +480,12 @@ const manufacturingJobs: ManufacturingJob[] = [
       { id: 'mrj-4-h3', stage: 'Cleaning', at: ts(-8), note: 'Polish completed' },
       { id: 'mrj-4-h4', stage: 'Quality Check', at: ts(-4), note: 'Passed — 999 hallmark verified' },
     ],
+    stages: stagePlan('mrj-4', 50, [
+      ['Material Procurement', 'Completed'],
+      ['Cutting', 'Completed'],
+      ['Cleaning', 'Completed'],
+      ['Quality Check', 'Completed'],
+    ]),
   }),
   mfgJob('mrj-5', 5, `ORD-${YEAR}-0001`, 'inv-5', 'cust-6', 'Corporate Diwali Hamper', 400, 'Cleaning', 'Delayed', 70, 'Ramesh Patil', -24, -2, {
     history: [
@@ -450,6 +496,12 @@ const manufacturingJobs: ManufacturingJob[] = [
     notes: 'Blocked on velvet box replenishment from supplier.',
     delayReason: 'Material shortage',
     delayedAtStage: 'Cleaning',
+    stages: stagePlan('mrj-5', 400, [
+      ['Material Procurement', 'Completed'],
+      ['Assembly', 'Completed'],
+      ['Cleaning', 'Delayed'],
+      ['Quality Check', 'Pending'],
+    ]),
   }),
   mfgJob('mrj-6', 6, `QT-${YEAR}-0001`, 'inv-1', 'cust-1', 'Silver Pooja Thali Set', 25, 'Quality Check', 'Completed', 100, 'Suresh Kamble', -55, -30, {
     completedAt: ts(-30),
@@ -458,8 +510,43 @@ const manufacturingJobs: ManufacturingJob[] = [
       { id: 'mrj-6-h2', stage: 'Assembly', at: ts(-45), note: 'Bowl sets assembled' },
       { id: 'mrj-6-h3', stage: 'Quality Check', at: ts(-30), note: 'Passed' },
     ],
+    stages: stagePlan('mrj-6', 25, [
+      ['Material Procurement', 'Completed'],
+      ['Assembly', 'Completed'],
+      ['Quality Check', 'Completed'],
+    ]),
   }),
 ]
+
+// Link each seeded job to its order/quotation and tidy its stage plan.
+manufacturingJobs.forEach((job) => {
+  const invoiceRecord = invoices.find(
+    (item) => item.orderRef === job.orderRef && (!job.invoiceId || item.id === job.invoiceId),
+  )
+  if (invoiceRecord) {
+    job.orderNumber = invoiceRecord.number
+    const quotationRecord = invoiceRecord.quotationId
+      ? quotations.find((item) => item.id === invoiceRecord.quotationId)
+      : undefined
+    job.quotationRef = quotationRecord?.number
+    const line = invoiceRecord.items.find((item) => item.description === job.productName)
+    job.orderQuantity = line?.quantity ?? job.quantity
+  } else {
+    job.orderQuantity = job.quantity
+  }
+  job.completedQuantity = job.status === 'Completed' ? job.quantity : 0
+
+  const plan = job.stages ?? []
+  plan.forEach((stage) => {
+    if (!stage.assignedTo) stage.assignedTo = job.assignedTo
+  })
+  const current = plan.find((stage) => stage.status !== 'Completed') ?? plan[plan.length - 1]
+  if (job.outsourced && job.vendor && current) current.vendor = job.vendor
+  if (job.delayReason) {
+    const delayed = plan.find((stage) => stage.status === 'Delayed')
+    if (delayed) delayed.delayReason = job.delayReason
+  }
+})
 
 /* ---------------------------- Packaging ---------------------------- */
 

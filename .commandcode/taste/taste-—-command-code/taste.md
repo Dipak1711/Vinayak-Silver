@@ -18,3 +18,4 @@
 - When reworking an existing app, must not delete or reset its existing demo/sample data — treat persisted demo data as something to preserve. Confidence: 0.7
 - When a real external integration cannot be included in a demo (e.g. courier API / live tracking), wants it represented by a clearly labelled mock/simulated integration plus realistic sample data, never a real connection. Confidence: 0.65
 - Treats any separate reference project as off-limits: read/reference only, never modified. Confidence: 0.7
+- After UI changes, wants a clear walkthrough of where in the app to see each change (which page/route, which screen element), rather than just what was changed in code. Confidence: 0.7

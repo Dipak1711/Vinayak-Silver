@@ -139,6 +139,31 @@ export function customerLabel(db: Database, id: ID): { companyName: string; city
   return { companyName: customer?.companyName ?? 'Unknown customer', city: customer?.city ?? '' }
 }
 
+export interface OrderRefs {
+  /** Invoice / order number for the order behind a job. */
+  orderNumber: string
+  /** Quotation number the order came from, when there is one. */
+  quotationNumber: string
+}
+
+/**
+ * Resolve the order and quotation numbers for a record from its invoice (or
+ * from the order reference itself). Used to keep the same references visible
+ * through manufacturing, packaging and dispatch.
+ */
+export function orderRefs(db: Database, invoiceId?: ID, orderRef?: string): OrderRefs {
+  const invoice = invoiceId
+    ? db.invoices.find((item) => item.id === invoiceId)
+    : db.invoices.find((item) => item.orderRef === orderRef)
+  const quotation = invoice?.quotationId
+    ? db.quotations.find((item) => item.id === invoice.quotationId)
+    : db.quotations.find((item) => item.number === orderRef)
+  return {
+    orderNumber: invoice?.number ?? orderRef ?? '—',
+    quotationNumber: quotation?.number ?? '—',
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /* Money                                                               */
 /* ------------------------------------------------------------------ */

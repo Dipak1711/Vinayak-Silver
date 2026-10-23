@@ -12,7 +12,7 @@ import { TBody, THead, Td, Th, TR, Table, TableEmptyRow, TableShell } from '@/co
 import { useData } from '@/store/DataContext'
 import { useToast } from '@/store/ToastContext'
 import { ensurePackagingJob, markReadyForDispatch, pushActivity, updatePackaging } from '@/lib/workflow'
-import { customerName } from '@/lib/calc'
+import { customerName, orderRefs } from '@/lib/calc'
 import { cn, downloadCSV, formatDate, formatNumber, todayISO } from '@/lib/utils'
 
 export function PackagingPage() {
@@ -410,6 +410,8 @@ export function PackagingPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="divide-y divide-silver-200">
                 <DataRow label="Customer" value={detail.customerId ? customerName(db, detail.customerId) : '—'} />
+                <DataRow label="Order number" value={orderRefs(db, detail.invoiceId, detail.orderRef).orderNumber} />
+                <DataRow label="Quotation" value={orderRefs(db, detail.invoiceId, detail.orderRef).quotationNumber} />
                 <DataRow label="Order reference" value={detail.orderRef} />
                 <DataRow label="Quantity to pack" value={formatNumber(detail.quantityToPack)} />
                 <DataRow label="Packed quantity" value={formatNumber(detail.packedQuantity)} />

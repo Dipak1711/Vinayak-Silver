@@ -14,7 +14,7 @@ import { useData } from '@/store/DataContext'
 import { useToast } from '@/store/ToastContext'
 import { createDispatch, fetchDispatchTracking, pushActivity, updateDispatchStatus } from '@/lib/workflow'
 import { MOCK_COURIER_LABEL } from '@/lib/mockCourier'
-import { customerName } from '@/lib/calc'
+import { customerName, orderRefs } from '@/lib/calc'
 import { addDaysISO, cn, downloadCSV, formatDate, formatDateTime, formatNumber, todayISO } from '@/lib/utils'
 
 export function DispatchPage() {
@@ -468,6 +468,9 @@ export function DispatchPage() {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="divide-y divide-silver-200">
+                <DataRow label="Order number" value={orderRefs(db, detail.invoiceId, detail.orderRef).orderNumber} />
+                <DataRow label="Quotation" value={orderRefs(db, detail.invoiceId, detail.orderRef).quotationNumber} />
+                <DataRow label="Order reference" value={detail.orderRef} />
                 <DataRow label="Courier" value={detail.courierName || '—'} />
                 <DataRow label="Tracking number" value={detail.trackingNumber || '—'} />
                 <DataRow label="Dispatch date" value={detail.dispatchDate ? formatDate(detail.dispatchDate) : '—'} />
