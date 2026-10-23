@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   AlertTriangle,
@@ -6,12 +6,14 @@ import {
   ClipboardList,
   Factory,
   FileText,
+  Hourglass,
   IndianRupee,
   LayoutDashboard,
   Receipt,
   Target,
   Truck,
   Users,
+  Wallet,
 } from 'lucide-react'
 import { PageHeader, EmptyState, ProgressBar } from '@/components/ui/Layout'
 import { Card, CardHeader } from '@/components/ui/Card'
@@ -36,6 +38,97 @@ import { cn, formatCurrency, formatDateTime, formatNumber, percentage, todayISO 
 function pctChange(current: number, previous: number): number {
   if (previous === 0) return current > 0 ? 100 : 0
   return ((current - previous) / previous) * 100
+}
+
+/* Collection rate as a ring that draws itself on load. */
+function CollectionRing({ rate }: { rate: number }) {
+  const size = 156
+  const stroke = 12
+  const radius = (size - stroke) / 2
+  const circumference = 2 * Math.PI * radius
+  const clamped = Math.max(0, Math.min(100, rate))
+  const [shown, setShown] = useState(0)
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setShown(clamped))
+    return () => cancelAnimationFrame(frame)
+  }, [clamped])
+
+  return (
+    <div className="relative" style={{ width: size, height: size }} role="img" aria-label={`${clamped}% of invoiced value collected`}>
+      <svg width={size} height={size} className="-rotate-90">
+        <defs>
+          <linearGradient id="ring-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#6ee7b7" />
+            <stop offset="100%" stopColor="#fcd34d" />
+          </linearGradient>
+        </defs>
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth={stroke} />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="url(#ring-grad)"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference * (1 - shown / 100)}
+          style={{ transition: 'stroke-dashoffset 1400ms cubic-bezier(0.16, 1, 0.3, 1)', filter: 'drop-shadow(0 0 6px rgba(110,231,183,0.55))' }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+        <span className="tnum text-[34px] leading-none font-extrabold tracking-[-0.03em]">
+          <AnimatedNumber value={clamped} format={(v) => `${Math.round(v)}%`} duration={1400} />
+        </span>
+        <span className="mt-1 text-[10.5px] font-bold tracking-[0.14em] text-white/70 uppercase">Collected</span>
+      </div>
+    </div>
+  )
+}
+
+/* A frosted tile for one headline figure. */
+function HeroTile({
+  label,
+  icon,
+  accent,
+  iconClass,
+  valueClass = 'text-white',
+  value,
+  chip,
+  spark,
+}: {
+  label: string
+  icon: ReactNode
+  accent: string
+  iconClass: string
+  valueClass?: string
+  value: number
+  chip: { text: string; good: boolean }
+  spark?: ReactNode
+}) {
+  return (
+    <div className="group relative overflow-hidden rounded-2xl bg-white/[0.09] p-4 ring-1 ring-white/15 backdrop-blur transition-[translate,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:bg-white/[0.14]">
+      <span className={cn('absolute inset-x-0 top-0 h-[3px] bg-linear-to-r', accent)} aria-hidden="true" />
+      <div className="flex items-center justify-between gap-2">
+        <span className="flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] text-white/70 uppercase">
+          <span className={cn('grid h-7 w-7 place-items-center rounded-lg', iconClass)}>{icon}</span>
+          {label}
+        </span>
+        <span
+          className={cn(
+            'tnum rounded-full px-2 py-0.5 text-[10.5px] font-bold',
+            chip.good ? 'bg-emerald-400/20 text-emerald-200' : 'bg-rose-400/25 text-rose-200',
+          )}
+        >
+          {chip.text}
+        </span>
+      </div>
+      <p className={cn('tnum mt-3 text-[28px] leading-none font-extrabold tracking-[-0.03em]', valueClass)}>
+        <AnimatedNumber value={value} format={(v) => formatCurrency(v, true)} duration={1100} />
+      </p>
+      <div className="mt-2">{spark}</div>
+    </div>
+  )
 }
 
 export function DashboardPage() {
@@ -66,6 +159,7 @@ export function DashboardPage() {
   )
 
   const invoicedSpark = useMemo(() => sales.map((point) => point.invoiced), [sales])
+  const collectedSpark = useMemo(() => sales.map((point) => point.collected), [sales])
   const overdueInvoices = useMemo(
     () => db.invoices.filter((invoice) => invoice.status !== 'Paid' && invoice.dueDate < todayISO()).length,
     [db.invoices],
@@ -106,86 +200,61 @@ export function DashboardPage() {
 
       {/* ---------------- Hero band ---------------- */}
       <Card variant="dark" padded={false} className="overflow-hidden">
-        <div className="relative p-4 lg:p-5">
-          {/* Decorative trend wash, pinned to the bottom edge so it never
-              crosses the figures it sits behind. */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 opacity-35" aria-hidden="true">
-            <Sparkline data={invoicedSpark} tone="gold" height={56} />
-          </div>
+        <div className="relative p-5 lg:p-6">
+          {/* Atmosphere: a warm glow top-right, a cool one bottom-left, and a
+              faint rupee mark, so the band reads as a surface, not a flat fill. */}
+          <div className="pointer-events-none absolute -top-24 -right-16 h-72 w-72 rounded-full bg-gold-400/25 blur-3xl" aria-hidden="true" />
+          <div className="pointer-events-none absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-emerald-400/20 blur-3xl" aria-hidden="true" />
+          <IndianRupee className="pointer-events-none absolute -right-6 -bottom-10 h-56 w-56 -rotate-12 text-white/[0.045]" aria-hidden="true" />
 
-          <div className="relative flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <h2 className="text-[20px] font-bold tracking-[-0.02em] text-white lg:text-[25px]">
+          <div className="relative grid items-center gap-6 lg:grid-cols-[auto_1fr] lg:gap-8">
+            <div className="flex flex-col items-center gap-3">
+              <CollectionRing rate={collectedRate} />
+              <div className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-300" />
+                </span>
+                <span className="text-[11.5px] font-semibold text-white/90">
+                  {metrics.totalInvoices} invoices · {metrics.pendingOrders} orders open
+                </span>
+              </div>
+            </div>
+
+            <div className="min-w-0">
+              <h2 className="text-[20px] font-extrabold tracking-[-0.02em] text-white lg:text-[24px]">
                 Revenue and fulfilment at a glance
               </h2>
-            </div>
-            <div className="flex items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-3 py-2 backdrop-blur">
-              <IndianRupee className="h-4 w-4 text-gold-300" aria-hidden="true" />
-              <span className="text-xs font-semibold text-white/90">
-                {metrics.totalInvoices} invoices · {metrics.pendingOrders} orders open
-              </span>
-            </div>
-          </div>
-
-          <div className="relative mt-5">
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">Collection rate</span>
-              <span className="tnum text-[11px] font-bold text-emerald-300">{collectedRate}% realised</span>
-            </div>
-            <ProgressBar value={collectedRate} tone="emerald" track="bg-white/25" className="mt-2" />
-          </div>
-
-          <div className="relative mt-5 grid gap-x-6 gap-y-5 sm:grid-cols-3">
-            <div className="min-w-0">
-              <p className="text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">Invoiced value</p>
-              <div className="mt-1.5 flex flex-wrap items-baseline gap-2">
-                <span className="tnum text-[26px] leading-none font-bold tracking-[-0.03em] text-white">
-                  <AnimatedNumber value={metrics.invoiceValue} format={(value) => formatCurrency(value, true)} />
-                </span>
-                <span
-                  className={cn(
-                    'tnum rounded-full px-1.5 py-0.5 text-[10.5px] font-bold',
-                    invoicedTrend >= 0 ? 'bg-emerald-400/20 text-emerald-300' : 'bg-rose-400/20 text-rose-300',
-                  )}
-                >
-                  {invoicedTrend >= 0 ? '+' : ''}
-                  {invoicedTrend.toFixed(1)}%
-                </span>
-              </div>
-            </div>
-
-            <div className="min-w-0">
-              <p className="text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">Collected</p>
-              <div className="mt-1.5 flex flex-wrap items-baseline gap-2">
-                <span className="tnum text-[26px] leading-none font-bold tracking-[-0.03em] text-emerald-300">
-                  <AnimatedNumber value={metrics.amountCollected} format={(value) => formatCurrency(value, true)} />
-                </span>
-                <span
-                  className={cn(
-                    'tnum rounded-full px-1.5 py-0.5 text-[10.5px] font-bold',
-                    collectedTrend >= 0 ? 'bg-emerald-400/20 text-emerald-300' : 'bg-rose-400/20 text-rose-300',
-                  )}
-                >
-                  {collectedTrend >= 0 ? '+' : ''}
-                  {collectedTrend.toFixed(1)}%
-                </span>
-              </div>
-            </div>
-
-            <div className="min-w-0">
-              <p className="text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">Outstanding</p>
-              <div className="mt-1.5 flex flex-wrap items-baseline gap-2">
-                <span className="tnum text-[26px] leading-none font-bold tracking-[-0.03em] text-gold-300">
-                  <AnimatedNumber value={metrics.outstanding} format={(value) => formatCurrency(value, true)} />
-                </span>
-                <span
-                  className={cn(
-                    'tnum rounded-full px-1.5 py-0.5 text-[10.5px] font-bold',
-                    overdueInvoices > 0 ? 'bg-rose-400/20 text-rose-300' : 'bg-emerald-400/20 text-emerald-300',
-                  )}
-                >
-                  {overdueInvoices > 0 ? `${overdueInvoices} overdue` : 'current'}
-                </span>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <HeroTile
+                  label="Invoiced"
+                  icon={<Receipt className="h-4 w-4" />}
+                  accent="from-white/70 to-white/10"
+                  iconClass="bg-white/15 text-white"
+                  value={metrics.invoiceValue}
+                  chip={{ text: `${invoicedTrend >= 0 ? '+' : ''}${invoicedTrend.toFixed(1)}%`, good: invoicedTrend >= 0 }}
+                  spark={<Sparkline data={invoicedSpark} tone="gold" height={30} />}
+                />
+                <HeroTile
+                  label="Collected"
+                  icon={<Wallet className="h-4 w-4" />}
+                  accent="from-emerald-300 to-emerald-500/10"
+                  iconClass="bg-emerald-400/20 text-emerald-200"
+                  valueClass="text-emerald-300"
+                  value={metrics.amountCollected}
+                  chip={{ text: `${collectedTrend >= 0 ? '+' : ''}${collectedTrend.toFixed(1)}%`, good: collectedTrend >= 0 }}
+                  spark={<Sparkline data={collectedSpark} tone="emerald" height={30} />}
+                />
+                <HeroTile
+                  label="Outstanding"
+                  icon={<Hourglass className="h-4 w-4" />}
+                  accent="from-gold-300 to-gold-500/10"
+                  iconClass="bg-gold-400/20 text-gold-200"
+                  valueClass="text-gold-300"
+                  value={metrics.outstanding}
+                  chip={{ text: overdueInvoices > 0 ? `${overdueInvoices} overdue` : 'current', good: overdueInvoices === 0 }}
+                  spark={<ProgressBar value={100 - collectedRate} tone="gold" track="bg-white/15" className="mt-2.5" />}
+                />
               </div>
             </div>
           </div>
