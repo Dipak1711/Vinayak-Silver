@@ -1,0 +1,478 @@
+export type ID = string;
+
+/* ------------------------------------------------------------------ */
+/* Shared                                                              */
+/* ------------------------------------------------------------------ */
+
+export type ActivityModule =
+  | 'Lead'
+  | 'Customer'
+  | 'Supplier'
+  | 'Quotation'
+  | 'Invoice'
+  | 'Inventory'
+  | 'Manufacturing'
+  | 'Packaging'
+  | 'Dispatch'
+  | 'System';
+
+export interface Activity {
+  id: ID;
+  at: string;
+  module: ActivityModule;
+  message: string;
+}
+
+export interface CompanySettings {
+  name: string;
+  tagline: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  gstin: string;
+  email: string;
+  phone: string;
+  website: string;
+  bankName: string;
+  bankAccount: string;
+  ifsc: string;
+  currency: string;
+  defaultTaxRate: number;
+  financialYear: string;
+}
+
+/* ------------------------------------------------------------------ */
+/* Leads                                                               */
+/* ------------------------------------------------------------------ */
+
+export type LeadStage =
+  | 'New Lead'
+  | 'Contacted'
+  | 'Follow-up'
+  | 'Negotiation'
+  | 'Won'
+  | 'Lost';
+
+export const LEAD_STAGES: LeadStage[] = [
+  'New Lead',
+  'Contacted',
+  'Follow-up',
+  'Negotiation',
+  'Won',
+  'Lost',
+];
+
+export type LeadSource =
+  | 'Website'
+  | 'Referral'
+  | 'Exhibition'
+  | 'Cold Call'
+  | 'Email Campaign'
+  | 'Walk-in'
+  | 'Social Media';
+
+export const LEAD_SOURCES: LeadSource[] = [
+  'Website',
+  'Referral',
+  'Exhibition',
+  'Cold Call',
+  'Email Campaign',
+  'Walk-in',
+  'Social Media',
+];
+
+export interface Lead {
+  id: ID;
+  name: string;
+  company: string;
+  email: string;
+  phone: string;
+  city: string;
+  source: LeadSource;
+  assignedTo: string;
+  expectedValue: number;
+  stage: LeadStage;
+  followUpDate: string;
+  notes: string;
+  createdAt: string;
+  convertedCustomerId?: ID;
+}
+
+/* ------------------------------------------------------------------ */
+/* Customers                                                           */
+/* ------------------------------------------------------------------ */
+
+export interface Customer {
+  id: ID;
+  code: string;
+  companyName: string;
+  contactPerson: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  gstin: string;
+  paymentTerms: number;
+  creditLimit: number;
+  notes: string;
+  createdAt: string;
+  leadId?: ID;
+}
+
+/* ------------------------------------------------------------------ */
+/* Suppliers                                                           */
+/* ------------------------------------------------------------------ */
+
+export interface Supplier {
+  id: ID;
+  code: string;
+  name: string;
+  contactPerson: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  gstin: string;
+  materialsSupplied: string[];
+  paymentTerms: number;
+  notes: string;
+  createdAt: string;
+}
+
+export type SupplierTxType = 'Purchase' | 'Payment';
+
+export interface SupplierTransaction {
+  id: ID;
+  supplierId: ID;
+  date: string;
+  type: SupplierTxType;
+  reference: string;
+  description: string;
+  /** Purchase = amount payable added, Payment = amount paid to supplier */
+  amount: number;
+  materialName?: string;
+  quantity?: number;
+}
+
+/* ------------------------------------------------------------------ */
+/* Products & raw inventory                                            */
+/* ------------------------------------------------------------------ */
+
+export type ProductType = 'Finished' | 'Made to Order';
+
+export interface Product {
+  id: ID;
+  sku: string;
+  name: string;
+  category: string;
+  type: ProductType;
+  unit: string;
+  rate: number;
+  stock: number;
+  description: string;
+}
+
+export type MaterialCategory =
+  | 'Silver'
+  | 'Base Metal'
+  | 'Packaging'
+  | 'Chemicals'
+  | 'Consumables';
+
+export const MATERIAL_CATEGORIES: MaterialCategory[] = [
+  'Silver',
+  'Base Metal',
+  'Packaging',
+  'Chemicals',
+  'Consumables',
+];
+
+export interface RawMaterial {
+  id: ID;
+  sku: string;
+  name: string;
+  category: MaterialCategory;
+  unit: string;
+  quantity: number;
+  cost: number;
+  minStock: number;
+  location: string;
+  supplierId?: ID;
+}
+
+export type MovementType = 'Inward' | 'Outward' | 'Adjustment';
+
+export interface StockMovement {
+  id: ID;
+  materialId: ID;
+  materialName: string;
+  type: MovementType;
+  quantity: number;
+  balanceAfter: number;
+  reference: string;
+  note: string;
+  date: string;
+  createdBy: string;
+}
+
+/* ------------------------------------------------------------------ */
+/* Quotations                                                          */
+/* ------------------------------------------------------------------ */
+
+export interface LineItem {
+  id: ID;
+  productId?: ID;
+  description: string;
+  quantity: number;
+  rate: number;
+  /** discount percentage */
+  discount: number;
+  /** tax percentage (GST) */
+  taxRate: number;
+  /** quantity * rate, before discount */
+  gross: number;
+  /** gross - discount amount */
+  net: number;
+  /** tax amount for the line */
+  tax: number;
+  /** net + tax */
+  total: number;
+}
+
+export type QuotationStatus = 'Draft' | 'Sent' | 'Approved' | 'Rejected';
+
+export const QUOTATION_STATUSES: QuotationStatus[] = [
+  'Draft',
+  'Sent',
+  'Approved',
+  'Rejected',
+];
+
+export interface Quotation {
+  id: ID;
+  number: string;
+  customerId: ID;
+  date: string;
+  validUntil: string;
+  items: LineItem[];
+  subtotal: number;
+  discountAmount: number;
+  taxAmount: number;
+  total: number;
+  status: QuotationStatus;
+  revision: number;
+  parentId?: ID;
+  notes: string;
+  createdBy: string;
+  convertedInvoiceId?: ID;
+}
+
+/* ------------------------------------------------------------------ */
+/* Invoices                                                            */
+/* ------------------------------------------------------------------ */
+
+export type PaymentStatus = 'Unpaid' | 'Advance' | 'Partial' | 'Paid';
+
+export type PaymentMode = 'Cash' | 'Bank Transfer' | 'UPI' | 'Cheque' | 'Card';
+
+export const PAYMENT_MODES: PaymentMode[] = [
+  'Cash',
+  'Bank Transfer',
+  'UPI',
+  'Cheque',
+  'Card',
+];
+
+export interface Payment {
+  id: ID;
+  date: string;
+  amount: number;
+  mode: PaymentMode;
+  reference: string;
+}
+
+export interface Invoice {
+  id: ID;
+  number: string;
+  /** workflow reference carried across modules (quotation number) */
+  orderRef: string;
+  customerId: ID;
+  quotationId?: ID;
+  date: string;
+  dueDate: string;
+  items: LineItem[];
+  subtotal: number;
+  discountAmount: number;
+  taxAmount: number;
+  total: number;
+  amountPaid: number;
+  payments: Payment[];
+  status: PaymentStatus;
+  notes: string;
+  createdBy: string;
+  /** true once stock + manufacturing jobs have been generated for this order */
+  orderConfirmed: boolean;
+  /** true when at least one line item must be manufactured */
+  needsManufacturing: boolean;
+}
+
+/* ------------------------------------------------------------------ */
+/* Manufacturing                                                       */
+/* ------------------------------------------------------------------ */
+
+export type MfgStage =
+  | 'Material Procurement'
+  | 'Cutting'
+  | 'Assembly'
+  | 'Laser Cutting'
+  | 'Cleaning'
+  | 'Quality Check';
+
+export const MFG_STAGES: MfgStage[] = [
+  'Material Procurement',
+  'Cutting',
+  'Assembly',
+  'Laser Cutting',
+  'Cleaning',
+  'Quality Check',
+];
+
+export type MfgStatus = 'Pending' | 'In Progress' | 'Completed' | 'Delayed';
+
+export interface StageLog {
+  id: ID;
+  stage: MfgStage;
+  at: string;
+  note: string;
+}
+
+export interface ManufacturingJob {
+  id: ID;
+  jobNumber: string;
+  orderRef: string;
+  invoiceId?: ID;
+  customerId?: ID;
+  productName: string;
+  quantity: number;
+  stage: MfgStage;
+  status: MfgStatus;
+  plannedStart: string;
+  plannedEnd: string;
+  completedAt?: string;
+  assignedTo: string;
+  progress: number;
+  outsourced: boolean;
+  vendor: string;
+  notes: string;
+  history: StageLog[];
+  createdAt: string;
+}
+
+/* ------------------------------------------------------------------ */
+/* Packaging                                                           */
+/* ------------------------------------------------------------------ */
+
+export type PackagingStatus = 'Pending' | 'In Progress' | 'Packed';
+
+export interface PackagingJob {
+  id: ID;
+  jobNumber: string;
+  orderRef: string;
+  productionJobId?: ID;
+  invoiceId?: ID;
+  customerId?: ID;
+  productName: string;
+  quantityToPack: number;
+  packedQuantity: number;
+  status: PackagingStatus;
+  assignedTo: string;
+  packingDate: string;
+  readyForDispatch: boolean;
+  notes: string;
+  createdAt: string;
+}
+
+/* ------------------------------------------------------------------ */
+/* Dispatch                                                            */
+/* ------------------------------------------------------------------ */
+
+export type DispatchStatus =
+  | 'Ready to Dispatch'
+  | 'Dispatched'
+  | 'In Transit'
+  | 'Delivered'
+  | 'Delayed';
+
+export const DISPATCH_STATUSES: DispatchStatus[] = [
+  'Ready to Dispatch',
+  'Dispatched',
+  'In Transit',
+  'Delivered',
+  'Delayed',
+];
+
+export interface DispatchEvent {
+  id: ID;
+  at: string;
+  status: DispatchStatus;
+  note: string;
+}
+
+export interface DispatchRecord {
+  id: ID;
+  number: string;
+  orderRef: string;
+  invoiceId?: ID;
+  customerId: ID;
+  courierName: string;
+  trackingNumber: string;
+  dispatchDate: string;
+  expectedDelivery: string;
+  quantity: number;
+  deliveryAddress: string;
+  status: DispatchStatus;
+  notes: string;
+  events: DispatchEvent[];
+  createdAt: string;
+}
+
+/* ------------------------------------------------------------------ */
+/* Database                                                            */
+/* ------------------------------------------------------------------ */
+
+export interface Database {
+  version: number;
+  seededAt: string;
+  leads: Lead[];
+  customers: Customer[];
+  suppliers: Supplier[];
+  products: Product[];
+  rawMaterials: RawMaterial[];
+  stockMovements: StockMovement[];
+  quotations: Quotation[];
+  invoices: Invoice[];
+  manufacturingJobs: ManufacturingJob[];
+  packagingJobs: PackagingJob[];
+  dispatches: DispatchRecord[];
+  supplierTransactions: SupplierTransaction[];
+  activities: Activity[];
+  settings: CompanySettings;
+  counters: Record<string, number>;
+}
+
+export type CollectionKey =
+  | 'leads'
+  | 'customers'
+  | 'suppliers'
+  | 'products'
+  | 'rawMaterials'
+  | 'stockMovements'
+  | 'quotations'
+  | 'invoices'
+  | 'manufacturingJobs'
+  | 'packagingJobs'
+  | 'dispatches'
+  | 'supplierTransactions'
+  | 'activities';

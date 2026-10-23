@@ -1,0 +1,536 @@
+@import 'tailwindcss';
+
+/* ==================================================================
+   VINAYAK SILVER — DESIGN SYSTEM
+   Visual language aligned to the reference product: a light, indigo-
+   accented ERP surface. White panels on a softly tinted canvas, one
+   confident primary, and restrained status colour.
+   ================================================================== */
+
+@theme {
+  --font-sans:
+    'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ---------------------------------------------------------------
+     Neutrals — cool platinum ramp on the reference values.
+     silver-100 is the canvas, silver-200/300 are hairlines and
+     control outlines, silver-500/600/700 are muted text.
+     --------------------------------------------------------------- */
+  --color-silver-50: #f9fafc;
+  --color-silver-100: #f6f7fb;
+  --color-silver-200: #e7e9f0;
+  --color-silver-300: #d5d9e4;
+  --color-silver-400: #aab2c3;
+  --color-silver-500: #8790a3;
+  --color-silver-600: #6b7488;
+  --color-silver-700: #4b5567;
+  --color-silver-800: #2f3a4d;
+  --color-silver-900: #172033;
+  --color-silver-950: #0f172a;
+
+  /* ---------------------------------------------------------------
+     Ink — deep navy chrome for headings, dark surfaces and the
+     printed brand mark. navy-900 matches the reference body text.
+     --------------------------------------------------------------- */
+  --color-navy-50: #f1f4f8;
+  --color-navy-100: #e1e6ee;
+  --color-navy-200: #c7d0de;
+  --color-navy-300: #9aa6ba;
+  --color-navy-400: #6b7893;
+  --color-navy-500: #4b5567;
+  --color-navy-600: #3a4356;
+  --color-navy-700: #2b3445;
+  --color-navy-800: #1c2537;
+  --color-navy-900: #0f172a;
+  --color-navy-950: #080d17;
+
+  /* ---------------------------------------------------------------
+     Primary — indigo. The reference action colour (#4f46e5).
+     `sapphire-*` and `blue-*` are the same system so existing
+     `bg-blue-600` call sites stay on-palette.
+     --------------------------------------------------------------- */
+  --color-sapphire-50: #eef2ff;
+  --color-sapphire-100: #e0e7ff;
+  --color-sapphire-200: #c7d2fe;
+  --color-sapphire-300: #a5b4fc;
+  --color-sapphire-400: #818cf8;
+  --color-sapphire-500: #6366f1;
+  --color-sapphire-600: #4f46e5;
+  --color-sapphire-700: #4338ca;
+  --color-sapphire-800: #3730a3;
+  --color-sapphire-900: #312e81;
+  --color-sapphire-950: #1e1b4b;
+
+  --color-blue-50: #eef2ff;
+  --color-blue-100: #e0e7ff;
+  --color-blue-200: #c7d2fe;
+  --color-blue-300: #a5b4fc;
+  --color-blue-400: #818cf8;
+  --color-blue-500: #6366f1;
+  --color-blue-600: #4f46e5;
+  --color-blue-700: #4338ca;
+  --color-blue-800: #3730a3;
+  --color-blue-900: #312e81;
+  --color-blue-950: #1e1b4b;
+
+  /* ---------------------------------------------------------------
+     Accent — burnished amber for value and premium moments. Never a
+     status colour, so it can never be read as a warning.
+     --------------------------------------------------------------- */
+  --color-gold-50: #fffbeb;
+  --color-gold-100: #fef3c7;
+  --color-gold-200: #fde68a;
+  --color-gold-300: #fcd34d;
+  --color-gold-400: #fbbf24;
+  --color-gold-500: #f59e0b;
+  --color-gold-600: #d97706;
+  --color-gold-700: #b45309;
+  --color-gold-800: #92400e;
+  --color-gold-900: #78350f;
+
+  /* ---------------------------------------------------------------
+     Status ramps — tuned on one lightness ladder so no state shouts
+     louder than another.
+     --------------------------------------------------------------- */
+  --color-emerald-50: #ecfdf5;
+  --color-emerald-100: #d1fae5;
+  --color-emerald-200: #a7f3d0;
+  --color-emerald-300: #6ee7b7;
+  --color-emerald-400: #34d399;
+  --color-emerald-500: #10b981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065f46;
+  --color-emerald-900: #064e3b;
+  --color-emerald-950: #022c22;
+
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fcd34d;
+  --color-amber-400: #fbbf24;
+  --color-amber-500: #f59e0b;
+  --color-amber-600: #d97706;
+  --color-amber-700: #b45309;
+  --color-amber-800: #92400e;
+  --color-amber-900: #78350f;
+  --color-amber-950: #451a03;
+
+  --color-rose-50: #fef2f2;
+  --color-rose-100: #fee2e2;
+  --color-rose-200: #fecaca;
+  --color-rose-300: #fca5a5;
+  --color-rose-400: #f87171;
+  --color-rose-500: #ef4444;
+  --color-rose-600: #dc2626;
+  --color-rose-700: #b91c1c;
+  --color-rose-800: #991b1b;
+  --color-rose-900: #7f1d1d;
+  --color-rose-950: #450a0a;
+
+  --color-violet-50: #f5f3ff;
+  --color-violet-100: #ede9fe;
+  --color-violet-200: #ddd6fe;
+  --color-violet-300: #c4b5fd;
+  --color-violet-400: #a78bfa;
+  --color-violet-500: #8b5cf6;
+  --color-violet-600: #7c3aed;
+  --color-violet-700: #6d28d9;
+  --color-violet-800: #5b21b6;
+  --color-violet-900: #4c1d95;
+  --color-violet-950: #2e1065;
+
+  --color-cyan-50: #f0fdfa;
+  --color-cyan-100: #ccfbf1;
+  --color-cyan-200: #99f6e4;
+  --color-cyan-300: #5eead4;
+  --color-cyan-400: #2dd4bf;
+  --color-cyan-500: #14b8a6;
+  --color-cyan-600: #0d9488;
+  --color-cyan-700: #0f766e;
+  --color-cyan-800: #115e59;
+  --color-cyan-900: #134e4a;
+  --color-cyan-950: #042f2e;
+
+  /* ---------------------------------------------------------------
+     Elevation — a hairline ring plus a soft, low-opacity shadow.
+     Light falls from above; higher objects cast a wider shadow.
+     --------------------------------------------------------------- */
+  --shadow-flat: 0 0 0 1px rgba(15, 23, 42, 0.05);
+  --shadow-card:
+    0 0 0 1px rgba(15, 23, 42, 0.05),
+    0 1px 2px -1px rgba(15, 23, 42, 0.04);
+  --shadow-lift:
+    0 0 0 1px rgba(15, 23, 42, 0.05),
+    0 4px 8px -2px rgba(15, 23, 42, 0.06),
+    0 12px 24px -10px rgba(15, 23, 42, 0.14);
+  --shadow-panel:
+    0 0 0 1px rgba(15, 23, 42, 0.06),
+    0 10px 24px -8px rgba(15, 23, 42, 0.16),
+    0 20px 48px -16px rgba(15, 23, 42, 0.18);
+  --shadow-modal:
+    0 0 0 1px rgba(15, 23, 42, 0.08),
+    0 30px 70px -20px rgba(15, 23, 42, 0.4);
+  --shadow-inset-top: inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+
+  /* ---------------------------------------------------------------
+     Radii — 16px panels, 12px controls, 20px dialogs.
+     --------------------------------------------------------------- */
+  --radius-lg: 0.75rem;
+  --radius-xl: 0.875rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.25rem;
+
+  /* ---------------------------------------------------------------
+     Motion — decelerating curves only. Bounce and elastic read as
+     toys in an instrument, so they are not in the system.
+     --------------------------------------------------------------- */
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-settle: cubic-bezier(0.34, 1.28, 0.64, 1);
+
+  --animate-fade-in: fade-in 200ms var(--ease-out-quart) both;
+  --animate-fade-up: fade-up 260ms var(--ease-out-quint) both;
+  --animate-slide-up: rise 240ms var(--ease-out-expo) both;
+  --animate-slide-in-right: slide-in-right 260ms var(--ease-out-expo) both;
+  --animate-pop-in: pop-in 200ms var(--ease-out-expo) both;
+  --animate-scale-in: scale-in 180ms var(--ease-out-quart) both;
+  --animate-shimmer: shimmer 1600ms linear infinite;
+  --animate-drawer: drawer 280ms var(--ease-out-expo) both;
+  --animate-pulse-ring: pulse-ring 2000ms var(--ease-out-quart) infinite;
+  /* Exits run shorter than entrances: the user already understands the
+     object by the time it leaves. */
+  --animate-fade-out: fade-out 150ms var(--ease-out-quart) both;
+  --animate-scale-out: scale-out 150ms var(--ease-out-quart) both;
+}
+
+/* ------------------------------------------------------------------ */
+/* Keyframes                                                          */
+/* ------------------------------------------------------------------ */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Overlay / modal entrance: scale to just past 1, then settle. Never
+   animate from scale(0) — the intermediate scale is what reads as mass. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes drawer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes scale-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(79, 70, 229, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Base                                                               */
+/* ------------------------------------------------------------------ */
+
+* {
+  border-color: var(--color-silver-200);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-silver-100);
+  color: var(--color-navy-900);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* The application canvas: an authored field tinted toward the brand
+   instead of a flat grey, so the white panels read as sitting on
+   something rather than floating in nothing. */
+.app-canvas {
+  background-color: var(--color-silver-100);
+  background-image:
+    radial-gradient(1100px 620px at 4% -8%, rgba(79, 70, 229, 0.09), transparent 68%),
+    radial-gradient(900px 560px at 104% -6%, rgba(13, 148, 136, 0.08), transparent 66%),
+    radial-gradient(760px 520px at 58% 112%, rgba(124, 58, 237, 0.06), transparent 70%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Numbers line up in tables, KPIs and money columns. */
+.tnum,
+table,
+input[type='number'] {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: var(--color-sapphire-200);
+  color: var(--color-navy-950);
+}
+
+/* A visible, consistent keyboard path. Never removed without replacement. */
+:focus-visible {
+  outline: 2px solid var(--color-sapphire-600);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Thin, unobtrusive scrollbars that do not fight the gesture. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-silver-300);
+  border-radius: 9999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-silver-400);
+  background-clip: content-box;
+}
+
+.dark-scroll::-webkit-scrollbar-thumb {
+  background: rgba(15, 23, 42, 0.16);
+  background-clip: content-box;
+  border: 3px solid transparent;
+}
+.dark-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 23, 42, 0.28);
+  background-clip: content-box;
+}
+
+/* Charts should not draw a focus box when clicked. */
+.recharts-wrapper:focus,
+.recharts-surface:focus {
+  outline: none;
+}
+
+/* Surface sheen for elevated dark chrome (hero bands, brand marks).
+   NOTE: applied as an overlay element, never on the same node as a
+   Tailwind gradient utility this file would out-rank in the cascade. */
+.sheen {
+  background-image:
+    radial-gradient(120% 140% at 0% 0%, rgba(255, 255, 255, 0.16) 0%, transparent 55%),
+    radial-gradient(100% 100% at 100% 0%, rgba(99, 102, 241, 0.35) 0%, transparent 60%);
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-silver-200) 25%,
+    var(--color-silver-100) 37%,
+    var(--color-silver-200) 63%
+  );
+  background-size: 200% 100%;
+}
+
+/* Touch targets are physical: the visual control can stay compact while
+   the hit area meets 44px on coarse pointers. */
+@media (pointer: coarse) {
+  .hit {
+    position: relative;
+  }
+  .hit::after {
+    content: '';
+    position: absolute;
+    inset: -7px;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Print                                                              */
+/* ------------------------------------------------------------------ */
+
+.print-only {
+  display: none;
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .print-area {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+  .print-scroll {
+    overflow: visible !important;
+  }
+  @page {
+    margin: 14mm;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Reduced motion                                                     */
+/* Opt-in: the static design is the default, and motion is added only
+   when the visitor has not asked for less of it. Functional signals
+   (focus, progress, spinners) stay alive; spatial movement becomes a
+   plain fade.                                                            */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: no-preference) {
+  .lift {
+    transition:
+      transform 160ms var(--ease-out-quart),
+      box-shadow 160ms var(--ease-out-quart);
+  }
+  .lift:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift);
+  }
+  .pressable {
+    transition:
+      transform 120ms var(--ease-out-quart),
+      box-shadow 150ms var(--ease-out-quart),
+      background-color 150ms var(--ease-out-quart),
+      color 150ms var(--ease-out-quart),
+      border-color 150ms var(--ease-out-quart);
+  }
+  .pressable:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  .row-hover {
+    transition: background-color 130ms var(--ease-out-quart);
+  }
+  .page-enter {
+    animation: fade-up 240ms var(--ease-out-quint) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

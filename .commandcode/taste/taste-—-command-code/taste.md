@@ -1,0 +1,16 @@
+# Taste — Command Code
+- Prefers front-end projects built with React + Vite + TypeScript (scaffolded from scratch when the directory is empty). Confidence: 0.75
+- Prefers Tailwind CSS for styling and Lucide React for icons in React projects. Confidence: 0.7
+- Prefers self-contained apps that run entirely in the browser with no backend, database, API, external service, API keys, environment variables or auth services; localStorage is an acceptable store for demo data. Confidence: 0.7
+- Do not deploy, commit or push changes unless explicitly requested. Confidence: 0.9
+- Wants realistic, fully-populated sample/demo data so the result looks convincing, rather than sparse placeholders. Confidence: 0.65
+- Expects connected, functional end-to-end flows and working buttons/forms — reject purely decorative, non-functional actions. Confidence: 0.7
+- Never claim tests were performed unless they were actually run. Confidence: 0.85
+- At completion, wants a summary of what was implemented, instructions for running the project locally, and an honest note of remaining limitations. Confidence: 0.7
+- When the default dev port is taken by another local project, expects the app to be pinned to a dedicated non-default port (e.g. via vite config with strictPort) rather than silently hopping ports. Confidence: 0.6
+- Prefers premium, professional, polished UI (consistent spacing, refined typography, polished tables/cards/charts/status badges, responsive layouts, sensible empty states, validation and success/error feedback) suitable for presenting to a business client. Confidence: 0.65
+- When reworking an existing app, wants the existing project modified in place (do not start a new project) and all existing modules, routes, forms, workflows and data/localStorage logic preserved — do not delete or rewrite working functionality just to change the design; prefer minimal, targeted changes. Confidence: 0.7
+- Treats a referenced project as a design reference only (never a source of business logic, features or replacement code), and wants its visual style replicated faithfully — palette, typography, spacing, radii, shadows and states — rather than merely choosing similar colors. Confidence: 0.6
+- Wants a design change applied consistently across every module/page, with the result responsive and usable at different screen sizes. Confidence: 0.6
+- Expects the project's own type check and production build (and linter) to be run after changes, with any errors introduced fixed, and improvements visually verified rather than just claimed. Confidence: 0.7
+- Prefers a brief plan up front — which elements will be reused and which files will change — before implementation begins. Confidence: 0.55
