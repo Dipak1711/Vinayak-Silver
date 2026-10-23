@@ -109,10 +109,10 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
                             title={item.label}
                             className={({ isActive }) =>
                               cn(
-                                'group relative flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13.5px] font-medium transition-colors duration-150',
+                                'group relative flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13.5px] font-medium transition-[background-color,color,translate,box-shadow] duration-200 ease-out',
                                 isActive
                                   ? 'bg-linear-to-r from-[#2f958a] to-[#2f958a] font-semibold text-white shadow-[0_10px_22px_-8px_rgba(47,149,138,0.65)]'
-                                  : 'text-silver-700 hover:bg-blue-50 hover:text-blue-700',
+                                  : 'text-silver-700 hover:translate-x-0.5 hover:bg-blue-50 hover:text-blue-700',
                                 mini && 'lg:h-11 lg:justify-center lg:px-0',
                               )
                             }

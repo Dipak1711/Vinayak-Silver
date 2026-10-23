@@ -441,6 +441,28 @@
   }
 }
 
+@keyframes drop-settle {
+  0% {
+    scale: 1.04;
+    box-shadow: 0 0 0 3px rgba(47, 149, 138, 0.55), 0 14px 28px -8px rgba(47, 149, 138, 0.5);
+  }
+  100% {
+    scale: 1;
+    box-shadow: 0 0 0 0 rgba(47, 149, 138, 0), 0 0 0 1px rgba(15, 23, 42, 0.05);
+  }
+}
+
+@keyframes ghost-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes badge-ping {
   0% {
     transform: scale(1);
@@ -683,6 +705,23 @@ input[type='number'] {
   .page-enter > :nth-child(4) { animation-delay: 180ms; }
   .page-enter > :nth-child(5) { animation-delay: 240ms; }
   .page-enter > :nth-child(n + 6) { animation-delay: 300ms; }
+  /* A dropped card settles into place with a brief ring of light. */
+  .drop-settle {
+    animation: drop-settle 800ms var(--ease-out-expo) both;
+  }
+  /* The placeholder grows into the lane instead of popping in. */
+  .ghost-in {
+    animation: ghost-in 220ms var(--ease-out-expo) both;
+  }
+  /* Controls ease between states instead of snapping. */
+  select,
+  input:not([type='range']),
+  textarea {
+    transition:
+      border-color 150ms var(--ease-out-quart),
+      box-shadow 150ms var(--ease-out-quart),
+      background-color 150ms var(--ease-out-quart);
+  }
   .badge-ping {
     animation: badge-ping 1800ms var(--ease-out-quart) infinite;
   }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   Building2,
@@ -24,6 +24,7 @@ import { Modal, ConfirmDialog } from '@/components/ui/Modal'
 import { StatCard } from '@/components/ui/StatCard'
 import { useData } from '@/store/DataContext'
 import { useToast } from '@/store/ToastContext'
+import { useFlip } from '@/hooks'
 import { convertLeadToCustomer, pushActivity } from '@/lib/workflow'
 import { formatCurrency, formatDate, todayISO, uid } from '@/lib/utils'
 import { cn } from '@/lib/utils'
@@ -67,6 +68,16 @@ const STAGE_GRADIENT: Record<LeadStage, string> = {
   Lost: 'from-rose-400 to-rose-600',
 }
 
+/* Solid accent per stage, used for the card's left edge. */
+const STAGE_ACCENT: Record<LeadStage, string> = {
+  'New Lead': 'from-cyan-400 to-cyan-600',
+  Contacted: 'from-violet-400 to-violet-600',
+  'Follow-up': 'from-amber-400 to-amber-600',
+  Negotiation: 'from-orange-400 to-rose-500',
+  Won: 'from-emerald-400 to-emerald-600',
+  Lost: 'from-rose-400 to-rose-600',
+}
+
 export function LeadsPage() {
   const { db, mutate } = useData()
   const toast = useToast()
@@ -85,6 +96,9 @@ export function LeadsPage() {
   const [convertId, setConvertId] = useState<string | null>(null)
   const [dragging, setDragging] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState<LeadStage | null>(null)
+  const [justMoved, setJustMoved] = useState<string | null>(null)
+  const scrollerRef = useRef<HTMLDivElement | null>(null)
+  const settleTimer = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     const focusId = (location.state as { focusId?: string } | null)?.focusId
@@ -102,6 +116,10 @@ export function LeadsPage() {
       return matchesTerm && matchesOwner && matchesSource
     })
   }, [db.leads, search, ownerFilter, sourceFilter])
+
+  // Cards glide to their new slot whenever a lead changes lane or the filter changes.
+  const boardRef = useFlip<HTMLDivElement>(filtered.map((lead) => `${lead.id}:${lead.stage}`).join('|'))
+  const draggedLead = dragging ? db.leads.find((lead) => lead.id === dragging) : undefined
 
   const detail = db.leads.find((lead) => lead.id === detailId) ?? null
   const convertLead = db.leads.find((lead) => lead.id === convertId) ?? null
@@ -205,6 +223,9 @@ export function LeadsPage() {
       pushActivity(draft, 'Lead', `${target.company} moved to ${stage}`)
     })
     toast.notify(`${lead.company} moved to ${stage}.`)
+    setJustMoved(leadId)
+    window.clearTimeout(settleTimer.current)
+    settleTimer.current = window.setTimeout(() => setJustMoved(null), 900)
   }
 
   const confirmDelete = () => {
@@ -311,7 +332,20 @@ export function LeadsPage() {
       <div className="relative">
         {/* Six lanes never fit one screen, so the right edge fades to make
             the horizontal scroll discoverable instead of looking clipped. */}
-        <div className="flex gap-4 overflow-x-auto pb-3">
+        <div
+          ref={(node) => {
+            scrollerRef.current = node
+            boardRef.current = node
+          }}
+          onDragOver={(event) => {
+            // Scroll the board when a card is held near either edge.
+            const box = scrollerRef.current?.getBoundingClientRect()
+            if (!box || !scrollerRef.current) return
+            if (event.clientX < box.left + 90) scrollerRef.current.scrollLeft -= 22
+            else if (event.clientX > box.right - 90) scrollerRef.current.scrollLeft += 22
+          }}
+          className="flex gap-4 overflow-x-auto pb-3"
+        >
           {LEAD_STAGES.map((stage) => {
           const stageLeads = filtered.filter((lead) => lead.stage === stage)
           const stageValue = stageLeads.reduce((acc, lead) => acc + lead.expectedValue, 0)
@@ -322,15 +356,21 @@ export function LeadsPage() {
                 event.preventDefault()
                 if (dragOver !== stage) setDragOver(stage)
               }}
-              onDragLeave={() => setDragOver((current) => (current === stage ? null : current))}
-              onDrop={() => {
+              onDragLeave={(event) => {
+                // Moving between a lane's own children is not leaving it.
+                if (event.currentTarget.contains(event.relatedTarget as Node | null)) return
+                setDragOver((current) => (current === stage ? null : current))
+              }}
+              onDrop={(event) => {
+                event.preventDefault()
                 if (dragging) moveStage(dragging, stage)
                 setDragging(null)
                 setDragOver(null)
               }}
               className={cn(
-                'flex w-[286px] shrink-0 flex-col overflow-hidden rounded-2xl bg-surface/70 shadow-flat transition-[background-color,box-shadow] duration-150',
-                dragOver === stage && 'bg-blue-50/80 ring-2 ring-blue-400 ring-inset',
+                'flex w-[286px] shrink-0 flex-col overflow-hidden rounded-2xl bg-surface/70 shadow-flat transition-[background-color,box-shadow,translate,opacity] duration-200 ease-out',
+                dragging && dragOver !== stage && 'opacity-80',
+                dragOver === stage && '-translate-y-0.5 bg-blue-50 shadow-lift ring-2 ring-blue-400 ring-inset',
               )}
             >
               <div className={cn('h-1 bg-linear-to-r', STAGE_GRADIENT[stage])} aria-hidden="true" />
@@ -339,7 +379,14 @@ export function LeadsPage() {
                   <p className="text-[13px] font-bold tracking-[-0.01em] text-navy-900">{stage}</p>
                   <p className="tnum text-[11px] text-silver-600">{formatCurrency(stageValue, true)}</p>
                 </div>
-                <span className="tnum rounded-full bg-silver-100 px-2 py-0.5 text-xs font-bold text-silver-600 ring-1 ring-silver-200 ring-inset">
+                <span
+                  className={cn(
+                    'tnum rounded-full px-2 py-0.5 text-xs font-bold ring-1 ring-inset transition-[scale,background-color,color] duration-200',
+                    dragOver === stage
+                      ? 'scale-110 bg-blue-600 text-white ring-blue-600'
+                      : 'bg-silver-100 text-silver-600 ring-silver-200',
+                  )}
+                >
                   {stageLeads.length}
                 </span>
               </div>
@@ -348,18 +395,29 @@ export function LeadsPage() {
                 {stageLeads.map((lead) => (
                   <article
                     key={lead.id}
+                    data-flip={lead.id}
                     draggable
-                    onDragStart={() => setDragging(lead.id)}
+                    onDragStart={(event) => {
+                      // Firefox only starts a drag when data is set.
+                      event.dataTransfer.setData('text/plain', lead.id)
+                      event.dataTransfer.effectAllowed = 'move'
+                      setDragging(lead.id)
+                    }}
                     onDragEnd={() => {
                       setDragging(null)
                       setDragOver(null)
                     }}
                     onClick={() => setDetailId(lead.id)}
                     className={cn(
-                      'group cursor-grab rounded-xl bg-surface p-3 shadow-card transition-[transform,box-shadow,opacity] duration-150 hover:shadow-lift active:cursor-grabbing',
-                      dragging === lead.id && 'scale-[0.97] rotate-1 opacity-45 shadow-lift',
+                      'group relative cursor-grab overflow-hidden rounded-xl bg-surface py-3 pr-3 pl-4 shadow-card transition-[translate,scale,rotate,box-shadow,opacity] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lift active:cursor-grabbing active:scale-[0.99]',
+                      dragging === lead.id && 'scale-[0.96] rotate-1 opacity-40 shadow-lift',
+                      justMoved === lead.id && 'drop-settle',
                     )}
                   >
+                    <span
+                      className={cn('absolute inset-y-0 left-0 w-1 bg-linear-to-b', STAGE_ACCENT[lead.stage])}
+                      aria-hidden="true"
+                    />
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-[13px] leading-snug font-bold text-navy-900">{lead.company}</p>
                       {lead.convertedCustomerId ? <Badge tone="success">Converted</Badge> : null}
@@ -372,16 +430,35 @@ export function LeadsPage() {
                       <Badge tone="silver">{lead.source}</Badge>
                       <Badge tone="neutral">{lead.assignedTo}</Badge>
                     </div>
-                    <p className="mt-2 flex items-center gap-1.5 text-[11px] text-silver-600">
-                      <CalendarDays className="h-3 w-3" aria-hidden="true" />
-                      Follow-up {formatDate(lead.followUpDate)}
-                    </p>
+                    {(() => {
+                      const overdue =
+                        lead.followUpDate < todayISO() && lead.stage !== 'Won' && lead.stage !== 'Lost'
+                      return (
+                        <p
+                          className={cn(
+                            'mt-2 flex items-center gap-1.5 text-[11px]',
+                            overdue ? 'font-semibold text-rose-600' : 'text-silver-600',
+                          )}
+                        >
+                          <CalendarDays className="h-3 w-3" aria-hidden="true" />
+                          Follow-up {formatDate(lead.followUpDate)}
+                          {overdue ? <span className="rounded-full bg-rose-50 px-1.5 py-px text-[10px] ring-1 ring-rose-200 ring-inset">Overdue</span> : null}
+                        </p>
+                      )
+                    })()}
                   </article>
                 ))}
 
                 {/* The drop target stays visible even when a lane is full, so
                     the empty space reads as somewhere to move a lead. */}
+                {dragOver === stage && draggedLead && draggedLead.stage !== stage ? (
+                  <div className="ghost-in rounded-xl border-2 border-dashed border-blue-400 bg-blue-50/80 px-3 py-3 text-center">
+                    <p className="truncate text-[12px] font-bold text-blue-700">{draggedLead.company}</p>
+                    <p className="text-[11px] text-blue-600">Drop to move to {stage}</p>
+                  </div>
+                ) : null}
                 <p
+                  hidden={dragOver === stage && Boolean(draggedLead) && draggedLead?.stage !== stage}
                   className={cn(
                     'rounded-xl border border-dashed px-3 text-center text-[11px] transition-colors',
                     stageLeads.length === 0 ? 'py-6' : 'py-3',
