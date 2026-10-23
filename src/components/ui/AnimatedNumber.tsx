@@ -17,7 +17,7 @@ function prefersReducedMotion(): boolean {
 export function AnimatedNumber({
   value,
   format,
-  duration = 520,
+  duration = 900,
   className,
 }: {
   value: number
@@ -52,19 +52,21 @@ export function AnimatedNumber({
     const tick = (now: number) => {
       const t = Math.min((now - start) / duration_, 1)
       const eased = 1 - Math.pow(1 - t, 5)
-      setDisplay(from + delta * eased)
+      const current = from + delta * eased
+      // Remember real progress, so an interrupted animation resumes from
+      // where it was (and a dev-mode double effect cannot skip to the end).
+      fromRef.current = current
+      setDisplay(current)
       if (t < 1) {
         frame = requestAnimationFrame(tick)
       } else {
+        fromRef.current = value
         setDisplay(value)
       }
     }
 
     frame = requestAnimationFrame(tick)
-    return () => {
-      cancelAnimationFrame(frame)
-      fromRef.current = value
-    }
+    return () => cancelAnimationFrame(frame)
   }, [value, duration, reduced])
 
   return <span className={cn('tnum', className)}>{render(display)}</span>

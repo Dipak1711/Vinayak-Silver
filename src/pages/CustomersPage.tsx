@@ -237,11 +237,11 @@ export function CustomersPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Customers" value={stats.count} hint={`${stats.withDues} with outstanding dues`} icon={<Users className="h-4.5 w-4.5" />} tone="blue" />
-        <StatCard label="Total billed" value={formatCurrency(stats.billed, true)} icon={<Receipt className="h-4.5 w-4.5" />} tone="violet" />
-        <StatCard label="Outstanding" value={formatCurrency(stats.outstanding, true)} icon={<Wallet className="h-4.5 w-4.5" />} tone="rose" />
+        <StatCard label="Total billed" value={0} numericValue={stats.billed} format={(v) => formatCurrency(v, true)} icon={<Receipt className="h-4.5 w-4.5" />} tone="violet" />
+        <StatCard label="Outstanding" value={0} numericValue={stats.outstanding} format={(v) => formatCurrency(v, true)} icon={<Wallet className="h-4.5 w-4.5" />} tone="rose" />
         <StatCard
           label="Average credit terms"
-          value={`${Math.round(db.customers.reduce((acc, customer) => acc + customer.paymentTerms, 0) / Math.max(db.customers.length, 1))} days`}
+          value={0} numericValue={Math.round(db.customers.reduce((acc, customer) => acc + customer.paymentTerms, 0) / Math.max(db.customers.length, 1))} format={(v) => `${Math.round(v)} days`}
           icon={<Building2 className="h-4.5 w-4.5" />}
           tone="navy"
         />

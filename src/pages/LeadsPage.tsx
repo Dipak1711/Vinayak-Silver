@@ -19,6 +19,7 @@ import { PageHeader, SearchInput, Toolbar, DataRow } from '@/components/ui/Layou
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
+import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { Field, Input, Select, Textarea } from '@/components/ui/Form'
 import { Modal, ConfirmDialog } from '@/components/ui/Modal'
 import { StatCard } from '@/components/ui/StatCard'
@@ -277,14 +278,14 @@ export function LeadsPage() {
         <StatCard label="Total leads" value={db.leads.length} icon={<Target className="h-4.5 w-4.5" />} tone="blue" />
         <StatCard
           label="Open pipeline value"
-          value={formatCurrency(openValue, true)}
+          value={0} numericValue={openValue} format={(v) => formatCurrency(v, true)}
           hint={`${db.leads.filter((lead) => lead.stage !== 'Won' && lead.stage !== 'Lost').length} active leads`}
           icon={<CalendarDays className="h-4.5 w-4.5" />}
           tone="amber"
         />
         <StatCard
           label="Won value"
-          value={formatCurrency(wonValue, true)}
+          value={0} numericValue={wonValue} format={(v) => formatCurrency(v, true)}
           hint={`${db.leads.filter((lead) => lead.stage === 'Won').length} leads won`}
           icon={<UserPlus className="h-4.5 w-4.5" />}
           tone="emerald"
@@ -377,7 +378,9 @@ export function LeadsPage() {
               <div className="flex items-center justify-between gap-2 px-3.5 py-3">
                 <div>
                   <p className="text-[13px] font-bold tracking-[-0.01em] text-navy-900">{stage}</p>
-                  <p className="tnum text-[11px] text-silver-600">{formatCurrency(stageValue, true)}</p>
+                  <p className="tnum text-[11px] text-silver-600">
+                    <AnimatedNumber value={stageValue} format={(v) => formatCurrency(v, true)} />
+                  </p>
                 </div>
                 <span
                   className={cn(
@@ -387,7 +390,7 @@ export function LeadsPage() {
                       : 'bg-silver-100 text-silver-600 ring-silver-200',
                   )}
                 >
-                  {stageLeads.length}
+                  <AnimatedNumber value={stageLeads.length} />
                 </span>
               </div>
 

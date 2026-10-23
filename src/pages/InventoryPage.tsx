@@ -321,7 +321,7 @@ export function InventoryPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Raw materials" value={stats.count} hint={`${stats.categories} categories`} icon={<Layers className="h-4.5 w-4.5" />} tone="blue" />
-        <StatCard label="Stock value" value={formatCurrency(stats.value, true)} icon={<Wallet className="h-4.5 w-4.5" />} tone="navy" />
+        <StatCard label="Stock value" value={0} numericValue={stats.value} format={(v) => formatCurrency(v, true)} icon={<Wallet className="h-4.5 w-4.5" />} tone="navy" />
         <StatCard
           label="Low stock items"
           value={stats.lowCount}

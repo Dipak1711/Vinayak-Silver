@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { ChevronDown, X } from 'lucide-react'
 import { NAV_ITEMS, SIDEBAR_GROUPS } from '@/config/nav'
 import { useData } from '@/store/DataContext'
+import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
 import { cn } from '@/lib/utils'
 
 export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean; onClose: () => void }) {
@@ -141,7 +142,7 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
                                       mini && 'lg:absolute lg:-top-1 lg:-right-1 lg:min-w-4 lg:px-1 lg:text-center',
                                     )}
                                   >
-                                    {badge}
+                                    <AnimatedNumber value={badge} />
                                   </span>
                                 ) : null}
                               </>

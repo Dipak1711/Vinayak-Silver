@@ -288,11 +288,11 @@ export function SuppliersPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Suppliers" value={stats.count} hint={`${stats.materials} materials supplied`} icon={<Handshake className="h-4.5 w-4.5" />} tone="blue" />
-        <StatCard label="Total purchases" value={formatCurrency(stats.purchased, true)} icon={<Truck className="h-4.5 w-4.5" />} tone="violet" />
-        <StatCard label="Outstanding payable" value={formatCurrency(stats.payable, true)} hint={`${stats.withPayable} suppliers due`} icon={<Wallet className="h-4.5 w-4.5" />} tone="rose" />
+        <StatCard label="Total purchases" value={0} numericValue={stats.purchased} format={(v) => formatCurrency(v, true)} icon={<Truck className="h-4.5 w-4.5" />} tone="violet" />
+        <StatCard label="Outstanding payable" value={0} numericValue={stats.payable} format={(v) => formatCurrency(v, true)} hint={`${stats.withPayable} suppliers due`} icon={<Wallet className="h-4.5 w-4.5" />} tone="rose" />
         <StatCard
           label="Average payment terms"
-          value={`${Math.round(db.suppliers.reduce((acc, supplier) => acc + supplier.paymentTerms, 0) / Math.max(db.suppliers.length, 1))} days`}
+          value={0} numericValue={Math.round(db.suppliers.reduce((acc, supplier) => acc + supplier.paymentTerms, 0) / Math.max(db.suppliers.length, 1))} format={(v) => `${Math.round(v)} days`}
           icon={<MapPin className="h-4.5 w-4.5" />}
           tone="navy"
         />

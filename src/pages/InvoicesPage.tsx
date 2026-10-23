@@ -373,9 +373,9 @@ export function InvoicesPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Total invoiced" value={formatCurrency(stats.total, true)} hint={`${stats.count} invoices raised`} icon={<Receipt className="h-4.5 w-4.5" />} tone="blue" />
-        <StatCard label="Amount collected" value={formatCurrency(stats.collected, true)} icon={<Wallet className="h-4.5 w-4.5" />} tone="emerald" />
-        <StatCard label="Outstanding" value={formatCurrency(stats.outstanding, true)} hint={`${stats.overdueCount} invoices overdue`} icon={<CircleDollarSign className="h-4.5 w-4.5" />} tone="amber" />
+        <StatCard label="Total invoiced" value={0} numericValue={stats.total} format={(v) => formatCurrency(v, true)} hint={`${stats.count} invoices raised`} icon={<Receipt className="h-4.5 w-4.5" />} tone="blue" />
+        <StatCard label="Amount collected" value={0} numericValue={stats.collected} format={(v) => formatCurrency(v, true)} icon={<Wallet className="h-4.5 w-4.5" />} tone="emerald" />
+        <StatCard label="Outstanding" value={0} numericValue={stats.outstanding} format={(v) => formatCurrency(v, true)} hint={`${stats.overdueCount} invoices overdue`} icon={<CircleDollarSign className="h-4.5 w-4.5" />} tone="amber" />
         <StatCard label="Awaiting confirmation" value={stats.unconfirmed} icon={<BadgeCheck className="h-4.5 w-4.5" />} tone="violet" />
       </div>
 

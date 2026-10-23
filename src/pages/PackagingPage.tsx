@@ -184,7 +184,7 @@ export function PackagingPage() {
         <StatCard label="Ready for dispatch" value={stats.ready} icon={<PackageCheck className="h-4.5 w-4.5" />} tone="emerald" />
         <StatCard
           label="Packing completion"
-          value={`${stats.completion}%`}
+          value={0} numericValue={stats.completion} format={(v) => `${Math.round(v)}%`}
           hint={`${formatNumber(stats.packedUnits)} of ${formatNumber(stats.units)} units packed`}
           icon={<Check className="h-4.5 w-4.5" />}
           tone="violet"
