@@ -50,10 +50,6 @@ export function AppLayout() {
             <Outlet />
           </div>
         </main>
-
-        <footer className="border-t border-silver-200 bg-surface/60 px-4 py-4 text-center text-xs text-silver-600 no-print lg:px-9">
-          Vinayak Silver ERP demo · All data is fictional and stored only in this browser's localStorage.
-        </footer>
       </div>
     </div>
   )

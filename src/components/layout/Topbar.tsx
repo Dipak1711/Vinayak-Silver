@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bell, Command, Menu, Moon, PanelLeftClose, PanelLeftOpen, Search, Sparkles, Sun } from 'lucide-react'
+import { Bell, Command, Menu, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun } from 'lucide-react'
 import { useData } from '@/store/DataContext'
 import { useClickOutside, useTheme } from '@/hooks'
 import { pendingTasks } from '@/lib/calc'
@@ -219,11 +219,6 @@ export function Topbar({
       </div>
 
       <div className="ml-auto flex items-center gap-2 sm:gap-3">
-        <span className="hidden items-center gap-1.5 rounded-lg border border-gold-200 bg-gold-50 px-2.5 py-1.5 text-[11px] font-semibold text-gold-800 xl:flex">
-          <Sparkles className="h-3.5 w-3.5 text-gold-600" aria-hidden="true" />
-          Demo mode · data saved locally
-        </span>
-
         <button
           type="button"
           onClick={toggleTheme}

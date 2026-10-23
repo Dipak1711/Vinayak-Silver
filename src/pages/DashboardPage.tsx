@@ -8,7 +8,6 @@ import {
   FileText,
   IndianRupee,
   LayoutDashboard,
-  PackageOpen,
   Receipt,
   Target,
   Truck,
@@ -77,16 +76,6 @@ export function DashboardPage() {
 
   const collectedRate = percentage(metrics.amountCollected, metrics.invoiceValue)
   const highSeverity = tasks.filter((task) => task.severity === 'high').length
-
-  const pipeline = [
-    { label: 'Leads', value: metrics.totalLeads, to: '/leads', icon: Target },
-    { label: 'Customers', value: metrics.totalCustomers, to: '/customers', icon: Users },
-    { label: 'Quotations', value: metrics.totalQuotations, to: '/quotations', icon: FileText },
-    { label: 'Invoices', value: metrics.totalInvoices, to: '/invoices', icon: Receipt },
-    { label: 'Production', value: metrics.productionJobs, to: '/manufacturing', icon: Factory },
-    { label: 'Packaging', value: db.packagingJobs.length, to: '/packaging', icon: PackageOpen },
-    { label: 'Dispatch', value: db.dispatches.length, to: '/dispatch', icon: Truck },
-  ]
 
   return (
     <>
@@ -284,43 +273,6 @@ export function DashboardPage() {
           onClick={() => navigate('/dispatch')}
         />
       </div>
-
-      {/* ---------------- Workflow strip ---------------- */}
-      <Card padded={false} className="overflow-hidden">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-silver-200 bg-linear-to-r from-silver-50 to-surface px-5 py-3.5">
-          <h3 className="text-[13px] font-bold tracking-[-0.01em] text-navy-900">Order workflow</h3>
-          <span className="hidden text-xs text-silver-500 sm:inline">·</span>
-          <p className="text-xs text-silver-600">
-            Lead → Customer → Quotation → Invoice → Manufacturing → Packaging → Dispatch
-          </p>
-        </div>
-        <div className="grid grid-cols-1 gap-2 p-4 sm:grid-cols-2 lg:grid-cols-4">
-          {pipeline.map((step, index) => {
-            const Icon = step.icon
-            return (
-              <button
-                key={step.label}
-                type="button"
-                onClick={() => navigate(step.to)}
-                className="lift group flex items-center gap-2.5 rounded-xl border border-silver-200 bg-surface px-3 py-2.5 text-left shadow-flat transition-colors hover:border-blue-300"
-              >
-                <span className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-silver-100 to-silver-200 text-navy-700 ring-1 ring-silver-200 ring-inset transition-colors group-hover:from-blue-50 group-hover:to-blue-100 group-hover:text-blue-700 group-hover:ring-blue-200">
-                  <Icon className="h-4 w-4" />
-                  <span className="tnum absolute -top-2 -left-2 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-ink text-[10px] font-bold text-white ring-2 ring-surface">
-                    {index + 1}
-                  </span>
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-[10px] font-bold tracking-[0.04em] whitespace-nowrap text-silver-600 uppercase">
-                    {step.label}
-                  </span>
-                  <span className="tnum block text-lg leading-tight font-bold text-navy-900">{step.value}</span>
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      </Card>
 
       {/* ---------------- Charts ---------------- */}
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">

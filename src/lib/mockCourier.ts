@@ -11,7 +11,7 @@ import type { DispatchStatus } from '@/types'
  */
 
 /** Shown on the UI so it is unmistakable that this is not a live feed. */
-export const MOCK_COURIER_LABEL = 'SIMULATED — Demo Only'
+export const MOCK_COURIER_LABEL = 'SIMULATED'
 
 const HUBS = ['Mumbai', 'Pune', 'Nashik', 'Surat', 'Delhi', 'Bengaluru', 'Hyderabad', 'Kolkata']
 

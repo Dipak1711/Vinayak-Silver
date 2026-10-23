@@ -36,7 +36,7 @@ export function saveDatabase(db: Database): void {
   try {
     store.setItem(STORAGE_KEY, JSON.stringify(db))
   } catch (error) {
-    console.error('[vinayak-silver] Failed to persist demo data', error)
+    console.error('[vinayak-silver] Failed to persist data', error)
   }
 }
 
@@ -91,7 +91,7 @@ export function loadDatabase(): Database {
     const parsed = JSON.parse(raw) as Partial<Database>
     if (!parsed || typeof parsed !== 'object') throw new Error('Invalid payload')
     if (parsed.version !== DB_VERSION) {
-      // Schema changed — rebuild the demo dataset.
+      // Schema changed — rebuild the default dataset.
       const seed = createSeedDatabase()
       saveDatabase(seed)
       return seed
@@ -99,14 +99,14 @@ export function loadDatabase(): Database {
     const merged = mergeWithDefaults(parsed)
     return merged
   } catch (error) {
-    console.warn('[vinayak-silver] Corrupt demo data detected, recreating sample data.', error)
+    console.warn('[vinayak-silver] Corrupt stored data detected, recreating defaults.', error)
     const seed = createSeedDatabase()
     saveDatabase(seed)
     return seed
   }
 }
 
-/** Wipe stored data and recreate the original demo dataset. */
+/** Replace stored data with the original dataset. */
 export function resetDatabase(): Database {
   const seed = createSeedDatabase()
   saveDatabase(seed)

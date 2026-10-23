@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { CompanySettings, Database } from '@/types'
-import { cloneDatabase, loadDatabase, resetDatabase, saveDatabase, STORAGE_KEY } from '@/lib/storage'
+import { cloneDatabase, loadDatabase, resetDatabase, saveDatabase } from '@/lib/storage'
 
 interface DataContextValue {
   db: Database
@@ -95,5 +95,3 @@ export function useData(): DataContextValue {
   if (!context) throw new Error('useData must be used inside a DataProvider')
   return context
 }
-
-export { STORAGE_KEY }

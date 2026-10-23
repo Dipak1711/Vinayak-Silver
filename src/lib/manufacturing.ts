@@ -9,7 +9,7 @@ import { uid } from '@/lib/utils'
  * a silver dinner set runs the full route. Nothing forces every order through
  * every process, and no global stage order is assumed.
  *
- * The default route below is **proposed demo design**, not a client rule.
+ * The default route below is **proposed default design**, not a client rule.
  */
 
 /** A lean default route (laser-cut corporate gifting). Editable per job. */

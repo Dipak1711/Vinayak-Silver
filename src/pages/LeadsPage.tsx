@@ -576,7 +576,7 @@ export function LeadsPage() {
       <ConfirmDialog
         open={Boolean(deleteId)}
         title="Delete lead"
-        message="This lead will be permanently removed from the demo pipeline. This action cannot be undone."
+        message="This lead will be permanently removed from the pipeline. This action cannot be undone."
         confirmLabel="Delete lead"
         onCancel={() => setDeleteId(null)}
         onConfirm={confirmDelete}
@@ -695,7 +695,7 @@ function ConvertLeadModal({
         <Field label="State">
           <Input value={form.state} onChange={(e) => setForm({ ...form, state: e.target.value })} />
         </Field>
-        <Field label="GSTIN" error={errors.gstin} hint="15 character GST number (demo value)">
+        <Field label="GSTIN" error={errors.gstin} hint="15-character GST number">
           <Input value={form.gstin} onChange={(e) => setForm({ ...form, gstin: e.target.value.toUpperCase() })} placeholder="27ABCDE1234F1Z5" invalid={Boolean(errors.gstin)} />
         </Field>
         <Field label="Payment terms (days)">

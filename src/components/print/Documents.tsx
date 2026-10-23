@@ -274,7 +274,7 @@ export function InvoiceDocument({
         </div>
       </div>
       <p className="mt-6 text-center text-[10px] text-silver-600">
-        This is a computer generated demo document. Declaration: goods once sold are not returnable.
+        This is a computer generated document. Declaration: goods once sold are not returnable.
       </p>
     </div>
   )

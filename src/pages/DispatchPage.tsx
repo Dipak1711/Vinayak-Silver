@@ -221,10 +221,10 @@ export function DispatchPage() {
       <div className="flex flex-wrap items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">
         <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" />
         <p className="flex-1">
-          Courier tracking in this demo is <span className="font-semibold">{MOCK_COURIER_LABEL}</span>. The
+          Courier tracking is <span className="font-semibold">{MOCK_COURIER_LABEL}</span>. The
           <span className="font-semibold"> Fetch tracking </span>
-          action generates realistic sample events locally; no real courier API is contacted, and the courier, tracking
-          number and delivery ETA are never changed.
+          action generates sample events locally; no real courier API is contacted, and the courier, tracking number
+          and delivery ETA are never changed.
         </p>
         <Badge tone="warning">{MOCK_COURIER_LABEL}</Badge>
       </div>

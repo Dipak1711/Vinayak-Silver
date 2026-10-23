@@ -11,7 +11,6 @@ import { DispatchPage } from '@/pages/DispatchPage'
 import { CustomersPage } from '@/pages/CustomersPage'
 import { SuppliersPage } from '@/pages/SuppliersPage'
 import { ReportsPage } from '@/pages/ReportsPage'
-import { SettingsPage } from '@/pages/SettingsPage'
 
 export default function App() {
   return (
@@ -28,7 +27,6 @@ export default function App() {
         <Route path="/customers" element={<CustomersPage />} />
         <Route path="/suppliers" element={<SuppliersPage />} />
         <Route path="/reports" element={<ReportsPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
