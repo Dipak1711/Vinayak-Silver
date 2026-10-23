@@ -4,12 +4,12 @@ import { cn } from '@/lib/utils'
 export type SparkTone = 'sapphire' | 'emerald' | 'gold' | 'rose' | 'violet' | 'slate'
 
 const STROKE: Record<SparkTone, string> = {
-  sapphire: '#247f75',
+  sapphire: '#df6527',
   emerald: '#059669',
   gold: '#d97706',
   rose: '#dc2626',
   violet: '#7c3aed',
-  slate: '#4b5567',
+  slate: '#6f665c',
 }
 
 /**

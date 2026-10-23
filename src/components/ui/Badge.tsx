@@ -22,8 +22,8 @@ const TONES: Record<BadgeTone, { chip: string; dot: string }> = {
     dot: 'bg-silver-500',
   },
   info: {
-    chip: 'bg-linear-to-b from-blue-50 to-blue-100/70 text-blue-800 ring-blue-200',
-    dot: 'bg-blue-500 shadow-[0_0_6px_1px_rgba(47,149,138,0.55)]',
+    chip: 'bg-linear-to-b from-cyan-50 to-cyan-100/70 text-cyan-800 ring-cyan-200',
+    dot: 'bg-cyan-500 shadow-[0_0_6px_1px_rgba(14,165,233,0.55)]',
   },
   success: {
     chip: 'bg-linear-to-b from-emerald-50 to-emerald-100/70 text-emerald-800 ring-emerald-200',
@@ -42,8 +42,8 @@ const TONES: Record<BadgeTone, { chip: string; dot: string }> = {
     dot: 'bg-violet-500 shadow-[0_0_6px_1px_rgba(139,92,246,0.55)]',
   },
   cyan: {
-    chip: 'bg-linear-to-b from-cyan-50 to-cyan-100/70 text-cyan-800 ring-cyan-200',
-    dot: 'bg-cyan-500 shadow-[0_0_6px_1px_rgba(20,184,166,0.55)]',
+    chip: 'bg-linear-to-b from-[#e6f7f5] to-[#cdeee9]/70 text-[#0f5f58] ring-[#a7ded6]',
+    dot: 'bg-[#14b8a6] shadow-[0_0_6px_1px_rgba(20,184,166,0.55)]',
   },
   gold: {
     chip: 'bg-linear-to-b from-gold-50 to-gold-100/70 text-gold-800 ring-gold-300',

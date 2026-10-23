@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
    table dividers, input outlines, hairlines — so a panel never has a
    border and a heavy shadow both shouting. */
 
-export type CardVariant = 'default' | 'raised' | 'flat' | 'dark' | 'interactive'
+export type CardVariant = 'default' | 'raised' | 'flat' | 'dark' | 'sunset' | 'interactive'
 
 const VARIANTS: Record<CardVariant, string> = {
   default: 'bg-surface shadow-card',
@@ -16,7 +16,9 @@ const VARIANTS: Record<CardVariant, string> = {
   // Explicit base colour as well as the gradient, so the surface is dark
   // even if a background-image from elsewhere wins the cascade. The sheen
   // is layered as its own element below.
-  dark: 'bg-[#0f3a36] bg-linear-to-br from-[#0f3a36] via-[#1d675f] to-[#1f7a63] text-white shadow-panel',
+  dark: 'bg-[#5a2710] bg-linear-to-br from-[#5a2710] via-[#c4531c] to-[#d6581e] text-white shadow-panel',
+  // Warm amber-to-orange hero surface.
+  sunset: 'bg-[#ed7333] bg-linear-to-br from-[#f58a4e] via-[#ed7333] to-[#d9622a] text-white shadow-[0_24px_48px_-20px_rgba(237,115,51,0.6)]',
   interactive: 'bg-surface shadow-card lift pressable cursor-pointer hover:shadow-lift',
 }
 
@@ -47,7 +49,7 @@ interface CardHeaderProps {
 }
 
 const ACCENTS: Record<string, string> = {
-  sapphire: 'from-[#45ada1] to-[#1d675f]',
+  sapphire: 'from-[#f28c4c] to-[#c4531c]',
   gold: 'from-gold-400 to-gold-700',
   emerald: 'from-emerald-500 to-emerald-700',
   rose: 'from-rose-500 to-rose-700',

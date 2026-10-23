@@ -19,14 +19,14 @@ export function PageHeader({
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div className="flex items-start gap-3.5">
         {icon ? (
-          <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-[16px] bg-linear-to-br from-[#2f958a] to-[#1f7a63] text-white shadow-[0_12px_24px_-8px_rgba(47,149,138,0.6),inset_0_1px_0_0_rgba(255,255,255,0.3)]">
+          <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-[16px] bg-linear-to-br from-[#f58a4e] to-[#e0662a] text-white shadow-[0_12px_24px_-8px_rgba(237,115,51,0.6),inset_0_1px_0_0_rgba(255,255,255,0.3)]">
             {icon}
           </span>
         ) : null}
         <div className="min-w-0">
           {eyebrow ? (
             <p className="flex items-center gap-3 text-[11.5px] font-semibold tracking-[0.22em] text-silver-500 uppercase">
-              <span className="h-[3px] w-8 shrink-0 rounded-full bg-linear-to-r from-[#2f958a] to-gold-400" aria-hidden="true" />
+              <span className="h-[3px] w-8 shrink-0 rounded-full bg-linear-to-r from-[#ed7333] to-gold-400" aria-hidden="true" />
               {eyebrow}
             </p>
           ) : null}
@@ -128,7 +128,7 @@ export function ProgressBar({
   track?: string
 }) {
   const tones: Record<string, string> = {
-    blue: 'from-[#45ada1] to-[#1d675f]',
+    blue: 'from-[#f28c4c] to-[#c4531c]',
     emerald: 'from-emerald-400 to-emerald-600',
     amber: 'from-amber-400 to-amber-600',
     rose: 'from-rose-400 to-rose-600',

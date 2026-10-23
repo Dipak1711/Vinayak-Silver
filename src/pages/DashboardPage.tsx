@@ -58,11 +58,11 @@ function CollectionRing({ rate }: { rate: number }) {
       <svg width={size} height={size} className="-rotate-90">
         <defs>
           <linearGradient id="ring-grad" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#6ee7b7" />
-            <stop offset="100%" stopColor="#fcd34d" />
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="100%" stopColor="#fff1c2" />
           </linearGradient>
         </defs>
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="rgba(255,255,255,0.28)" strokeWidth={stroke} />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -73,14 +73,14 @@ function CollectionRing({ rate }: { rate: number }) {
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={circumference * (1 - shown / 100)}
-          style={{ transition: 'stroke-dashoffset 1400ms cubic-bezier(0.16, 1, 0.3, 1)', filter: 'drop-shadow(0 0 6px rgba(110,231,183,0.55))' }}
+          style={{ transition: 'stroke-dashoffset 1400ms cubic-bezier(0.16, 1, 0.3, 1)', filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.6))' }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
         <span className="tnum text-[34px] leading-none font-extrabold tracking-[-0.03em]">
           <AnimatedNumber value={clamped} format={(v) => `${Math.round(v)}%`} duration={1400} />
         </span>
-        <span className="mt-1 text-[10.5px] font-bold tracking-[0.14em] text-white/70 uppercase">Collected</span>
+        <span className="mt-1 text-[10.5px] font-bold tracking-[0.14em] text-white/90 uppercase">Collected</span>
       </div>
     </div>
   )
@@ -107,17 +107,17 @@ function HeroTile({
   spark?: ReactNode
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl bg-white/[0.09] p-4 ring-1 ring-white/15 backdrop-blur transition-[translate,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:bg-white/[0.14]">
+    <div className="group relative overflow-hidden rounded-2xl bg-white/[0.16] p-4 ring-1 ring-white/30 backdrop-blur transition-[translate,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:bg-white/[0.24]">
       <span className={cn('absolute inset-x-0 top-0 h-[3px] bg-linear-to-r', accent)} aria-hidden="true" />
       <div className="flex items-center justify-between gap-2">
-        <span className="flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] text-white/70 uppercase">
+        <span className="flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] text-white/90 uppercase">
           <span className={cn('grid h-7 w-7 place-items-center rounded-lg', iconClass)}>{icon}</span>
           {label}
         </span>
         <span
           className={cn(
             'tnum rounded-full px-2 py-0.5 text-[10.5px] font-bold',
-            chip.good ? 'bg-emerald-400/20 text-emerald-200' : 'bg-rose-400/25 text-rose-200',
+            chip.good ? 'bg-white/25 text-white' : 'bg-rose-700/40 text-white',
           )}
         >
           {chip.text}
@@ -199,23 +199,23 @@ export function DashboardPage() {
       />
 
       {/* ---------------- Hero band ---------------- */}
-      <Card variant="dark" padded={false} className="overflow-hidden">
+      <Card variant="sunset" padded={false} className="overflow-hidden">
         <div className="relative p-5 lg:p-6">
           {/* Atmosphere: a warm glow top-right, a cool one bottom-left, and a
               faint rupee mark, so the band reads as a surface, not a flat fill. */}
-          <div className="pointer-events-none absolute -top-24 -right-16 h-72 w-72 rounded-full bg-gold-400/25 blur-3xl" aria-hidden="true" />
-          <div className="pointer-events-none absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-emerald-400/20 blur-3xl" aria-hidden="true" />
+          <div className="pointer-events-none absolute -top-24 -right-16 h-72 w-72 rounded-full bg-white/30 blur-3xl" aria-hidden="true" />
+          <div className="pointer-events-none absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-rose-500/30 blur-3xl" aria-hidden="true" />
           <IndianRupee className="pointer-events-none absolute -right-6 -bottom-10 h-56 w-56 -rotate-12 text-white/[0.045]" aria-hidden="true" />
 
           <div className="relative grid items-center gap-6 lg:grid-cols-[auto_1fr] lg:gap-8">
             <div className="flex flex-col items-center gap-3">
               <CollectionRing rate={collectedRate} />
-              <div className="flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur">
+              <div className="flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-3 py-1.5 backdrop-blur">
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-60" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-300" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-70" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
                 </span>
-                <span className="text-[11.5px] font-semibold text-white/90">
+                <span className="text-[11.5px] font-semibold text-white">
                   {metrics.totalInvoices} invoices · {metrics.pendingOrders} orders open
                 </span>
               </div>
@@ -230,30 +230,28 @@ export function DashboardPage() {
                   label="Invoiced"
                   icon={<Receipt className="h-4 w-4" />}
                   accent="from-white/70 to-white/10"
-                  iconClass="bg-white/15 text-white"
+                  iconClass="bg-white/25 text-white"
                   value={metrics.invoiceValue}
                   chip={{ text: `${invoicedTrend >= 0 ? '+' : ''}${invoicedTrend.toFixed(1)}%`, good: invoicedTrend >= 0 }}
-                  spark={<Sparkline data={invoicedSpark} tone="gold" height={30} />}
+                  spark={<div className="brightness-0 invert opacity-80"><Sparkline data={invoicedSpark} tone="gold" height={30} /></div>}
                 />
                 <HeroTile
                   label="Collected"
                   icon={<Wallet className="h-4 w-4" />}
-                  accent="from-emerald-300 to-emerald-500/10"
-                  iconClass="bg-emerald-400/20 text-emerald-200"
-                  valueClass="text-emerald-300"
+                  accent="from-white/80 to-white/10"
+                  iconClass="bg-white/25 text-white"
                   value={metrics.amountCollected}
                   chip={{ text: `${collectedTrend >= 0 ? '+' : ''}${collectedTrend.toFixed(1)}%`, good: collectedTrend >= 0 }}
-                  spark={<Sparkline data={collectedSpark} tone="emerald" height={30} />}
+                  spark={<div className="brightness-0 invert opacity-80"><Sparkline data={collectedSpark} tone="emerald" height={30} /></div>}
                 />
                 <HeroTile
                   label="Outstanding"
                   icon={<Hourglass className="h-4 w-4" />}
-                  accent="from-gold-300 to-gold-500/10"
-                  iconClass="bg-gold-400/20 text-gold-200"
-                  valueClass="text-gold-300"
+                  accent="from-white/80 to-white/10"
+                  iconClass="bg-white/25 text-white"
                   value={metrics.outstanding}
                   chip={{ text: overdueInvoices > 0 ? `${overdueInvoices} overdue` : 'current', good: overdueInvoices === 0 }}
-                  spark={<ProgressBar value={100 - collectedRate} tone="gold" track="bg-white/15" className="mt-2.5" />}
+                  spark={<div className="brightness-0 invert opacity-90"><ProgressBar value={100 - collectedRate} tone="gold" track="bg-white/25" className="mt-2.5" /></div>}
                 />
               </div>
             </div>
@@ -362,7 +360,7 @@ export function DashboardPage() {
         <Card className="xl:col-span-2">
           <CardHeader accent="sapphire" title="Production jobs by stage" subtitle="Where work is sitting on the shop floor" />
           <div className="mt-4">
-            <CategoryBarChart data={productionStages} color="#247f75" />
+            <CategoryBarChart data={productionStages} color="#df6527" />
           </div>
         </Card>
 

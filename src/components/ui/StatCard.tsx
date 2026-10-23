@@ -19,9 +19,9 @@ interface ToneSpec {
    gradient, so a row of cards reads as calm colour, not loud swatches. */
 const soft = (bg: string, fg: string, ring: string) => `${bg} ${fg} ring-1 ring-inset ${ring}`
 const TONES: Record<StatTone, ToneSpec> = {
-  sapphire: { tile: soft('bg-blue-100/70', 'text-blue-700', 'ring-blue-200'), glow: '#2f958a', spark: 'sapphire' },
+  sapphire: { tile: soft('bg-blue-100/70', 'text-blue-700', 'ring-blue-200'), glow: '#ed7333', spark: 'sapphire' },
   // `blue` is the same system as `sapphire`; both names are accepted.
-  blue: { tile: soft('bg-blue-100/70', 'text-blue-700', 'ring-blue-200'), glow: '#2f958a', spark: 'sapphire' },
+  blue: { tile: soft('bg-blue-100/70', 'text-blue-700', 'ring-blue-200'), glow: '#ed7333', spark: 'sapphire' },
   emerald: { tile: soft('bg-emerald-100/70', 'text-emerald-700', 'ring-emerald-200'), glow: '#10b981', spark: 'emerald' },
   amber: { tile: soft('bg-amber-100/70', 'text-amber-700', 'ring-amber-200'), glow: '#f59e0b', spark: 'gold' },
   rose: { tile: soft('bg-rose-100/70', 'text-rose-700', 'ring-rose-200'), glow: '#ef4444', spark: 'rose' },

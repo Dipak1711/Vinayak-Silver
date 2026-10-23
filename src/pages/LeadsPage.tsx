@@ -61,7 +61,7 @@ const EMPTY_FORM: LeadFormState = {
 const SALES_TEAM = ['Priya Sharma', 'Amit Verma', 'Neha Gupta']
 
 const STAGE_GRADIENT: Record<LeadStage, string> = {
-  'New Lead': 'from-blue-400 to-blue-600',
+  'New Lead': 'from-cyan-400 to-cyan-600',
   Contacted: 'from-violet-400 to-violet-600',
   'Follow-up': 'from-amber-400 to-amber-600',
   Negotiation: 'from-amber-500 to-rose-500',

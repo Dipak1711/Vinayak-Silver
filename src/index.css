@@ -22,33 +22,33 @@
      silver-100 is the canvas, silver-200/300 are hairlines and
      control outlines, silver-500/600/700 are muted text.
      --------------------------------------------------------------- */
-  --color-silver-50: #f9fafc;
-  --color-silver-100: #f6f7fb;
-  --color-silver-200: #e7e9f0;
-  --color-silver-300: #d5d9e4;
-  --color-silver-400: #aab2c3;
-  --color-silver-500: #8790a3;
-  --color-silver-600: #6b7488;
-  --color-silver-700: #4b5567;
-  --color-silver-800: #2f3a4d;
-  --color-silver-900: #172033;
-  --color-silver-950: #0f172a;
+  --color-silver-50: #fbfaf8;
+  --color-silver-100: #f7f4f0;
+  --color-silver-200: #ebe6df;
+  --color-silver-300: #d9d2c8;
+  --color-silver-400: #b3aa9e;
+  --color-silver-500: #8f857a;
+  --color-silver-600: #6f665c;
+  --color-silver-700: #544c43;
+  --color-silver-800: #3a342d;
+  --color-silver-900: #231f1a;
+  --color-silver-950: #15120f;
 
   /* ---------------------------------------------------------------
      Ink — deep navy chrome for headings, dark surfaces and the
      printed brand mark. navy-900 matches the reference body text.
      --------------------------------------------------------------- */
-  --color-navy-50: #f1f4f8;
-  --color-navy-100: #e1e6ee;
-  --color-navy-200: #c7d0de;
-  --color-navy-300: #9aa6ba;
-  --color-navy-400: #6b7893;
-  --color-navy-500: #4b5567;
-  --color-navy-600: #3a4356;
-  --color-navy-700: #2b3445;
-  --color-navy-800: #1c2537;
-  --color-navy-900: #0f172a;
-  --color-navy-950: #080d17;
+  --color-navy-50: #f6f3ef;
+  --color-navy-100: #ece6de;
+  --color-navy-200: #d6cdc1;
+  --color-navy-300: #a99e90;
+  --color-navy-400: #7d7365;
+  --color-navy-500: #5a5146;
+  --color-navy-600: #453e35;
+  --color-navy-700: #342e27;
+  --color-navy-800: #26211c;
+  --color-navy-900: #1a1612;
+  --color-navy-950: #100d0a;
 
   /* ---------------------------------------------------------------
      Semantic surfaces. `surface` is the panel colour that flips with
@@ -56,36 +56,36 @@
      must stay dark in both themes (printed marks, number dots).
      --------------------------------------------------------------- */
   --color-surface: #ffffff;
-  --color-ink: #0f172a;
+  --color-ink: #1a1612;
 
   /* ---------------------------------------------------------------
-     Primary — indigo. The reference action colour (#247f75).
+     Primary — indigo. The reference action colour (#df6527).
      `sapphire-*` and `blue-*` are the same system so existing
      `bg-blue-600` call sites stay on-palette.
      --------------------------------------------------------------- */
-  --color-sapphire-50: #effaf8;
-  --color-sapphire-100: #d3f1ec;
-  --color-sapphire-200: #a8e2da;
-  --color-sapphire-300: #76cbc0;
-  --color-sapphire-400: #45ada1;
-  --color-sapphire-500: #2f958a;
-  --color-sapphire-600: #247f75;
-  --color-sapphire-700: #1d675f;
-  --color-sapphire-800: #19524d;
-  --color-sapphire-900: #164440;
-  --color-sapphire-950: #0f3a36;
+  --color-sapphire-50: #fff5ee;
+  --color-sapphire-100: #ffe6d4;
+  --color-sapphire-200: #fccba8;
+  --color-sapphire-300: #f8aa77;
+  --color-sapphire-400: #f28c4c;
+  --color-sapphire-500: #ed7333;
+  --color-sapphire-600: #df6527;
+  --color-sapphire-700: #c4531c;
+  --color-sapphire-800: #943f17;
+  --color-sapphire-900: #7a3616;
+  --color-sapphire-950: #5a2710;
 
-  --color-blue-50: #effaf8;
-  --color-blue-100: #d3f1ec;
-  --color-blue-200: #a8e2da;
-  --color-blue-300: #76cbc0;
-  --color-blue-400: #45ada1;
-  --color-blue-500: #2f958a;
-  --color-blue-600: #247f75;
-  --color-blue-700: #1d675f;
-  --color-blue-800: #19524d;
-  --color-blue-900: #164440;
-  --color-blue-950: #0f3a36;
+  --color-blue-50: #fff5ee;
+  --color-blue-100: #ffe6d4;
+  --color-blue-200: #fccba8;
+  --color-blue-300: #f8aa77;
+  --color-blue-400: #f28c4c;
+  --color-blue-500: #ed7333;
+  --color-blue-600: #df6527;
+  --color-blue-700: #c4531c;
+  --color-blue-800: #943f17;
+  --color-blue-900: #7a3616;
+  --color-blue-950: #5a2710;
 
   /* ---------------------------------------------------------------
      Accent — burnished amber for value and premium moments. Never a
@@ -224,58 +224,58 @@
   :root[data-theme='dark'] {
     color-scheme: dark;
 
-    --color-surface: #121826;
-    --color-ink: #0f172a;
+    --color-surface: #1b1713;
+    --color-ink: #1a1612;
 
     /* neutrals — canvas, panels, hairlines, muted text */
-    --color-silver-50: #171f2f;
-    --color-silver-100: #0b0f19;
-    --color-silver-200: #232d42;
-    --color-silver-300: #33405c;
-    --color-silver-400: #4c5a78;
-    --color-silver-500: #7d889e;
-    --color-silver-600: #98a2b6;
-    --color-silver-700: #aeb7c9;
-    --color-silver-800: #cdd5e2;
-    --color-silver-900: #e4e9f2;
-    --color-silver-950: #f2f5fb;
+    --color-silver-50: #1d1915;
+    --color-silver-100: #120f0c;
+    --color-silver-200: #2b2620;
+    --color-silver-300: #3d362e;
+    --color-silver-400: #5c5348;
+    --color-silver-500: #9a9084;
+    --color-silver-600: #b0a699;
+    --color-silver-700: #c4bbaf;
+    --color-silver-800: #ddd6cc;
+    --color-silver-900: #ece7df;
+    --color-silver-950: #f7f3ed;
 
     /* ink chrome — headings and body text become light */
-    --color-navy-50: #1a2233;
-    --color-navy-100: #222c40;
-    --color-navy-200: #2c3850;
-    --color-navy-300: #46536b;
-    --color-navy-400: #6b7893;
-    --color-navy-500: #8b95a9;
-    --color-navy-600: #a9b2c4;
-    --color-navy-700: #c6cede;
-    --color-navy-800: #dde3ee;
-    --color-navy-900: #e9edf6;
-    --color-navy-950: #f3f6fc;
+    --color-navy-50: #211c17;
+    --color-navy-100: #2a241e;
+    --color-navy-200: #362f27;
+    --color-navy-300: #54493d;
+    --color-navy-400: #82776a;
+    --color-navy-500: #a39989;
+    --color-navy-600: #bdb4a6;
+    --color-navy-700: #d3cbbf;
+    --color-navy-800: #e6e0d6;
+    --color-navy-900: #f1ede6;
+    --color-navy-950: #faf7f2;
 
     /* primary — solid steps hold, tints become translucent, ink steps lift */
-    --color-sapphire-50: rgba(47, 149, 138, 0.14);
-    --color-sapphire-100: rgba(47, 149, 138, 0.26);
-    --color-sapphire-200: rgba(47, 149, 138, 0.4);
-    --color-sapphire-300: #76cbc0;
-    --color-sapphire-400: #45ada1;
-    --color-sapphire-500: #2f958a;
-    --color-sapphire-600: #247f75;
-    --color-sapphire-700: #45ada1;
-    --color-sapphire-800: #76cbc0;
-    --color-sapphire-900: #a8e2da;
+    --color-sapphire-50: rgba(237, 115, 51, 0.14);
+    --color-sapphire-100: rgba(237, 115, 51, 0.26);
+    --color-sapphire-200: rgba(237, 115, 51, 0.4);
+    --color-sapphire-300: #f8aa77;
+    --color-sapphire-400: #f28c4c;
+    --color-sapphire-500: #ed7333;
+    --color-sapphire-600: #df6527;
+    --color-sapphire-700: #f28c4c;
+    --color-sapphire-800: #f8aa77;
+    --color-sapphire-900: #fccba8;
     --color-sapphire-950: #ddd6fe;
 
-    --color-blue-50: rgba(47, 149, 138, 0.14);
-    --color-blue-100: rgba(47, 149, 138, 0.26);
-    --color-blue-200: rgba(47, 149, 138, 0.4);
-    --color-blue-300: #76cbc0;
-    --color-blue-400: #45ada1;
-    --color-blue-500: #2f958a;
-    --color-blue-600: #247f75;
-    --color-blue-700: #45ada1;
-    --color-blue-800: #76cbc0;
-    --color-blue-900: #a8e2da;
+    --color-blue-50: rgba(237, 115, 51, 0.14);
+    --color-blue-100: rgba(237, 115, 51, 0.26);
+    --color-blue-200: rgba(237, 115, 51, 0.4);
+    --color-blue-300: #f8aa77;
+    --color-blue-400: #f28c4c;
+    --color-blue-500: #ed7333;
+    --color-blue-600: #df6527;
+    --color-blue-700: #f28c4c;
+    --color-blue-800: #f8aa77;
+    --color-blue-900: #fccba8;
     --color-blue-950: #ddd6fe;
 
     /* accent — gold / amber */
@@ -444,11 +444,11 @@
 @keyframes drop-settle {
   0% {
     scale: 1.04;
-    box-shadow: 0 0 0 3px rgba(47, 149, 138, 0.55), 0 14px 28px -8px rgba(47, 149, 138, 0.5);
+    box-shadow: 0 0 0 3px rgba(237, 115, 51, 0.55), 0 14px 28px -8px rgba(237, 115, 51, 0.5);
   }
   100% {
     scale: 1;
-    box-shadow: 0 0 0 0 rgba(47, 149, 138, 0), 0 0 0 1px rgba(15, 23, 42, 0.05);
+    box-shadow: 0 0 0 0 rgba(237, 115, 51, 0), 0 0 0 1px rgba(15, 23, 42, 0.05);
   }
 }
 
@@ -535,13 +535,13 @@
 
 @keyframes pulse-ring {
   0% {
-    box-shadow: 0 0 0 0 rgba(36, 127, 117, 0.45);
+    box-shadow: 0 0 0 0 rgba(223, 101, 39, 0.45);
   }
   70% {
-    box-shadow: 0 0 0 8px rgba(36, 127, 117, 0);
+    box-shadow: 0 0 0 8px rgba(223, 101, 39, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(36, 127, 117, 0);
+    box-shadow: 0 0 0 0 rgba(223, 101, 39, 0);
   }
 }
 
@@ -580,9 +580,9 @@ body {
 .app-canvas {
   background-color: var(--color-silver-100);
   background-image:
-    radial-gradient(1000px 560px at 0% -10%, rgba(47, 149, 138, 0.14), transparent 68%),
-    radial-gradient(800px 520px at 100% -8%, rgba(47, 149, 138, 0.10), transparent 66%),
-    radial-gradient(900px 500px at 50% 115%, rgba(56, 189, 248, 0.08), transparent 70%);
+    radial-gradient(1000px 560px at 0% -10%, rgba(237, 115, 51, 0.14), transparent 68%),
+    radial-gradient(800px 520px at 100% -8%, rgba(237, 115, 51, 0.10), transparent 66%),
+    radial-gradient(900px 500px at 50% 115%, rgba(245, 158, 11, 0.07), transparent 70%);
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
@@ -637,14 +637,14 @@ input[type='number'] {
 .sheen {
   background-image:
     radial-gradient(120% 140% at 0% 0%, rgba(255, 255, 255, 0.16) 0%, transparent 55%),
-    radial-gradient(100% 100% at 100% 0%, rgba(47, 149, 138, 0.35) 0%, transparent 60%);
+    radial-gradient(100% 100% at 100% 0%, rgba(237, 115, 51, 0.35) 0%, transparent 60%);
 }
 
 /* Light lavender navigation chrome that follows the theme tokens. */
 .sidebar-chrome {
   background-color: var(--color-surface);
   background-image:
-    radial-gradient(360px 240px at 0% 0%, rgba(47, 149, 138, 0.12), transparent 70%),
+    radial-gradient(360px 240px at 0% 0%, rgba(237, 115, 51, 0.12), transparent 70%),
     radial-gradient(320px 260px at 100% 100%, rgba(245, 158, 11, 0.09), transparent 70%),
     linear-gradient(180deg, var(--color-blue-50) 0%, var(--color-surface) 45%);
 }
@@ -657,7 +657,7 @@ input[type='number'] {
 
 /* Page titles: ink fading into the brand indigo. */
 .title-gradient {
-  background-image: linear-gradient(115deg, var(--color-navy-900) 35%, #2f958a 100%);
+  background-image: linear-gradient(115deg, var(--color-navy-900) 35%, #ed7333 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

@@ -18,17 +18,17 @@ import { formatCurrency, formatNumber } from '@/lib/utils'
 /* Seven steps of distinct lightness, so a pie still reads when every hue
    collapses to grey (deuteranopia, bad projectors, printed handouts). */
 export const CHART_PALETTE = [
-  '#247f75', // indigo
-  '#d97706', // amber
-  '#059669', // emerald
+  '#ed7333', // orange
+  '#0f766e', // teal
   '#7c3aed', // violet
-  '#0d9488', // teal
+  '#0ea5e9', // sky
+  '#059669', // emerald
   '#dc2626', // rose
-  '#64748b', // slate
+  '#8f857a', // warm grey
 ]
 
-const AXIS = { fontSize: 11, fill: '#8790a3', fontWeight: 500 }
-const GRID = '#e7e9f0'
+const AXIS = { fontSize: 11, fill: '#8f857a', fontWeight: 500 }
+const GRID = '#ebe6df'
 
 interface TooltipEntry {
   name?: string
@@ -81,8 +81,8 @@ export function SalesTrendChart({
       <AreaChart data={data} margin={{ top: 8, right: 8, left: -14, bottom: 0 }}>
         <defs>
           <linearGradient id="invoicedFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#247f75" stopOpacity={0.30} />
-            <stop offset="100%" stopColor="#247f75" stopOpacity={0.01} />
+            <stop offset="0%" stopColor="#df6527" stopOpacity={0.30} />
+            <stop offset="100%" stopColor="#df6527" stopOpacity={0.01} />
           </linearGradient>
           <linearGradient id="collectedFill" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#059669" stopOpacity={0.28} />
@@ -98,12 +98,12 @@ export function SalesTrendChart({
           width={62}
           tickFormatter={(value: number) => (value >= 100000 ? `${(value / 100000).toFixed(0)}L` : `${value / 1000}K`)}
         />
-        <Tooltip content={<ChartTooltip />} cursor={{ stroke: '#d5d9e4', strokeWidth: 1 }} />
+        <Tooltip content={<ChartTooltip />} cursor={{ stroke: '#d9d2c8', strokeWidth: 1 }} />
         <Area
           type="monotone"
           dataKey="invoiced"
           name="Invoiced"
-          stroke="#247f75"
+          stroke="#df6527"
           strokeWidth={2.5}
           fill="url(#invoicedFill)"
           activeDot={{ r: 4, strokeWidth: 2, stroke: '#fff' }}
@@ -128,7 +128,7 @@ export function SalesTrendChart({
 
 export function CategoryBarChart({
   data,
-  color = '#247f75',
+  color = '#df6527',
   height = 240,
   currency = false,
   horizontal = false,
@@ -166,7 +166,7 @@ export function CategoryBarChart({
             <YAxis tick={AXIS} axisLine={false} tickLine={false} width={40} />
           </>
         )}
-        <Tooltip content={<ChartTooltip currency={currency} />} cursor={{ fill: '#f6f7fb' }} />
+        <Tooltip content={<ChartTooltip currency={currency} />} cursor={{ fill: '#f7f4f0' }} />
         <Bar
           dataKey="value"
           name="Value"

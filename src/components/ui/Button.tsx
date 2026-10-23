@@ -25,7 +25,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
    variant is allowed to be loud; outline and ghost stay quiet. */
 const VARIANTS: Record<ButtonVariant, string> = {
   primary:
-    'btn-sheen bg-linear-to-b from-[#2f958a] to-[#1d675f] text-white shadow-[0_10px_24px_-8px_rgba(36,127,117,0.6),inset_0_1px_0_0_rgba(255,255,255,0.22)] hover:from-[#37a094] hover:to-[#247f75] hover:shadow-[0_14px_28px_-8px_rgba(36,127,117,0.7),inset_0_1px_0_0_rgba(255,255,255,0.25)]',
+    'btn-sheen bg-linear-to-b from-[#f1823f] to-[#e0662a] text-white shadow-[0_10px_24px_-8px_rgba(237,115,51,0.6),inset_0_1px_0_0_rgba(255,255,255,0.25)] hover:from-[#f58a4e] hover:to-[#ed7333] hover:shadow-[0_14px_28px_-8px_rgba(237,115,51,0.7),inset_0_1px_0_0_rgba(255,255,255,0.3)]',
   secondary: 'bg-blue-50 text-blue-700 hover:bg-blue-100',
   outline: 'bg-surface text-navy-800 shadow-flat hover:bg-silver-50 hover:text-navy-900 hover:shadow-card',
   ghost: 'text-navy-700 hover:bg-silver-100 hover:text-navy-900',
