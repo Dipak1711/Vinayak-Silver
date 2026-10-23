@@ -25,7 +25,7 @@ export function Field({
   children: ReactNode
 }) {
   const message = error ? (
-    <p className="flex items-center gap-1.5 text-xs font-medium text-rose-700">
+    <p className="field-error flex items-center gap-1.5 text-xs font-medium text-rose-700">
       <AlertCircle className="h-3.5 w-3.5 shrink-0" />
       {error}
     </p>
@@ -71,7 +71,7 @@ export function Input({
       className={cn(
         CONTROL,
         'h-[42px]',
-        invalid && 'border-rose-400 focus:border-rose-500 focus:ring-rose-100',
+        invalid && 'field-shake border-rose-400 focus:border-rose-500 focus:ring-rose-100',
         className,
       )}
       {...rest}
@@ -90,7 +90,7 @@ export function Textarea({
       className={cn(
         CONTROL,
         'min-h-[84px] py-2 leading-relaxed',
-        invalid && 'border-rose-400 focus:border-rose-500 focus:ring-rose-100',
+        invalid && 'field-shake border-rose-400 focus:border-rose-500 focus:ring-rose-100',
         className,
       )}
       {...rest}
@@ -110,7 +110,7 @@ export function Select({
       className={cn(
         CONTROL,
         'h-[42px] cursor-pointer appearance-none bg-[length:16px] bg-[right_0.6rem_center] bg-no-repeat pr-9',
-        invalid && 'border-rose-400',
+        invalid && 'field-shake border-rose-400',
         className,
       )}
       style={{

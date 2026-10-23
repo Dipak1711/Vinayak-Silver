@@ -516,7 +516,7 @@ export function ReportsPage() {
       />
 
       {summary.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div key={`${report}-summary`} className="tab-swap grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {summary.map((item) => (
             <StatCard key={item.label} label={item.label} value={item.value} tone="blue" />
           ))}
@@ -575,7 +575,7 @@ export function ReportsPage() {
         </div>
       </Card>
 
-      <TableShell>
+      <TableShell key={`${report}-table`} className="tab-swap">
         <Table className="min-w-[880px]">
           <THead>
             <TR>

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
 export type BadgeTone =
@@ -145,8 +145,19 @@ const LIVE_STATUSES = new Set(['In Progress', 'In Transit', 'Delayed', 'Dispatch
 
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
   const tone = STATUS_TONES[status] ?? 'neutral'
+  // A real status change (not first render) pops the badge once, so the
+  // motion always reflects a state change that actually happened.
+  const previous = useRef(status)
+  const [changed, setChanged] = useState(false)
+  useEffect(() => {
+    if (previous.current === status) return
+    previous.current = status
+    setChanged(true)
+    const timer = window.setTimeout(() => setChanged(false), 900)
+    return () => window.clearTimeout(timer)
+  }, [status])
   return (
-    <Badge tone={tone} className={className} dot live={LIVE_STATUSES.has(status)}>
+    <Badge tone={tone} className={cn(changed && 'badge-changed', className)} dot live={LIVE_STATUSES.has(status)}>
       {status}
     </Badge>
   )

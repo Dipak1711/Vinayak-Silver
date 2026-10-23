@@ -377,7 +377,7 @@ export function InventoryPage() {
       </Card>
 
       {tab === 'materials' ? (
-        <TableShell>
+        <TableShell key="materials" className="tab-swap">
           <Table>
             <THead>
               <TR>
@@ -441,7 +441,7 @@ export function InventoryPage() {
           </Table>
         </TableShell>
       ) : (
-        <TableShell>
+        <TableShell key="movements" className="tab-swap">
           <Table>
             <THead>
               <TR>

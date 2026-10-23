@@ -8,6 +8,7 @@ interface Toast {
   id: string
   message: string
   variant: ToastVariant
+  leaving?: boolean
 }
 
 interface ToastContextValue {
@@ -33,8 +34,10 @@ const VARIANT_ICON: Record<ToastVariant, ReactNode> = {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
+  // Mark as leaving first so the exit animation can play, then remove.
   const dismiss = useCallback((id: string) => {
-    setToasts((current) => current.filter((toast) => toast.id !== id))
+    setToasts((current) => current.map((toast) => (toast.id === id ? { ...toast, leaving: true } : toast)))
+    window.setTimeout(() => setToasts((current) => current.filter((toast) => toast.id !== id)), 180)
   }, [])
 
   const notify = useCallback(
@@ -60,7 +63,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={toast.id}
             role="status"
             className={cn(
-              'pointer-events-auto flex items-start gap-3 rounded-xl border p-3 shadow-panel animate-slide-up',
+              'pointer-events-auto flex items-start gap-3 rounded-xl border p-3 shadow-panel',
+              toast.leaving ? 'toast-out' : 'animate-slide-up',
               VARIANT_STYLES[toast.variant],
             )}
           >

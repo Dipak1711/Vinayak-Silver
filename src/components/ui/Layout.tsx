@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Search, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -136,6 +136,12 @@ export function ProgressBar({
     gold: 'from-gold-400 to-gold-600',
   }
   const clamped = Math.max(0, Math.min(100, value))
+  // Mount at zero, then fill: the bar visibly grows to its value on first paint.
+  const [shown, setShown] = useState(0)
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setShown(clamped))
+    return () => cancelAnimationFrame(frame)
+  }, [clamped])
   return (
     <div
       className={cn('h-1.5 w-full overflow-hidden rounded-full', track, className)}
@@ -145,8 +151,8 @@ export function ProgressBar({
       aria-valuemax={100}
     >
       <div
-        className={cn('h-full w-full origin-left rounded-full bg-linear-to-r transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]', tones[tone])}
-        style={{ transform: `scaleX(${clamped / 100})` }}
+        className={cn('h-full w-full origin-left rounded-full bg-linear-to-r transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]', tones[tone])}
+        style={{ transform: `scaleX(${shown / 100})` }}
       />
     </div>
   )

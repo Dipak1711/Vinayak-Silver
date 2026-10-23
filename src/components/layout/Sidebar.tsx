@@ -23,7 +23,7 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
     <>
       {open ? (
         <div
-          className="no-print fixed inset-0 z-30 bg-black/50 backdrop-blur-sm lg:hidden"
+          className="no-print animate-fade-in fixed inset-0 z-30 bg-black/50 backdrop-blur-sm lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -90,7 +90,14 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
                   />
                 </button>
 
-                {!isClosed || mini ? (
+                <div
+                  className={cn(
+                    'grid transition-[grid-template-rows,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]',
+                    !isClosed || mini ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0',
+                  )}
+                  aria-hidden={isClosed && !mini ? true : undefined}
+                >
+                  <div className="min-h-0 overflow-hidden">
                   <ul
                     className={cn(
                       'mt-1 mb-2.5 ml-[19px] flex flex-col gap-0.5 border-l border-blue-100 pl-2.5',
@@ -144,7 +151,8 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
                       )
                     })}
                   </ul>
-                ) : null}
+                  </div>
+                </div>
               </div>
             )
           })}
