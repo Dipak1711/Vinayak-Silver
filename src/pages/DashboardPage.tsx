@@ -83,7 +83,6 @@ export function DashboardPage() {
         eyebrow="Operations overview"
         icon={<LayoutDashboard className="h-5 w-5" />}
         title="Dashboard"
-        description={`Live position across sales, production and fulfilment · FY ${db.settings.financialYear}`}
         actions={
           <>
             <div className="mr-1 hidden items-center gap-2 rounded-xl border border-silver-200 bg-surface px-3 py-1.5 shadow-flat lg:flex">
@@ -107,7 +106,7 @@ export function DashboardPage() {
 
       {/* ---------------- Hero band ---------------- */}
       <Card variant="dark" padded={false} className="overflow-hidden">
-        <div className="relative p-5 lg:p-6">
+        <div className="relative p-4 lg:p-5">
           {/* Decorative trend wash, pinned to the bottom edge so it never
               crosses the figures it sits behind. */}
           <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 opacity-35" aria-hidden="true">
@@ -116,10 +115,7 @@ export function DashboardPage() {
 
           <div className="relative flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-[11px] font-bold tracking-[0.14em] text-gold-300 uppercase">
-                {db.settings.name} · {db.settings.tagline}
-              </p>
-              <h2 className="mt-1.5 text-[21px] font-bold tracking-[-0.02em] text-white lg:text-[25px]">
+              <h2 className="text-[20px] font-bold tracking-[-0.02em] text-white lg:text-[25px]">
                 Revenue and fulfilment at a glance
               </h2>
             </div>
@@ -143,7 +139,7 @@ export function DashboardPage() {
             <div className="min-w-0">
               <p className="text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">Invoiced value</p>
               <div className="mt-1.5 flex flex-wrap items-baseline gap-2">
-                <span className="tnum text-[30px] leading-none font-bold tracking-[-0.03em] text-white">
+                <span className="tnum text-[26px] leading-none font-bold tracking-[-0.03em] text-white">
                   <AnimatedNumber value={metrics.invoiceValue} format={(value) => formatCurrency(value, true)} />
                 </span>
                 <span
@@ -156,13 +152,12 @@ export function DashboardPage() {
                   {invoicedTrend.toFixed(1)}%
                 </span>
               </div>
-              <p className="mt-1.5 text-[11px] text-white/55">vs previous month</p>
             </div>
 
             <div className="min-w-0">
               <p className="text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">Collected</p>
               <div className="mt-1.5 flex flex-wrap items-baseline gap-2">
-                <span className="tnum text-[30px] leading-none font-bold tracking-[-0.03em] text-emerald-300">
+                <span className="tnum text-[26px] leading-none font-bold tracking-[-0.03em] text-emerald-300">
                   <AnimatedNumber value={metrics.amountCollected} format={(value) => formatCurrency(value, true)} />
                 </span>
                 <span
@@ -175,13 +170,12 @@ export function DashboardPage() {
                   {collectedTrend.toFixed(1)}%
                 </span>
               </div>
-              <p className="mt-1.5 text-[11px] text-white/55">cash actually received</p>
             </div>
 
             <div className="min-w-0">
               <p className="text-[11px] font-bold tracking-[0.08em] text-white/70 uppercase">Outstanding</p>
               <div className="mt-1.5 flex flex-wrap items-baseline gap-2">
-                <span className="tnum text-[30px] leading-none font-bold tracking-[-0.03em] text-gold-300">
+                <span className="tnum text-[26px] leading-none font-bold tracking-[-0.03em] text-gold-300">
                   <AnimatedNumber value={metrics.outstanding} format={(value) => formatCurrency(value, true)} />
                 </span>
                 <span
@@ -193,7 +187,6 @@ export function DashboardPage() {
                   {overdueInvoices > 0 ? `${overdueInvoices} overdue` : 'current'}
                 </span>
               </div>
-              <p className="mt-1.5 text-[11px] text-white/55">balance still receivable</p>
             </div>
           </div>
         </div>
@@ -300,7 +293,7 @@ export function DashboardPage() {
         <Card className="xl:col-span-2">
           <CardHeader accent="sapphire" title="Production jobs by stage" subtitle="Where work is sitting on the shop floor" />
           <div className="mt-4">
-            <CategoryBarChart data={productionStages} color="#4f46e5" />
+            <CategoryBarChart data={productionStages} color="#247f75" />
           </div>
         </Card>
 

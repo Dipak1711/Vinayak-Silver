@@ -496,7 +496,6 @@ export function ReportsPage() {
         eyebrow="Analytics & finance"
         icon={<BarChart3 className="h-5 w-5" />}
         title="Report and Ledger"
-        description="Operational reports and customer / supplier ledgers calculated from locally stored transactions."
         actions={
           <Button variant="outline" icon={<FileSpreadsheet className="h-4 w-4" />} onClick={exportCSV} disabled={rows.length === 0}>
             Export CSV

@@ -7,24 +7,28 @@ import { cn } from '@/lib/utils'
 export type StatTone = 'sapphire' | 'blue' | 'emerald' | 'amber' | 'rose' | 'violet' | 'navy' | 'cyan' | 'gold'
 
 interface ToneSpec {
+  /** Soft icon tile: tinted fill, coloured glyph, hairline ring. */
   tile: string
+  /** Solid colour behind the card's top-down wash. */
   glow: string
   spark: SparkTone
 }
 
-/* Icon tiles carry a two-stop gradient plus a matching top-light, so the
-   row of tiles reads as one material rather than eight pastels. */
+/* Cards are white panels with a tone-coloured wash that fades down from
+   the top edge; the icon sits in a soft tinted tile rather than a solid
+   gradient, so a row of cards reads as calm colour, not loud swatches. */
+const soft = (bg: string, fg: string, ring: string) => `${bg} ${fg} ring-1 ring-inset ${ring}`
 const TONES: Record<StatTone, ToneSpec> = {
-  sapphire: { tile: 'from-blue-500 to-blue-700', glow: '#4f46e5', spark: 'sapphire' },
+  sapphire: { tile: soft('bg-blue-100/70', 'text-blue-700', 'ring-blue-200'), glow: '#2f958a', spark: 'sapphire' },
   // `blue` is the same system as `sapphire`; both names are accepted.
-  blue: { tile: 'from-blue-500 to-blue-700', glow: '#4f46e5', spark: 'sapphire' },
-  emerald: { tile: 'from-emerald-500 to-emerald-700', glow: '#059669', spark: 'emerald' },
-  amber: { tile: 'from-amber-500 to-amber-700', glow: '#f59e0b', spark: 'gold' },
-  rose: { tile: 'from-rose-500 to-rose-700', glow: '#dc2626', spark: 'rose' },
-  violet: { tile: 'from-violet-500 to-violet-700', glow: '#7c3aed', spark: 'violet' },
-  navy: { tile: 'from-[#2b3445] to-[#0f172a]', glow: '#1c2537', spark: 'slate' },
-  cyan: { tile: 'from-cyan-500 to-cyan-700', glow: '#0d9488', spark: 'sapphire' },
-  gold: { tile: 'from-gold-400 to-gold-700', glow: '#d97706', spark: 'gold' },
+  blue: { tile: soft('bg-blue-100/70', 'text-blue-700', 'ring-blue-200'), glow: '#2f958a', spark: 'sapphire' },
+  emerald: { tile: soft('bg-emerald-100/70', 'text-emerald-700', 'ring-emerald-200'), glow: '#10b981', spark: 'emerald' },
+  amber: { tile: soft('bg-amber-100/70', 'text-amber-700', 'ring-amber-200'), glow: '#f59e0b', spark: 'gold' },
+  rose: { tile: soft('bg-rose-100/70', 'text-rose-700', 'ring-rose-200'), glow: '#ef4444', spark: 'rose' },
+  violet: { tile: soft('bg-violet-100/70', 'text-violet-700', 'ring-violet-200'), glow: '#8b5cf6', spark: 'violet' },
+  navy: { tile: soft('bg-silver-100', 'text-silver-700', 'ring-silver-300'), glow: '#64748b', spark: 'slate' },
+  cyan: { tile: soft('bg-cyan-100/70', 'text-cyan-700', 'ring-cyan-200'), glow: '#0ea5e9', spark: 'sapphire' },
+  gold: { tile: soft('bg-gold-100/70', 'text-gold-700', 'ring-gold-200'), glow: '#f59e0b', spark: 'gold' },
 }
 
 export interface StatCardProps {
@@ -69,43 +73,29 @@ export function StatCard({
 
   const body = (
     <>
-      {/* A tone-tinted wash from the top-left corner, so each card carries
-          its own colour rather than every card reading as flat white. */}
       <span
         className="pointer-events-none absolute inset-0"
         style={{
-          backgroundImage: `linear-gradient(135deg, ${spec.glow}2b 0%, ${spec.glow}0d 40%, transparent 64%)`,
+          backgroundImage: `linear-gradient(180deg, ${spec.glow}26 0%, ${spec.glow}0f 50%, transparent 100%)`,
         }}
         aria-hidden="true"
       />
-      <span
-        className="pointer-events-none absolute -top-14 -right-12 h-32 w-32 rounded-full opacity-[0.16] blur-2xl"
-        style={{ background: spec.glow }}
-        aria-hidden="true"
-      />
-      <div className="relative flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[11.5px] leading-tight font-semibold tracking-[0.08em] text-silver-600 uppercase">
-            {label}
-          </p>
-          <p className="mt-2.5 text-[26px] leading-none font-extrabold tracking-[-0.035em] text-navy-900">
-            {animated !== undefined ? <AnimatedNumber value={animated} format={format} /> : value}
-          </p>
-        </div>
+      <div className="relative flex items-center gap-3.5">
         {icon ? (
-          <span
-            className={cn(
-              'flex h-11 w-11 shrink-0 items-center justify-center rounded-[14px] bg-linear-to-br text-white shadow-[0_2px_6px_-1px_rgba(15,23,42,0.25),inset_0_1px_0_0_rgba(255,255,255,0.25)]',
-              spec.tile,
-            )}
-          >
+          <span className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', spec.tile)}>
             {icon}
           </span>
         ) : null}
+        <div className="min-w-0">
+          <p className="text-[24px] leading-none font-extrabold tracking-[-0.03em] text-navy-900">
+            {animated !== undefined ? <AnimatedNumber value={animated} format={format} /> : value}
+          </p>
+          <p className="mt-1 truncate text-[13px] leading-tight font-semibold text-silver-700">{label}</p>
+        </div>
       </div>
 
       {hasFooter ? (
-        <div className="relative mt-auto flex flex-col gap-2.5 pt-3">
+        <div className="relative mt-auto flex flex-col gap-2 pt-2.5">
           {trend || hint ? (
             <div className="flex items-center gap-2">
               {trend ? (
@@ -122,11 +112,11 @@ export function StatCard({
                   {trend.value.toFixed(1)}%
                 </span>
               ) : null}
-              {hint ? <span className="min-w-0 truncate text-xs text-silver-600">{hint}</span> : null}
+              {hint ? <span className="min-w-0 truncate text-[12.5px] text-silver-600">{hint}</span> : null}
             </div>
           ) : null}
 
-          {spark && spark.length > 1 ? <Sparkline data={spark} tone={spec.spark} height={30} /> : null}
+          {spark && spark.length > 1 ? <Sparkline data={spark} tone={spec.spark} height={22} /> : null}
 
           {footer}
         </div>
@@ -135,8 +125,9 @@ export function StatCard({
   )
 
   const shell = cn(
-    'relative flex h-full w-full flex-col overflow-hidden rounded-2xl bg-surface p-5 text-left shadow-card',
-    onClick && 'lift pressable cursor-pointer',
+    'relative flex h-full w-full flex-col overflow-hidden rounded-2xl bg-surface p-4 text-left shadow-card',
+    'lift',
+    onClick && 'pressable cursor-pointer',
     className,
   )
 

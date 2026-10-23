@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 
 export function TableShell({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn('overflow-hidden rounded-2xl bg-surface shadow-card', className)}>
+    <div className={cn('overflow-hidden rounded-2xl bg-surface shadow-lift', className)}>
       <div className="overflow-x-auto">{children}</div>
     </div>
   )
@@ -16,7 +16,7 @@ export function Table({ children, className }: { children: ReactNode; className?
 
 export function THead({ children }: { children: ReactNode }) {
   return (
-    <thead className="border-b border-silver-300 bg-linear-to-b from-blue-50/70 to-silver-50 text-left">
+    <thead className="border-b border-silver-200 bg-linear-to-b from-blue-50 to-blue-50/30 text-left">
       {children}
     </thead>
   )
@@ -43,7 +43,7 @@ export function TR({
       aria-selected={selected || undefined}
       className={cn(
         'row-hover transition-colors',
-        selected ? 'bg-blue-50/60' : 'hover:bg-blue-50/50',
+        selected ? 'bg-blue-50/70' : 'hover:bg-blue-50/60 hover:shadow-[inset_3px_0_0_0_var(--color-blue-500)]',
         onClick && 'cursor-pointer',
         className,
       )}

@@ -307,7 +307,6 @@ export function ManufacturingPage() {
         eyebrow="Production floor"
         icon={<Factory className="h-5 w-5" />}
         title="Manufacturing"
-        description="Order-based production jobs. Each job carries its own stage plan, with Cutting and Laser Cutting selectable per order."
         actions={
           <>
             <Button
@@ -352,7 +351,7 @@ export function ManufacturingPage() {
         <StatCard label="Total jobs" value={stats.total} hint={`${stats.outsourced} with outsourced stages`} icon={<Factory className="h-4.5 w-4.5" />} tone="blue" />
         <StatCard label="In progress" value={stats.active} hint={`${stats.pending} pending`} icon={<RefreshCw className="h-4.5 w-4.5" />} tone="violet" />
         <StatCard label="Delayed / overdue" value={stats.delayed + stats.overdue} hint={`${stats.overdue} past planned end date`} icon={<AlertTriangle className="h-4.5 w-4.5" />} tone={stats.delayed + stats.overdue > 0 ? 'rose' : 'emerald'} />
-        <StatCard label="Completed" value={stats.completed} hint="Moved to packaging" icon={<CheckCircle2 className="h-4.5 w-4.5" />} tone="emerald" />
+        <StatCard label="Completed" value={stats.completed} icon={<CheckCircle2 className="h-4.5 w-4.5" />} tone="emerald" />
       </div>
 
       <Card>

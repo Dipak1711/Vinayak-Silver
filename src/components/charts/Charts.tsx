@@ -18,7 +18,7 @@ import { formatCurrency, formatNumber } from '@/lib/utils'
 /* Seven steps of distinct lightness, so a pie still reads when every hue
    collapses to grey (deuteranopia, bad projectors, printed handouts). */
 export const CHART_PALETTE = [
-  '#4f46e5', // indigo
+  '#247f75', // indigo
   '#d97706', // amber
   '#059669', // emerald
   '#7c3aed', // violet
@@ -81,8 +81,8 @@ export function SalesTrendChart({
       <AreaChart data={data} margin={{ top: 8, right: 8, left: -14, bottom: 0 }}>
         <defs>
           <linearGradient id="invoicedFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#4f46e5" stopOpacity={0.30} />
-            <stop offset="100%" stopColor="#4f46e5" stopOpacity={0.01} />
+            <stop offset="0%" stopColor="#247f75" stopOpacity={0.30} />
+            <stop offset="100%" stopColor="#247f75" stopOpacity={0.01} />
           </linearGradient>
           <linearGradient id="collectedFill" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#059669" stopOpacity={0.28} />
@@ -103,7 +103,7 @@ export function SalesTrendChart({
           type="monotone"
           dataKey="invoiced"
           name="Invoiced"
-          stroke="#4f46e5"
+          stroke="#247f75"
           strokeWidth={2.5}
           fill="url(#invoicedFill)"
           activeDot={{ r: 4, strokeWidth: 2, stroke: '#fff' }}
@@ -128,7 +128,7 @@ export function SalesTrendChart({
 
 export function CategoryBarChart({
   data,
-  color = '#4f46e5',
+  color = '#247f75',
   height = 240,
   currency = false,
   horizontal = false,

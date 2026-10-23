@@ -223,7 +223,6 @@ export function CustomersPage() {
         eyebrow="Master data"
         icon={<Users className="h-5 w-5" />}
         title="Customer"
-        description="Customer master data with related quotations, invoices, payments and ledger."
         actions={
           <>
             <Button variant="outline" onClick={exportCSV}>
@@ -238,12 +237,11 @@ export function CustomersPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Customers" value={stats.count} hint={`${stats.withDues} with outstanding dues`} icon={<Users className="h-4.5 w-4.5" />} tone="blue" />
-        <StatCard label="Total billed" value={formatCurrency(stats.billed, true)} hint="Across all invoices" icon={<Receipt className="h-4.5 w-4.5" />} tone="violet" />
-        <StatCard label="Outstanding" value={formatCurrency(stats.outstanding, true)} hint="Balance receivable" icon={<Wallet className="h-4.5 w-4.5" />} tone="rose" />
+        <StatCard label="Total billed" value={formatCurrency(stats.billed, true)} icon={<Receipt className="h-4.5 w-4.5" />} tone="violet" />
+        <StatCard label="Outstanding" value={formatCurrency(stats.outstanding, true)} icon={<Wallet className="h-4.5 w-4.5" />} tone="rose" />
         <StatCard
           label="Average credit terms"
           value={`${Math.round(db.customers.reduce((acc, customer) => acc + customer.paymentTerms, 0) / Math.max(db.customers.length, 1))} days`}
-          hint="Across the customer base"
           icon={<Building2 className="h-4.5 w-4.5" />}
           tone="navy"
         />

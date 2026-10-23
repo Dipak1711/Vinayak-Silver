@@ -19,18 +19,18 @@ export function PageHeader({
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div className="flex items-start gap-3.5">
         {icon ? (
-          <span className="relative grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-blue-50 text-blue-600 ring-1 ring-blue-100 ring-inset">
+          <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-[16px] bg-linear-to-br from-[#2f958a] to-[#1f7a63] text-white shadow-[0_12px_24px_-8px_rgba(47,149,138,0.6),inset_0_1px_0_0_rgba(255,255,255,0.3)]">
             {icon}
           </span>
         ) : null}
         <div className="min-w-0">
           {eyebrow ? (
             <p className="flex items-center gap-3 text-[11.5px] font-semibold tracking-[0.22em] text-silver-500 uppercase">
-              <span className="h-[3px] w-8 shrink-0 rounded-full bg-blue-600" aria-hidden="true" />
+              <span className="h-[3px] w-8 shrink-0 rounded-full bg-linear-to-r from-[#2f958a] to-gold-400" aria-hidden="true" />
               {eyebrow}
             </p>
           ) : null}
-          <h1 className="mt-2.5 text-[30px] leading-[1.1] font-extrabold tracking-[-0.035em] text-navy-900 sm:text-[36px]">
+          <h1 className="title-gradient mt-2.5 text-[28px] leading-[1.1] font-extrabold tracking-[-0.03em] sm:text-[32px]">
             {title}
           </h1>
           {description ? (
@@ -128,7 +128,7 @@ export function ProgressBar({
   track?: string
 }) {
   const tones: Record<string, string> = {
-    blue: 'from-blue-400 to-blue-600',
+    blue: 'from-[#45ada1] to-[#1d675f]',
     emerald: 'from-emerald-400 to-emerald-600',
     amber: 'from-amber-400 to-amber-600',
     rose: 'from-rose-400 to-rose-600',

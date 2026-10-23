@@ -307,7 +307,6 @@ export function InventoryPage() {
         eyebrow="Stock & materials"
         icon={<Boxes className="h-5 w-5" />}
         title="Raw Inventory"
-        description="Manage raw materials used to manufacture silver articles and gifting products."
         actions={
           <>
             <Button variant="outline" onClick={exportCSV}>
@@ -322,7 +321,7 @@ export function InventoryPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Raw materials" value={stats.count} hint={`${stats.categories} categories`} icon={<Layers className="h-4.5 w-4.5" />} tone="blue" />
-        <StatCard label="Stock value" value={formatCurrency(stats.value, true)} hint="Quantity × unit cost" icon={<Wallet className="h-4.5 w-4.5" />} tone="navy" />
+        <StatCard label="Stock value" value={formatCurrency(stats.value, true)} icon={<Wallet className="h-4.5 w-4.5" />} tone="navy" />
         <StatCard
           label="Low stock items"
           value={stats.lowCount}
@@ -330,7 +329,7 @@ export function InventoryPage() {
           icon={<AlertTriangle className="h-4.5 w-4.5" />}
           tone={stats.lowCount > 0 ? 'rose' : 'emerald'}
         />
-        <StatCard label="Stock movements" value={stats.movements} hint="Inward, outward and adjustments" icon={<Coins className="h-4.5 w-4.5" />} tone="violet" />
+        <StatCard label="Stock movements" value={stats.movements} icon={<Coins className="h-4.5 w-4.5" />} tone="violet" />
       </div>
 
       <SegmentedTabs

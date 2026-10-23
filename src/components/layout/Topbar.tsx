@@ -298,7 +298,7 @@ export function Topbar({
         </div>
 
         <div className="flex items-center gap-2.5 rounded-full border border-silver-200 bg-surface py-1 pr-3.5 pl-1 shadow-flat">
-          <span className="grid h-8 w-8 place-items-center rounded-full bg-linear-to-br from-blue-500 to-blue-700 text-[10.5px] font-bold text-white shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)]">
+          <span className="grid h-8 w-8 place-items-center rounded-full bg-linear-to-br from-[#2f958a] to-[#1f7a63] text-[10.5px] font-bold text-white ring-2 ring-gold-300/70 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.25)]">
             PS
           </span>
           <span className="hidden leading-tight sm:block">

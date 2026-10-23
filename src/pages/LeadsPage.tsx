@@ -245,7 +245,6 @@ export function LeadsPage() {
         eyebrow="Sales pipeline"
         icon={<Target className="h-5 w-5" />}
         title="Lead"
-        description="Track enquiries through the sales pipeline and convert them into customers."
         actions={
           <Button icon={<Plus className="h-4 w-4" />} onClick={openCreate}>
             Add lead
@@ -272,7 +271,6 @@ export function LeadsPage() {
         <StatCard
           label="Converted customers"
           value={db.leads.filter((lead) => lead.convertedCustomerId).length}
-          hint="Leads already converted"
           icon={<Users className="h-4.5 w-4.5" />}
           tone="violet"
         />

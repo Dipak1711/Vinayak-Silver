@@ -11,17 +11,49 @@ export type BadgeTone =
   | 'silver'
   | 'navy'
   | 'gold'
+  | 'cyan'
 
-const TONES: Record<BadgeTone, string> = {
-  neutral: 'bg-silver-100 text-silver-700 ring-silver-200',
-  info: 'bg-blue-50 text-blue-800 ring-blue-200',
-  success: 'bg-emerald-50 text-emerald-800 ring-emerald-200',
-  warning: 'bg-amber-50 text-amber-800 ring-amber-200',
-  danger: 'bg-rose-50 text-rose-800 ring-rose-200',
-  purple: 'bg-violet-50 text-violet-800 ring-violet-200',
-  silver: 'bg-silver-100 text-navy-700 ring-silver-300',
-  navy: 'bg-ink text-white ring-ink',
-  gold: 'bg-gold-50 text-gold-800 ring-gold-300',
+/* Each tone is a soft two-stop tint plus a matching ring, so a table full
+   of badges reads as a coloured legend rather than grey pills. The dot
+   takes the tone's solid colour and carries a faint glow. */
+const TONES: Record<BadgeTone, { chip: string; dot: string }> = {
+  neutral: {
+    chip: 'bg-linear-to-b from-silver-50 to-silver-100 text-silver-700 ring-silver-300',
+    dot: 'bg-silver-500',
+  },
+  info: {
+    chip: 'bg-linear-to-b from-blue-50 to-blue-100/70 text-blue-800 ring-blue-200',
+    dot: 'bg-blue-500 shadow-[0_0_6px_1px_rgba(47,149,138,0.55)]',
+  },
+  success: {
+    chip: 'bg-linear-to-b from-emerald-50 to-emerald-100/70 text-emerald-800 ring-emerald-200',
+    dot: 'bg-emerald-500 shadow-[0_0_6px_1px_rgba(16,185,129,0.55)]',
+  },
+  warning: {
+    chip: 'bg-linear-to-b from-amber-50 to-amber-100/70 text-amber-800 ring-amber-200',
+    dot: 'bg-amber-500 shadow-[0_0_6px_1px_rgba(245,158,11,0.55)]',
+  },
+  danger: {
+    chip: 'bg-linear-to-b from-rose-50 to-rose-100/70 text-rose-800 ring-rose-200',
+    dot: 'bg-rose-500 shadow-[0_0_6px_1px_rgba(239,68,68,0.55)]',
+  },
+  purple: {
+    chip: 'bg-linear-to-b from-violet-50 to-violet-100/70 text-violet-800 ring-violet-200',
+    dot: 'bg-violet-500 shadow-[0_0_6px_1px_rgba(139,92,246,0.55)]',
+  },
+  cyan: {
+    chip: 'bg-linear-to-b from-cyan-50 to-cyan-100/70 text-cyan-800 ring-cyan-200',
+    dot: 'bg-cyan-500 shadow-[0_0_6px_1px_rgba(20,184,166,0.55)]',
+  },
+  gold: {
+    chip: 'bg-linear-to-b from-gold-50 to-gold-100/70 text-gold-800 ring-gold-300',
+    dot: 'bg-gold-500 shadow-[0_0_6px_1px_rgba(245,158,11,0.55)]',
+  },
+  silver: {
+    chip: 'bg-linear-to-b from-silver-50 to-silver-200/70 text-navy-700 ring-silver-300',
+    dot: 'bg-navy-400',
+  },
+  navy: { chip: 'bg-ink text-white ring-ink', dot: 'bg-white' },
 }
 
 export function Badge({
@@ -29,21 +61,30 @@ export function Badge({
   children,
   className,
   dot = false,
+  live = false,
 }: {
   tone?: BadgeTone
   children: ReactNode
   className?: string
   dot?: boolean
+  /** Pulses the dot, for states that are happening right now. */
+  live?: boolean
 }) {
+  const spec = TONES[tone]
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap ring-1 ring-inset',
-        TONES[tone],
+        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-[3px] text-[11px] font-semibold whitespace-nowrap ring-1 ring-inset',
+        spec.chip,
         className,
       )}
     >
-      {dot ? <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-current" aria-hidden="true" /> : null}
+      {dot ? (
+        <span className="relative flex h-1.5 w-1.5 shrink-0" aria-hidden="true">
+          {live ? <span className="badge-ping absolute inset-0 rounded-full bg-current opacity-60" /> : null}
+          <span className={cn('relative h-1.5 w-1.5 rounded-full', spec.dot)} />
+        </span>
+      ) : null}
       {children}
     </span>
   )
@@ -54,25 +95,29 @@ export function Badge({
    StatusBadge always shows its dot and its label. */
 const STATUS_TONES: Record<string, BadgeTone> = {
   // Leads
-  'New Lead': 'info',
+  'New Lead': 'cyan',
   Contacted: 'purple',
   'Follow-up': 'warning',
-  Negotiation: 'warning',
+  Negotiation: 'gold',
   Won: 'success',
   Lost: 'danger',
   // Quotations
   Draft: 'neutral',
-  Sent: 'info',
+  Sent: 'cyan',
   Approved: 'success',
   Rejected: 'danger',
   Superseded: 'neutral',
   // Invoices / payments
   Unpaid: 'danger',
-  Advance: 'info',
+  Advance: 'cyan',
   Partial: 'warning',
   Paid: 'success',
   // Manufacturing
   Pending: 'neutral',
+  'Low stock': 'danger',
+  'In stock': 'success',
+  Open: 'info',
+  Overdue: 'danger',
   'In Progress': 'info',
   Completed: 'success',
   Delayed: 'danger',
@@ -80,7 +125,7 @@ const STATUS_TONES: Record<string, BadgeTone> = {
   Packed: 'success',
   // Dispatch
   'Ready to Dispatch': 'silver',
-  Dispatched: 'info',
+  Dispatched: 'cyan',
   'In Transit': 'purple',
   Delivered: 'success',
   // Stock movements
@@ -95,10 +140,13 @@ const STATUS_TONES: Record<string, BadgeTone> = {
   Payment: 'success',
 }
 
+/* States that mean "something is happening right now" pulse gently. */
+const LIVE_STATUSES = new Set(['In Progress', 'In Transit', 'Delayed', 'Dispatched'])
+
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
   const tone = STATUS_TONES[status] ?? 'neutral'
   return (
-    <Badge tone={tone} className={className} dot>
+    <Badge tone={tone} className={className} dot live={LIVE_STATUSES.has(status)}>
       {status}
     </Badge>
   )

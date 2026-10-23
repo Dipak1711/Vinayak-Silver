@@ -351,7 +351,6 @@ export function InvoicesPage() {
         eyebrow="Billing & payments"
         icon={<Receipt className="h-5 w-5" />}
         title="Invoice"
-        description="Raise invoices from approved quotations or direct orders, record payments and confirm orders for production."
         actions={
           <>
             <Button variant="outline" icon={<IndianRupee className="h-4 w-4" />} onClick={exportCSV}>
@@ -375,9 +374,9 @@ export function InvoicesPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Total invoiced" value={formatCurrency(stats.total, true)} hint={`${stats.count} invoices raised`} icon={<Receipt className="h-4.5 w-4.5" />} tone="blue" />
-        <StatCard label="Amount collected" value={formatCurrency(stats.collected, true)} hint="Payments recorded" icon={<Wallet className="h-4.5 w-4.5" />} tone="emerald" />
+        <StatCard label="Amount collected" value={formatCurrency(stats.collected, true)} icon={<Wallet className="h-4.5 w-4.5" />} tone="emerald" />
         <StatCard label="Outstanding" value={formatCurrency(stats.outstanding, true)} hint={`${stats.overdueCount} invoices overdue`} icon={<CircleDollarSign className="h-4.5 w-4.5" />} tone="amber" />
-        <StatCard label="Awaiting confirmation" value={stats.unconfirmed} hint="Confirm to start production" icon={<BadgeCheck className="h-4.5 w-4.5" />} tone="violet" />
+        <StatCard label="Awaiting confirmation" value={stats.unconfirmed} icon={<BadgeCheck className="h-4.5 w-4.5" />} tone="violet" />
       </div>
 
       {(db.advances ?? []).length > 0 ? (

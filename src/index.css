@@ -59,33 +59,33 @@
   --color-ink: #0f172a;
 
   /* ---------------------------------------------------------------
-     Primary — indigo. The reference action colour (#4f46e5).
+     Primary — indigo. The reference action colour (#247f75).
      `sapphire-*` and `blue-*` are the same system so existing
      `bg-blue-600` call sites stay on-palette.
      --------------------------------------------------------------- */
-  --color-sapphire-50: #eef2ff;
-  --color-sapphire-100: #e0e7ff;
-  --color-sapphire-200: #c7d2fe;
-  --color-sapphire-300: #a5b4fc;
-  --color-sapphire-400: #818cf8;
-  --color-sapphire-500: #6366f1;
-  --color-sapphire-600: #4f46e5;
-  --color-sapphire-700: #4338ca;
-  --color-sapphire-800: #3730a3;
-  --color-sapphire-900: #312e81;
-  --color-sapphire-950: #1e1b4b;
+  --color-sapphire-50: #effaf8;
+  --color-sapphire-100: #d3f1ec;
+  --color-sapphire-200: #a8e2da;
+  --color-sapphire-300: #76cbc0;
+  --color-sapphire-400: #45ada1;
+  --color-sapphire-500: #2f958a;
+  --color-sapphire-600: #247f75;
+  --color-sapphire-700: #1d675f;
+  --color-sapphire-800: #19524d;
+  --color-sapphire-900: #164440;
+  --color-sapphire-950: #0f3a36;
 
-  --color-blue-50: #eef2ff;
-  --color-blue-100: #e0e7ff;
-  --color-blue-200: #c7d2fe;
-  --color-blue-300: #a5b4fc;
-  --color-blue-400: #818cf8;
-  --color-blue-500: #6366f1;
-  --color-blue-600: #4f46e5;
-  --color-blue-700: #4338ca;
-  --color-blue-800: #3730a3;
-  --color-blue-900: #312e81;
-  --color-blue-950: #1e1b4b;
+  --color-blue-50: #effaf8;
+  --color-blue-100: #d3f1ec;
+  --color-blue-200: #a8e2da;
+  --color-blue-300: #76cbc0;
+  --color-blue-400: #45ada1;
+  --color-blue-500: #2f958a;
+  --color-blue-600: #247f75;
+  --color-blue-700: #1d675f;
+  --color-blue-800: #19524d;
+  --color-blue-900: #164440;
+  --color-blue-950: #0f3a36;
 
   /* ---------------------------------------------------------------
      Accent — burnished amber for value and premium moments. Never a
@@ -154,17 +154,17 @@
   --color-violet-900: #4c1d95;
   --color-violet-950: #2e1065;
 
-  --color-cyan-50: #f0fdfa;
-  --color-cyan-100: #ccfbf1;
-  --color-cyan-200: #99f6e4;
-  --color-cyan-300: #5eead4;
-  --color-cyan-400: #2dd4bf;
-  --color-cyan-500: #14b8a6;
-  --color-cyan-600: #0d9488;
-  --color-cyan-700: #0f766e;
-  --color-cyan-800: #115e59;
-  --color-cyan-900: #134e4a;
-  --color-cyan-950: #042f2e;
+  --color-cyan-50: #f0f9ff;
+  --color-cyan-100: #e0f2fe;
+  --color-cyan-200: #bae6fd;
+  --color-cyan-300: #7dd3fc;
+  --color-cyan-400: #38bdf8;
+  --color-cyan-500: #0ea5e9;
+  --color-cyan-600: #0284c7;
+  --color-cyan-700: #0369a1;
+  --color-cyan-800: #075985;
+  --color-cyan-900: #0c4a6e;
+  --color-cyan-950: #082f49;
 
   /* ---------------------------------------------------------------
      Elevation — a hairline ring plus a soft, low-opacity shadow.
@@ -254,28 +254,28 @@
     --color-navy-950: #f3f6fc;
 
     /* primary — solid steps hold, tints become translucent, ink steps lift */
-    --color-sapphire-50: rgba(99, 102, 241, 0.14);
-    --color-sapphire-100: rgba(99, 102, 241, 0.26);
-    --color-sapphire-200: rgba(99, 102, 241, 0.4);
-    --color-sapphire-300: #a5b4fc;
-    --color-sapphire-400: #818cf8;
-    --color-sapphire-500: #6366f1;
-    --color-sapphire-600: #4f46e5;
-    --color-sapphire-700: #818cf8;
-    --color-sapphire-800: #a5b4fc;
-    --color-sapphire-900: #c7d2fe;
+    --color-sapphire-50: rgba(47, 149, 138, 0.14);
+    --color-sapphire-100: rgba(47, 149, 138, 0.26);
+    --color-sapphire-200: rgba(47, 149, 138, 0.4);
+    --color-sapphire-300: #76cbc0;
+    --color-sapphire-400: #45ada1;
+    --color-sapphire-500: #2f958a;
+    --color-sapphire-600: #247f75;
+    --color-sapphire-700: #45ada1;
+    --color-sapphire-800: #76cbc0;
+    --color-sapphire-900: #a8e2da;
     --color-sapphire-950: #ddd6fe;
 
-    --color-blue-50: rgba(99, 102, 241, 0.14);
-    --color-blue-100: rgba(99, 102, 241, 0.26);
-    --color-blue-200: rgba(99, 102, 241, 0.4);
-    --color-blue-300: #a5b4fc;
-    --color-blue-400: #818cf8;
-    --color-blue-500: #6366f1;
-    --color-blue-600: #4f46e5;
-    --color-blue-700: #818cf8;
-    --color-blue-800: #a5b4fc;
-    --color-blue-900: #c7d2fe;
+    --color-blue-50: rgba(47, 149, 138, 0.14);
+    --color-blue-100: rgba(47, 149, 138, 0.26);
+    --color-blue-200: rgba(47, 149, 138, 0.4);
+    --color-blue-300: #76cbc0;
+    --color-blue-400: #45ada1;
+    --color-blue-500: #2f958a;
+    --color-blue-600: #247f75;
+    --color-blue-700: #45ada1;
+    --color-blue-800: #76cbc0;
+    --color-blue-900: #a8e2da;
     --color-blue-950: #ddd6fe;
 
     /* accent — gold / amber */
@@ -339,17 +339,17 @@
     --color-violet-900: #ddd6fe;
     --color-violet-950: #ede9fe;
 
-    --color-cyan-50: rgba(20, 184, 166, 0.14);
-    --color-cyan-100: rgba(20, 184, 166, 0.22);
-    --color-cyan-200: rgba(20, 184, 166, 0.4);
-    --color-cyan-300: #5eead4;
-    --color-cyan-400: #2dd4bf;
-    --color-cyan-500: #14b8a6;
-    --color-cyan-600: #0d9488;
-    --color-cyan-700: #2dd4bf;
-    --color-cyan-800: #5eead4;
-    --color-cyan-900: #99f6e4;
-    --color-cyan-950: #ccfbf1;
+    --color-cyan-50: rgba(14, 165, 233, 0.14);
+    --color-cyan-100: rgba(14, 165, 233, 0.22);
+    --color-cyan-200: rgba(14, 165, 233, 0.4);
+    --color-cyan-300: #7dd3fc;
+    --color-cyan-400: #38bdf8;
+    --color-cyan-500: #0ea5e9;
+    --color-cyan-600: #0284c7;
+    --color-cyan-700: #38bdf8;
+    --color-cyan-800: #7dd3fc;
+    --color-cyan-900: #bae6fd;
+    --color-cyan-950: #e0f2fe;
 
     /* elevation — a light hairline and deeper shadow read as depth on dark */
     --shadow-flat: 0 0 0 1px rgba(255, 255, 255, 0.06);
@@ -441,15 +441,33 @@
   }
 }
 
+@keyframes badge-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  80%,
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
+
 @keyframes pulse-ring {
   0% {
-    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.45);
+    box-shadow: 0 0 0 0 rgba(36, 127, 117, 0.45);
   }
   70% {
-    box-shadow: 0 0 0 8px rgba(79, 70, 229, 0);
+    box-shadow: 0 0 0 8px rgba(36, 127, 117, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0);
+    box-shadow: 0 0 0 0 rgba(36, 127, 117, 0);
   }
 }
 
@@ -488,9 +506,9 @@ body {
 .app-canvas {
   background-color: var(--color-silver-100);
   background-image:
-    radial-gradient(1100px 620px at 4% -8%, rgba(79, 70, 229, 0.09), transparent 68%),
-    radial-gradient(900px 560px at 104% -6%, rgba(13, 148, 136, 0.08), transparent 66%),
-    radial-gradient(760px 520px at 58% 112%, rgba(124, 58, 237, 0.06), transparent 70%);
+    radial-gradient(1000px 560px at 0% -10%, rgba(47, 149, 138, 0.14), transparent 68%),
+    radial-gradient(800px 520px at 100% -8%, rgba(47, 149, 138, 0.10), transparent 66%),
+    radial-gradient(900px 500px at 50% 115%, rgba(56, 189, 248, 0.08), transparent 70%);
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
@@ -545,7 +563,51 @@ input[type='number'] {
 .sheen {
   background-image:
     radial-gradient(120% 140% at 0% 0%, rgba(255, 255, 255, 0.16) 0%, transparent 55%),
-    radial-gradient(100% 100% at 100% 0%, rgba(99, 102, 241, 0.35) 0%, transparent 60%);
+    radial-gradient(100% 100% at 100% 0%, rgba(47, 149, 138, 0.35) 0%, transparent 60%);
+}
+
+/* Light lavender navigation chrome that follows the theme tokens. */
+.sidebar-chrome {
+  background-color: var(--color-surface);
+  background-image:
+    radial-gradient(360px 240px at 0% 0%, rgba(47, 149, 138, 0.12), transparent 70%),
+    radial-gradient(320px 260px at 100% 100%, rgba(245, 158, 11, 0.09), transparent 70%),
+    linear-gradient(180deg, var(--color-blue-50) 0%, var(--color-surface) 45%);
+}
+
+/* Keyboard focus on navigation: one clean inset ring, no offset outline. */
+.sidebar-chrome a:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
+}
+
+/* Page titles: ink fading into the brand indigo. */
+.title-gradient {
+  background-image: linear-gradient(115deg, var(--color-navy-900) 35%, #2f958a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* A soft light sweep across solid buttons on hover. */
+.btn-sheen {
+  overflow: hidden;
+  isolation: isolate;
+}
+.btn-sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.28) 50%, transparent 65%);
+  transform: translateX(-120%);
+}
+
+/* Loading placeholder. */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-silver-200) 25%, var(--color-silver-100) 50%, var(--color-silver-200) 75%);
+  background-size: 200% 100%;
+  border-radius: 8px;
 }
 
 /* Touch targets are physical: the visual control can stay compact while
@@ -611,6 +673,25 @@ input[type='number'] {
   }
   .page-enter {
     animation: fade-up 240ms var(--ease-out-quint) both;
+  }
+  /* Top-level blocks on a page rise in one after another. */
+  .page-enter > * {
+    animation: fade-up 420ms var(--ease-out-expo) both;
+  }
+  .page-enter > :nth-child(2) { animation-delay: 60ms; }
+  .page-enter > :nth-child(3) { animation-delay: 120ms; }
+  .page-enter > :nth-child(4) { animation-delay: 180ms; }
+  .page-enter > :nth-child(5) { animation-delay: 240ms; }
+  .page-enter > :nth-child(n + 6) { animation-delay: 300ms; }
+  .badge-ping {
+    animation: badge-ping 1800ms var(--ease-out-quart) infinite;
+  }
+  .btn-sheen:hover::after {
+    transform: translateX(120%);
+    transition: transform 650ms var(--ease-out-quart);
+  }
+  .skeleton {
+    animation: shimmer 1.4s linear infinite;
   }
 }
 

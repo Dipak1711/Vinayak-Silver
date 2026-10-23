@@ -31,8 +31,8 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
 
       <aside
         className={cn(
-          'no-print fixed inset-y-0 left-0 z-40 flex w-[284px] flex-col border-r border-silver-200 bg-surface',
-          'shadow-[0_8px_32px_-18px_rgba(15,23,42,0.35)] dark:shadow-none',
+          'sidebar-chrome no-print fixed inset-y-0 left-0 z-40 flex w-[284px] flex-col border-r border-silver-200',
+          'shadow-[0_8px_32px_-18px_rgba(36,127,117,0.35)] dark:shadow-none',
           'transition-[transform,width] duration-250 ease-[cubic-bezier(0.16,1,0.3,1)] lg:sticky lg:top-0 lg:z-auto lg:h-screen lg:translate-x-0 lg:self-start lg:shadow-none',
           open ? 'translate-x-0' : '-translate-x-full',
           mini && 'lg:w-[84px]',
@@ -40,14 +40,14 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
         aria-label="Main navigation"
       >
         <div className={cn('flex items-center gap-3.5 px-5 py-5', mini && 'lg:justify-center lg:px-0')}>
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-linear-to-br from-blue-500 to-blue-800 text-[14px] font-black text-white shadow-[0_10px_24px_-8px_rgba(79,70,229,0.55)] ring-1 ring-inset ring-white/20">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[14px] bg-linear-to-br from-[#45ada1] via-[#2f958a] to-[#1f7a63] text-[14px] font-black text-white shadow-[0_10px_24px_-8px_rgba(47,149,138,0.6)] ring-1 ring-inset ring-white/30">
             VS
           </span>
           <div className={cn('min-w-0 flex-1', mini && 'lg:hidden')}>
             <p className="truncate text-[17px] leading-tight font-extrabold tracking-[-0.02em] text-navy-900">
               Vinayak Silver
             </p>
-            <p className="mt-0.5 truncate text-[10.5px] font-semibold tracking-[0.2em] text-silver-500 uppercase">
+            <p className="mt-0.5 truncate text-[10.5px] font-semibold tracking-[0.2em] text-gold-600 uppercase">
               ERP Suite
             </p>
           </div>
@@ -74,11 +74,11 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
                   onClick={() => setCollapsed((current) => ({ ...current, [group.id]: !current[group.id] }))}
                   aria-expanded={!isClosed}
                   className={cn(
-                    'pressable flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors hover:bg-silver-100',
+                    'pressable flex w-full items-center gap-3 rounded-xl p-1.5 text-left transition-colors hover:bg-blue-50/70',
                     mini && 'lg:hidden',
                   )}
                 >
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px] bg-blue-50 text-blue-600">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[11px] bg-linear-to-br from-blue-50 to-violet-100 text-blue-600 ring-1 ring-inset ring-blue-100">
                     <GroupIcon className="h-4.5 w-4.5" />
                   </span>
                   <span className="flex-1 truncate text-[14.5px] font-semibold text-navy-900">{group.title}</span>
@@ -93,7 +93,7 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
                 {!isClosed || mini ? (
                   <ul
                     className={cn(
-                      'mt-1 mb-2.5 ml-[19px] flex flex-col gap-0.5 border-l border-silver-200 pl-2.5',
+                      'mt-1 mb-2.5 ml-[19px] flex flex-col gap-0.5 border-l border-blue-100 pl-2.5',
                       mini && 'lg:mt-1 lg:mb-1.5 lg:ml-0 lg:items-center lg:gap-1 lg:border-l-0 lg:pl-0',
                     )}
                   >
@@ -111,8 +111,8 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
                               cn(
                                 'group relative flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13.5px] font-medium transition-colors duration-150',
                                 isActive
-                                  ? 'bg-blue-600 font-semibold text-white shadow-[0_10px_24px_-8px_rgba(79,70,229,0.55)]'
-                                  : 'text-silver-700 hover:bg-silver-100 hover:text-navy-900',
+                                  ? 'bg-linear-to-r from-[#2f958a] to-[#2f958a] font-semibold text-white shadow-[0_10px_22px_-8px_rgba(47,149,138,0.65)]'
+                                  : 'text-silver-700 hover:bg-blue-50 hover:text-blue-700',
                                 mini && 'lg:h-11 lg:justify-center lg:px-0',
                               )
                             }
@@ -122,7 +122,7 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
                                 <Icon
                                   className={cn(
                                     'h-4.5 w-4.5 shrink-0 transition-transform duration-200 group-hover:scale-110',
-                                    isActive ? 'text-white' : 'text-silver-500 group-hover:text-blue-600',
+                                    isActive ? 'text-white' : 'text-blue-400 group-hover:text-blue-600',
                                   )}
                                 />
                                 <span className={cn('flex-1 truncate', mini && 'lg:hidden')}>{item.label}</span>
@@ -130,7 +130,7 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
                                   <span
                                     className={cn(
                                       'tnum rounded-full px-1.5 py-0.5 text-[10.5px] font-bold',
-                                      isActive ? 'bg-white/25 text-white' : 'bg-amber-50 text-amber-700',
+                                      isActive ? 'bg-white/25 text-white' : 'bg-gold-100 text-gold-700',
                                       mini && 'lg:absolute lg:-top-1 lg:-right-1 lg:min-w-4 lg:px-1 lg:text-center',
                                     )}
                                   >

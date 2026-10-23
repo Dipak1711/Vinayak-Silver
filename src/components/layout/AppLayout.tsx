@@ -1,7 +1,21 @@
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Topbar } from '@/components/layout/Topbar'
+
+function PageFallback() {
+  return (
+    <div className="flex flex-col gap-5" aria-busy="true">
+      <div className="skeleton h-12 w-72" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="skeleton h-32 rounded-2xl" />
+        ))}
+      </div>
+      <div className="skeleton h-80 rounded-2xl" />
+    </div>
+  )
+}
 
 export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -47,7 +61,9 @@ export function AppLayout() {
             key={location.pathname}
             className="page-enter mx-auto flex w-full max-w-[1640px] flex-col gap-5"
           >
-            <Outlet />
+            <Suspense fallback={<PageFallback />}>
+              <Outlet />
+            </Suspense>
           </div>
         </main>
       </div>

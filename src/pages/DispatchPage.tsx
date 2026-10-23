@@ -183,7 +183,6 @@ export function DispatchPage() {
         eyebrow="Logistics"
         icon={<Truck className="h-5 w-5" />}
         title="Dispatch"
-        description="Move packed orders out of the warehouse and track courier movement with a labelled simulated integration."
         actions={
           <Button
             variant="outline"
@@ -212,10 +211,10 @@ export function DispatchPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Ready to dispatch" value={stats.ready} hint="Packed and waiting for pickup" icon={<PackageCheck className="h-4.5 w-4.5" />} tone="amber" />
-        <StatCard label="In transit" value={stats.inTransit} hint="Dispatched but not delivered" icon={<Truck className="h-4.5 w-4.5" />} tone="blue" />
+        <StatCard label="Ready to dispatch" value={stats.ready} icon={<PackageCheck className="h-4.5 w-4.5" />} tone="amber" />
+        <StatCard label="In transit" value={stats.inTransit} icon={<Truck className="h-4.5 w-4.5" />} tone="blue" />
         <StatCard label="Delivered" value={stats.delivered} hint={`${stats.total} dispatch records in total`} icon={<CheckCircle2 className="h-4.5 w-4.5" />} tone="emerald" />
-        <StatCard label="Delayed" value={stats.delayed} hint="Flagged with courier issues" icon={<AlertTriangle className="h-4.5 w-4.5" />} tone={stats.delayed > 0 ? 'rose' : 'navy'} />
+        <StatCard label="Delayed" value={stats.delayed} icon={<AlertTriangle className="h-4.5 w-4.5" />} tone={stats.delayed > 0 ? 'rose' : 'navy'} />
       </div>
 
       <div className="flex flex-wrap items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-900">

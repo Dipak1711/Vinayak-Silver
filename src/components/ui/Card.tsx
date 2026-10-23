@@ -16,7 +16,7 @@ const VARIANTS: Record<CardVariant, string> = {
   // Explicit base colour as well as the gradient, so the surface is dark
   // even if a background-image from elsewhere wins the cascade. The sheen
   // is layered as its own element below.
-  dark: 'bg-blue-900 bg-linear-to-br from-blue-900 via-blue-700 to-blue-600 text-white shadow-panel',
+  dark: 'bg-[#0f3a36] bg-linear-to-br from-[#0f3a36] via-[#1d675f] to-[#1f7a63] text-white shadow-panel',
   interactive: 'bg-surface shadow-card lift pressable cursor-pointer hover:shadow-lift',
 }
 
@@ -47,7 +47,7 @@ interface CardHeaderProps {
 }
 
 const ACCENTS: Record<string, string> = {
-  sapphire: 'from-blue-500 to-blue-700',
+  sapphire: 'from-[#45ada1] to-[#1d675f]',
   gold: 'from-gold-400 to-gold-700',
   emerald: 'from-emerald-500 to-emerald-700',
   rose: 'from-rose-500 to-rose-700',

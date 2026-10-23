@@ -254,7 +254,6 @@ export function SuppliersPage() {
         eyebrow="Procurement"
         icon={<Handshake className="h-5 w-5" />}
         title="Supplier"
-        description="Supplier master, purchase records and outstanding payables."
         actions={
           <>
             <Button
@@ -289,12 +288,11 @@ export function SuppliersPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Suppliers" value={stats.count} hint={`${stats.materials} materials supplied`} icon={<Handshake className="h-4.5 w-4.5" />} tone="blue" />
-        <StatCard label="Total purchases" value={formatCurrency(stats.purchased, true)} hint="From stored purchase records" icon={<Truck className="h-4.5 w-4.5" />} tone="violet" />
+        <StatCard label="Total purchases" value={formatCurrency(stats.purchased, true)} icon={<Truck className="h-4.5 w-4.5" />} tone="violet" />
         <StatCard label="Outstanding payable" value={formatCurrency(stats.payable, true)} hint={`${stats.withPayable} suppliers due`} icon={<Wallet className="h-4.5 w-4.5" />} tone="rose" />
         <StatCard
           label="Average payment terms"
           value={`${Math.round(db.suppliers.reduce((acc, supplier) => acc + supplier.paymentTerms, 0) / Math.max(db.suppliers.length, 1))} days`}
-          hint="Across all suppliers"
           icon={<MapPin className="h-4.5 w-4.5" />}
           tone="navy"
         />

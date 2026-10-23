@@ -1,16 +1,17 @@
+import { lazy } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/components/layout/AppLayout'
-import { DashboardPage } from '@/pages/DashboardPage'
-import { LeadsPage } from '@/pages/LeadsPage'
-import { QuotationsPage } from '@/pages/QuotationsPage'
-import { InvoicesPage } from '@/pages/InvoicesPage'
-import { InventoryPage } from '@/pages/InventoryPage'
-import { ManufacturingPage } from '@/pages/ManufacturingPage'
-import { PackagingPage } from '@/pages/PackagingPage'
-import { DispatchPage } from '@/pages/DispatchPage'
-import { CustomersPage } from '@/pages/CustomersPage'
-import { SuppliersPage } from '@/pages/SuppliersPage'
-import { ReportsPage } from '@/pages/ReportsPage'
+const DashboardPage = lazy(() => import('@/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })))
+const LeadsPage = lazy(() => import('@/pages/LeadsPage').then((m) => ({ default: m.LeadsPage })))
+const QuotationsPage = lazy(() => import('@/pages/QuotationsPage').then((m) => ({ default: m.QuotationsPage })))
+const InvoicesPage = lazy(() => import('@/pages/InvoicesPage').then((m) => ({ default: m.InvoicesPage })))
+const InventoryPage = lazy(() => import('@/pages/InventoryPage').then((m) => ({ default: m.InventoryPage })))
+const ManufacturingPage = lazy(() => import('@/pages/ManufacturingPage').then((m) => ({ default: m.ManufacturingPage })))
+const PackagingPage = lazy(() => import('@/pages/PackagingPage').then((m) => ({ default: m.PackagingPage })))
+const DispatchPage = lazy(() => import('@/pages/DispatchPage').then((m) => ({ default: m.DispatchPage })))
+const CustomersPage = lazy(() => import('@/pages/CustomersPage').then((m) => ({ default: m.CustomersPage })))
+const SuppliersPage = lazy(() => import('@/pages/SuppliersPage').then((m) => ({ default: m.SuppliersPage })))
+const ReportsPage = lazy(() => import('@/pages/ReportsPage').then((m) => ({ default: m.ReportsPage })))
 
 export default function App() {
   return (

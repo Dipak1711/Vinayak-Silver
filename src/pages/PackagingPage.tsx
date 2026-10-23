@@ -151,7 +151,6 @@ export function PackagingPage() {
         eyebrow="Fulfilment"
         icon={<PackageOpen className="h-5 w-5" />}
         title="Packaging"
-        description="Pack completed production and ready stock, then release orders to dispatch."
         actions={
           <Button
             variant="outline"
@@ -182,7 +181,7 @@ export function PackagingPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Packaging jobs" value={stats.total} hint={`${stats.units} units to pack`} icon={<PackageOpen className="h-4.5 w-4.5" />} tone="blue" />
         <StatCard label="Pending" value={stats.pending} hint={`${stats.inProgress} in progress`} icon={<Plus className="h-4.5 w-4.5" />} tone="amber" />
-        <StatCard label="Ready for dispatch" value={stats.ready} hint="Released to the dispatch queue" icon={<PackageCheck className="h-4.5 w-4.5" />} tone="emerald" />
+        <StatCard label="Ready for dispatch" value={stats.ready} icon={<PackageCheck className="h-4.5 w-4.5" />} tone="emerald" />
         <StatCard
           label="Packing completion"
           value={`${stats.completion}%`}

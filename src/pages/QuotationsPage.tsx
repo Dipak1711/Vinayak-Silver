@@ -278,7 +278,6 @@ export function QuotationsPage() {
         eyebrow="Sales documents"
         icon={<FileText className="h-5 w-5" />}
         title="Quotation"
-        description="Build quotations with automatic tax calculation, revisions and one-click conversion to invoices."
         actions={
           <>
             <Button variant="outline" icon={<Search className="h-4 w-4" />} onClick={exportCSV}>
@@ -293,7 +292,7 @@ export function QuotationsPage() {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Total quotations" value={stats.count} icon={<FileText className="h-4.5 w-4.5" />} tone="blue" />
-        <StatCard label="Approved value" value={formatCurrency(stats.approvedValue, true)} hint="Ready to invoice" icon={<Check className="h-4.5 w-4.5" />} tone="emerald" />
+        <StatCard label="Approved value" value={formatCurrency(stats.approvedValue, true)} icon={<Check className="h-4.5 w-4.5" />} tone="emerald" />
         <StatCard label="Awaiting decision" value={stats.pendingCount} hint={`${formatCurrency(stats.pendingValue, true)} in draft / sent`} icon={<GitBranch className="h-4.5 w-4.5" />} tone="amber" />
         <StatCard label="Converted to invoices" value={`${stats.conversionRate}%`} hint={`${stats.converted} quotations converted`} icon={<Receipt className="h-4.5 w-4.5" />} tone="violet" />
       </div>
