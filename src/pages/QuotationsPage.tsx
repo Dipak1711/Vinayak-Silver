@@ -29,7 +29,7 @@ import { useToast } from '@/store/ToastContext'
 import { buildLineItem, computeTotals, customerName, type LineItemInput } from '@/lib/calc'
 import { convertQuotationToInvoice, createQuotation, duplicateQuotation, pushActivity } from '@/lib/workflow'
 import { dealIdOf, dealSummary } from '@/lib/deals'
-import { addDaysISO, downloadCSV, formatCurrency, formatDate, todayISO } from '@/lib/utils'
+import { addDaysISO, cn, downloadCSV, formatCurrency, formatDate, todayISO } from '@/lib/utils'
 
 export function QuotationsPage() {
   const { db, mutate } = useData()
@@ -49,6 +49,7 @@ export function QuotationsPage() {
   const [date, setDate] = useState(() => todayISO())
   const [validUntil, setValidUntil] = useState(() => addDaysISO(todayISO(), 30))
   const [notes, setNotes] = useState('')
+  const [formStatus, setFormStatus] = useState<QuotationStatus>('Draft')
   const [items, setItems] = useState<LineItemInput[]>(() => [newLineItem(db.settings.defaultTaxRate)])
   const [errors, setErrors] = useState<Record<string, string>>({})
 
@@ -124,6 +125,7 @@ export function QuotationsPage() {
     setDate(todayISO())
     setValidUntil(addDaysISO(todayISO(), 30))
     setNotes('')
+    setFormStatus('Draft')
     setItems([newLineItem(db.settings.defaultTaxRate)])
     setErrors({})
   }
@@ -140,6 +142,7 @@ export function QuotationsPage() {
     setDate(quotation.date)
     setValidUntil(quotation.validUntil)
     setNotes(quotation.notes)
+    setFormStatus(quotation.status)
     setItems(quotation.items.map((item) => ({ ...item })))
     setErrors({})
     setFormOpen(true)
@@ -181,6 +184,10 @@ export function QuotationsPage() {
           ...computed,
         })
         pushActivity(draft, 'Quotation', `Quotation ${target.number} updated`)
+        if (target.status !== formStatus) {
+          target.status = formStatus
+          pushActivity(draft, 'Quotation', `${target.number} marked ${formStatus}`)
+        }
       })
       toast.success('Quotation updated.')
     } else {
@@ -413,7 +420,7 @@ export function QuotationsPage() {
         }
       >
         <div className="flex flex-col gap-4">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className={cn('grid grid-cols-1 gap-4', editing ? 'sm:grid-cols-4' : 'sm:grid-cols-3')}>
             <Field label="Customer" required error={errors.customer}>
               <Select value={customerId} onChange={(event) => setCustomerId(event.target.value)} invalid={Boolean(errors.customer)}>
                 <option value="">Select customer…</option>
@@ -430,6 +437,15 @@ export function QuotationsPage() {
             <Field label="Valid until" error={errors.validUntil}>
               <Input type="date" value={validUntil} onChange={(event) => setValidUntil(event.target.value)} invalid={Boolean(errors.validUntil)} />
             </Field>
+            {editing ? (
+              <Field label="Status">
+                <Select value={formStatus} onChange={(event) => setFormStatus(event.target.value as QuotationStatus)}>
+                  {QUOTATION_STATUSES.map((status) => (
+                    <option key={status}>{status}</option>
+                  ))}
+                </Select>
+              </Field>
+            ) : null}
           </div>
 
           <div>
