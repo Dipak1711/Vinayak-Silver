@@ -11,7 +11,6 @@ import { Checkbox, Field, Input, Select } from '@/components/ui/Form'
 import { Modal } from '@/components/ui/Modal'
 import { StatCard } from '@/components/ui/StatCard'
 import { TBody, THead, Td, Th, TR, Table, TableEmptyRow, TableShell } from '@/components/ui/Table'
-import { FlowStrip } from '@/components/FlowStrip'
 import { NewJobModal } from '@/components/NewJobModal'
 import { useData } from '@/store/DataContext'
 import { useToast } from '@/store/ToastContext'
@@ -186,8 +185,6 @@ function StageWork({ stage }: { stage: MfgStage }) {
           </>
         }
       />
-
-      <FlowStrip current={stagePath(stage)} />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Ready to work" value={ready.length} icon={<Clock className="h-4.5 w-4.5" />} tone="amber" hint={`${formatNumber(unitsInQueue)} units in queue`} />

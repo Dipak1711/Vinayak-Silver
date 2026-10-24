@@ -76,11 +76,11 @@ function CollectionRing({ rate }: { rate: number }) {
           style={{ transition: 'stroke-dashoffset 1400ms cubic-bezier(0.16, 1, 0.3, 1)', filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.6))' }}
         />
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+      <div className="absolute inset-0 flex flex-col items-center justify-center text-[#1a1612]">
         <span className="tnum text-[34px] leading-none font-extrabold tracking-[-0.03em]">
           <AnimatedNumber value={clamped} format={(v) => `${Math.round(v)}%`} duration={1400} />
         </span>
-        <span className="mt-1 text-[10.5px] font-bold tracking-[0.14em] text-white/90 uppercase">Collected</span>
+        <span className="mt-1 text-[10.5px] font-bold tracking-[0.14em] text-[#3a342d] uppercase">Collected</span>
       </div>
     </div>
   )
@@ -92,7 +92,7 @@ function HeroTile({
   icon,
   accent,
   iconClass,
-  valueClass = 'text-white',
+  valueClass = 'text-[#1a1612]',
   value,
   chip,
   spark,
@@ -107,17 +107,17 @@ function HeroTile({
   spark?: ReactNode
 }) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl bg-white/[0.16] p-4 ring-1 ring-white/30 backdrop-blur transition-[translate,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:bg-white/[0.24]">
+    <div className="group relative overflow-hidden rounded-2xl bg-white/85 p-4 shadow-[0_10px_24px_-14px_rgba(122,46,14,0.55)] ring-1 ring-white/70 backdrop-blur transition-[translate,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:bg-white/95">
       <span className={cn('absolute inset-x-0 top-0 h-[3px] bg-linear-to-r', accent)} aria-hidden="true" />
       <div className="flex items-center justify-between gap-2">
-        <span className="flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] text-white/90 uppercase">
+        <span className="flex items-center gap-2 text-[11px] font-bold tracking-[0.1em] text-[#5a5146] uppercase">
           <span className={cn('grid h-7 w-7 place-items-center rounded-lg', iconClass)}>{icon}</span>
           {label}
         </span>
         <span
           className={cn(
             'tnum rounded-full px-2 py-0.5 text-[10.5px] font-bold',
-            chip.good ? 'bg-white/25 text-white' : 'bg-rose-700/40 text-white',
+            chip.good ? 'bg-[#d1fae5] text-[#065f46]' : 'bg-[#fee2e2] text-[#991b1b]',
           )}
         >
           {chip.text}
@@ -212,12 +212,12 @@ export function DashboardPage() {
           <div className="relative grid items-center gap-6 lg:grid-cols-[auto_1fr] lg:gap-8">
             <div className="flex flex-col items-center gap-3">
               <CollectionRing rate={collectedRate} />
-              <div className="flex items-center gap-2 rounded-full border border-white/30 bg-white/20 px-3 py-1.5 backdrop-blur">
+              <div className="flex items-center gap-2 rounded-full border border-white/70 bg-white/85 px-3 py-1.5 backdrop-blur">
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-70" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10b981] opacity-60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#10b981]" />
                 </span>
-                <span className="text-[11.5px] font-semibold text-white">
+                <span className="text-[11.5px] font-semibold text-[#1a1612]">
                   {metrics.totalInvoices} invoices · {metrics.pendingOrders} orders open
                 </span>
               </div>
@@ -231,29 +231,29 @@ export function DashboardPage() {
                 <HeroTile
                   label="Invoiced"
                   icon={<Receipt className="h-4 w-4" />}
-                  accent="from-white/70 to-white/10"
-                  iconClass="bg-white/25 text-white"
+                  accent="from-[#f58a4e] to-[#ed7333]/10"
+                  iconClass="bg-[#fde3d3] text-[#c4531c]"
                   value={metrics.invoiceValue}
                   chip={{ text: `${invoicedTrend >= 0 ? '+' : ''}${invoicedTrend.toFixed(1)}%`, good: invoicedTrend >= 0 }}
-                  spark={<div className="brightness-0 invert opacity-80"><Sparkline data={invoicedSpark} tone="gold" height={30} /></div>}
+                  spark={<Sparkline data={invoicedSpark} tone="sapphire" height={30} />}
                 />
                 <HeroTile
                   label="Collected"
                   icon={<Wallet className="h-4 w-4" />}
-                  accent="from-white/80 to-white/10"
-                  iconClass="bg-white/25 text-white"
+                  accent="from-[#f58a4e] to-[#ed7333]/10"
+                  iconClass="bg-[#fde3d3] text-[#c4531c]"
                   value={metrics.amountCollected}
                   chip={{ text: `${collectedTrend >= 0 ? '+' : ''}${collectedTrend.toFixed(1)}%`, good: collectedTrend >= 0 }}
-                  spark={<div className="brightness-0 invert opacity-80"><Sparkline data={collectedSpark} tone="emerald" height={30} /></div>}
+                  spark={<Sparkline data={collectedSpark} tone="emerald" height={30} />}
                 />
                 <HeroTile
                   label="Outstanding"
                   icon={<Hourglass className="h-4 w-4" />}
-                  accent="from-white/80 to-white/10"
-                  iconClass="bg-white/25 text-white"
+                  accent="from-[#f58a4e] to-[#ed7333]/10"
+                  iconClass="bg-[#fde3d3] text-[#c4531c]"
                   value={metrics.outstanding}
                   chip={{ text: overdueInvoices > 0 ? `${overdueInvoices} overdue` : 'current', good: overdueInvoices === 0 }}
-                  spark={<div className="brightness-0 invert opacity-90"><ProgressBar value={100 - collectedRate} tone="gold" track="bg-white/25" className="mt-2.5" /></div>}
+                  spark={<ProgressBar value={100 - collectedRate} tone="gold" track="bg-[#f3e8dd]" className="mt-2.5" />}
                 />
               </div>
             </div>

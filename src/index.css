@@ -22,33 +22,33 @@
      silver-100 is the canvas, silver-200/300 are hairlines and
      control outlines, silver-500/600/700 are muted text.
      --------------------------------------------------------------- */
-  --color-silver-50: #fbfaf8;
-  --color-silver-100: #f7f4f0;
-  --color-silver-200: #ebe6df;
-  --color-silver-300: #d9d2c8;
-  --color-silver-400: #b3aa9e;
-  --color-silver-500: #8f857a;
-  --color-silver-600: #6f665c;
-  --color-silver-700: #544c43;
-  --color-silver-800: #3a342d;
-  --color-silver-900: #231f1a;
-  --color-silver-950: #15120f;
+  --color-silver-50: #f8fafc;
+  --color-silver-100: #f3f5f9;
+  --color-silver-200: #e5e9f0;
+  --color-silver-300: #d2d8e3;
+  --color-silver-400: #a7b0c0;
+  --color-silver-500: #8590a3;
+  --color-silver-600: #667085;
+  --color-silver-700: #475467;
+  --color-silver-800: #2b3546;
+  --color-silver-900: #182031;
+  --color-silver-950: #0f172a;
 
   /* ---------------------------------------------------------------
      Ink — deep navy chrome for headings, dark surfaces and the
      printed brand mark. navy-900 matches the reference body text.
      --------------------------------------------------------------- */
-  --color-navy-50: #f6f3ef;
-  --color-navy-100: #ece6de;
-  --color-navy-200: #d6cdc1;
-  --color-navy-300: #a99e90;
-  --color-navy-400: #7d7365;
-  --color-navy-500: #5a5146;
-  --color-navy-600: #453e35;
-  --color-navy-700: #342e27;
-  --color-navy-800: #26211c;
-  --color-navy-900: #1a1612;
-  --color-navy-950: #100d0a;
+  --color-navy-50: #f1f4f8;
+  --color-navy-100: #e2e7ef;
+  --color-navy-200: #c8d0dd;
+  --color-navy-300: #9aa5b8;
+  --color-navy-400: #6b7891;
+  --color-navy-500: #4b5567;
+  --color-navy-600: #3a4356;
+  --color-navy-700: #2b3445;
+  --color-navy-800: #1c2537;
+  --color-navy-900: #0f172a;
+  --color-navy-950: #080d17;
 
   /* ---------------------------------------------------------------
      Semantic surfaces. `surface` is the panel colour that flips with
@@ -56,7 +56,7 @@
      must stay dark in both themes (printed marks, number dots).
      --------------------------------------------------------------- */
   --color-surface: #ffffff;
-  --color-ink: #1a1612;
+  --color-ink: #0f172a;
 
   /* ---------------------------------------------------------------
      Primary — indigo. The reference action colour (#df6527).
@@ -224,34 +224,34 @@
   :root[data-theme='dark'] {
     color-scheme: dark;
 
-    --color-surface: #1b1713;
-    --color-ink: #1a1612;
+    --color-surface: #121826;
+    --color-ink: #0f172a;
 
     /* neutrals — canvas, panels, hairlines, muted text */
-    --color-silver-50: #1d1915;
-    --color-silver-100: #120f0c;
-    --color-silver-200: #2b2620;
-    --color-silver-300: #3d362e;
-    --color-silver-400: #5c5348;
-    --color-silver-500: #9a9084;
-    --color-silver-600: #b0a699;
-    --color-silver-700: #c4bbaf;
-    --color-silver-800: #ddd6cc;
-    --color-silver-900: #ece7df;
-    --color-silver-950: #f7f3ed;
+    --color-silver-50: #161d2b;
+    --color-silver-100: #0b0f19;
+    --color-silver-200: #232c3d;
+    --color-silver-300: #323d52;
+    --color-silver-400: #4b5872;
+    --color-silver-500: #7d889e;
+    --color-silver-600: #98a2b6;
+    --color-silver-700: #aeb7c9;
+    --color-silver-800: #cdd5e2;
+    --color-silver-900: #e4e9f2;
+    --color-silver-950: #f2f5fb;
 
     /* ink chrome — headings and body text become light */
-    --color-navy-50: #211c17;
-    --color-navy-100: #2a241e;
-    --color-navy-200: #362f27;
-    --color-navy-300: #54493d;
-    --color-navy-400: #82776a;
-    --color-navy-500: #a39989;
-    --color-navy-600: #bdb4a6;
-    --color-navy-700: #d3cbbf;
-    --color-navy-800: #e6e0d6;
-    --color-navy-900: #f1ede6;
-    --color-navy-950: #faf7f2;
+    --color-navy-50: #1a2233;
+    --color-navy-100: #222c40;
+    --color-navy-200: #2c3850;
+    --color-navy-300: #46536b;
+    --color-navy-400: #6b7893;
+    --color-navy-500: #8b95a9;
+    --color-navy-600: #a9b2c4;
+    --color-navy-700: #c6cede;
+    --color-navy-800: #dde3ee;
+    --color-navy-900: #e9edf6;
+    --color-navy-950: #f3f6fc;
 
     /* primary — solid steps hold, tints become translucent, ink steps lift */
     --color-sapphire-50: rgba(237, 115, 51, 0.14);
@@ -613,11 +613,13 @@ body {
 .app-canvas {
   background-color: var(--color-silver-100);
   background-image:
-    radial-gradient(900px 520px at 0% -8%, rgba(237, 115, 51, 0.20), transparent 66%),
-    radial-gradient(760px 480px at 100% -6%, rgba(245, 158, 11, 0.16), transparent 64%),
-    radial-gradient(700px 520px at 8% 105%, rgba(20, 184, 166, 0.12), transparent 68%),
-    radial-gradient(760px 520px at 96% 100%, rgba(139, 92, 246, 0.11), transparent 68%);
-  background-repeat: no-repeat;
+    radial-gradient(rgba(15, 23, 42, 0.055) 1px, transparent 1px),
+    radial-gradient(900px 520px at 0% -10%, rgba(237, 115, 51, 0.10), transparent 66%),
+    radial-gradient(800px 520px at 100% -8%, rgba(59, 130, 246, 0.10), transparent 64%),
+    radial-gradient(800px 560px at 100% 105%, rgba(139, 92, 246, 0.07), transparent 68%),
+    radial-gradient(700px 520px at 0% 105%, rgba(20, 184, 166, 0.07), transparent 68%);
+  background-size: 22px 22px, auto, auto, auto, auto;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
   background-attachment: fixed;
 }
 
@@ -625,16 +627,17 @@ body {
    so glass panels have something warm and cool to pick up. */
 :root[data-theme='dark'] .app-canvas {
   background-image:
-    radial-gradient(900px 520px at 0% -8%, rgba(237, 115, 51, 0.22), transparent 66%),
-    radial-gradient(700px 480px at 100% -6%, rgba(245, 158, 11, 0.10), transparent 64%),
-    radial-gradient(700px 520px at 6% 104%, rgba(20, 184, 166, 0.14), transparent 68%),
-    radial-gradient(800px 560px at 98% 100%, rgba(139, 92, 246, 0.20), transparent 68%);
+    radial-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    radial-gradient(900px 520px at 0% -10%, rgba(237, 115, 51, 0.12), transparent 66%),
+    radial-gradient(800px 520px at 100% -8%, rgba(59, 130, 246, 0.14), transparent 64%),
+    radial-gradient(800px 560px at 100% 105%, rgba(139, 92, 246, 0.12), transparent 68%);
+  background-size: 22px 22px, auto, auto, auto;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;
 }
 :root[data-theme='dark'] .sidebar-chrome {
   background-image:
-    radial-gradient(360px 240px at 0% 0%, rgba(237, 115, 51, 0.20), transparent 70%),
-    radial-gradient(320px 260px at 100% 100%, rgba(139, 92, 246, 0.14), transparent 70%),
-    linear-gradient(180deg, #1a1410 0%, #120e0b 100%);
+    radial-gradient(360px 240px at 0% 0%, rgba(237, 115, 51, 0.10), transparent 70%),
+    linear-gradient(180deg, #121826 0%, #0e1320 100%);
 }
 
 /* Numbers line up in tables, KPIs and money columns. */
@@ -694,9 +697,8 @@ input[type='number'] {
 .sidebar-chrome {
   background-color: var(--color-surface);
   background-image:
-    radial-gradient(360px 240px at 0% 0%, rgba(237, 115, 51, 0.12), transparent 70%),
-    radial-gradient(320px 260px at 100% 100%, rgba(245, 158, 11, 0.09), transparent 70%),
-    linear-gradient(180deg, var(--color-blue-50) 0%, var(--color-surface) 45%);
+    radial-gradient(360px 220px at 0% 0%, rgba(237, 115, 51, 0.07), transparent 70%),
+    linear-gradient(180deg, var(--color-surface) 0%, var(--color-silver-50) 100%);
 }
 
 /* Keyboard focus on navigation: one clean inset ring, no offset outline. */
@@ -707,10 +709,7 @@ input[type='number'] {
 
 /* Page titles: ink fading into the brand indigo. */
 .title-gradient {
-  background-image: linear-gradient(115deg, var(--color-navy-900) 35%, #ed7333 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--color-navy-900);
 }
 
 /* A soft light sweep across solid buttons on hover. */

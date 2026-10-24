@@ -37,25 +37,6 @@ export const FLOW_STEPS: FlowStep[] = [
   { to: '/dispatch', label: 'Dispatch', icon: Truck, description: 'Shipments and delivery tracking', kind: 'dispatch' },
 ]
 
-/**
- * Older jobs can still sit at Material Procurement or Cleaning. Those steps are
- * not part of the standard flow, so they only appear while a job is waiting there.
- */
-export function flowStepsFor(db: Database): FlowStep[] {
-  const counts = flowCounts(db)
-  const legacy = MFG_STAGES.filter((stage) => !CORE_STAGES.includes(stage) && (counts[stagePath(stage)] ?? 0) > 0)
-  if (legacy.length === 0) return FLOW_STEPS
-  const steps = [...FLOW_STEPS]
-  legacy.forEach((stage) => {
-    const order = MFG_STAGES.indexOf(stage)
-    const at = steps.findIndex(
-      (step) => step.kind === 'stage' && MFG_STAGES.indexOf(step.label as MfgStage) > order,
-    )
-    steps.splice(at === -1 ? steps.findIndex((step) => step.kind === 'packaging') : at, 0, stageStep(stage))
-  })
-  return steps
-}
-
 export const MANUFACTURING_OVERVIEW = {
   to: '/manufacturing',
   label: 'Manufacturing',
