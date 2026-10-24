@@ -42,28 +42,38 @@ export function useTheme() {
  */
 export function useFlip<T extends HTMLElement>(signal: string) {
   const ref = useRef<T | null>(null)
-  const rects = useRef(new Map<string, DOMRect>())
+  const positions = useRef(new Map<string, { x: number; y: number }>())
 
   useLayoutEffect(() => {
     const root = ref.current
     if (!root) return
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const next = new Map<string, DOMRect>()
+    // Positions are measured against the container's scrolled content and the
+    // page, so scrolling between two renders never reads as movement.
+    const box = root.getBoundingClientRect()
+    const next = new Map<string, { x: number; y: number }>()
     root.querySelectorAll<HTMLElement>('[data-flip]').forEach((el) => {
       const id = el.dataset.flip as string
       const rect = el.getBoundingClientRect()
-      next.set(id, rect)
-      const prev = rects.current.get(id)
+      const pos = { x: rect.left - box.left + root.scrollLeft, y: rect.top + window.scrollY }
+      next.set(id, pos)
+      const prev = positions.current.get(id)
       if (!prev || reduce) return
-      const dx = prev.left - rect.left
-      const dy = prev.top - rect.top
+      const dx = prev.x - pos.x
+      const dy = prev.y - pos.y
       if (Math.abs(dx) < 2 && Math.abs(dy) < 2) return
-      el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'translate(0, 0)' }], {
-        duration: 380,
+      // Lift the card's column above its neighbours while it travels across them.
+      const layer = el.closest<HTMLElement>('[data-flip-layer]')
+      if (layer) layer.style.zIndex = '20'
+      const animation = el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'translate(0, 0)' }], {
+        duration: 420,
         easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
       })
+      animation.onfinish = animation.oncancel = () => {
+        if (layer) layer.style.zIndex = ''
+      }
     })
-    rects.current = next
+    positions.current = next
   }, [signal])
 
   return ref

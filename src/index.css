@@ -444,11 +444,13 @@
 @keyframes drop-settle {
   0% {
     scale: 1.04;
-    box-shadow: 0 0 0 3px rgba(237, 115, 51, 0.55), 0 14px 28px -8px rgba(237, 115, 51, 0.5);
+    box-shadow:
+      0 0 0 3px color-mix(in srgb, var(--settle, #ed7333) 60%, transparent),
+      0 16px 30px -8px color-mix(in srgb, var(--settle, #ed7333) 50%, transparent);
   }
   100% {
     scale: 1;
-    box-shadow: 0 0 0 0 rgba(237, 115, 51, 0), 0 0 0 1px rgba(15, 23, 42, 0.05);
+    box-shadow: 0 0 0 0 transparent;
   }
 }
 
@@ -545,6 +547,64 @@
   100% {
     transform: translateX(560%) skewX(-12deg);
     opacity: 0;
+  }
+}
+
+@keyframes slot-open {
+  from {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-bottom: -10px;
+  }
+  to {
+    max-height: 90px;
+    opacity: 1;
+  }
+}
+
+@keyframes drop-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+    box-shadow: 0 0 0 0 transparent;
+  }
+  15% {
+    transform: translateX(-7px);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.5);
+  }
+  35% {
+    transform: translateX(6px);
+  }
+  55% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes confetti {
+  0% {
+    transform: translate(0, 0) rotate(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), calc(var(--dy) + 60px)) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+
+@keyframes count-bump {
+  0% {
+    scale: 0.6;
+  }
+  60% {
+    scale: 1.2;
+  }
+  100% {
+    scale: 1;
   }
 }
 
@@ -861,6 +921,21 @@ input[type='number'] {
   }
   .hero-sweep {
     animation: hero-sweep 7s var(--ease-out-quart) 1.5s infinite;
+  }
+  /* Kanban: a slot opens in the target lane, pushing cards down. */
+  .slot-open {
+    animation: slot-open 280ms var(--ease-out-expo) both;
+    overflow: hidden;
+  }
+  /* A lost lead shakes once where it lands. */
+  .drop-shake {
+    animation: drop-shake 520ms var(--ease-out-quart) both;
+  }
+  .confetti-bit {
+    animation: confetti 950ms cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  }
+  .count-bump {
+    animation: count-bump 380ms var(--ease-out-expo) both;
   }
   .badge-ping {
     animation: badge-ping 1800ms var(--ease-out-quart) infinite;

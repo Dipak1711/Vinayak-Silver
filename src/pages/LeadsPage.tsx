@@ -60,15 +60,6 @@ const EMPTY_FORM: LeadFormState = {
 
 const SALES_TEAM = ['Priya Sharma', 'Amit Verma', 'Neha Gupta']
 
-const STAGE_GRADIENT: Record<LeadStage, string> = {
-  'New Lead': 'from-cyan-400 to-cyan-600',
-  Contacted: 'from-violet-400 to-violet-600',
-  'Follow-up': 'from-amber-400 to-amber-600',
-  Negotiation: 'from-amber-500 to-rose-500',
-  Won: 'from-emerald-400 to-emerald-600',
-  Lost: 'from-rose-400 to-rose-600',
-}
-
 /* Solid accent per stage, used for the card's left edge. */
 const STAGE_ACCENT: Record<LeadStage, string> = {
   'New Lead': 'from-cyan-400 to-cyan-600',
@@ -77,6 +68,60 @@ const STAGE_ACCENT: Record<LeadStage, string> = {
   Negotiation: 'from-orange-400 to-rose-500',
   Won: 'from-emerald-400 to-emerald-600',
   Lost: 'from-rose-400 to-rose-600',
+}
+
+/* One colour per stage, used for the lane header, the drop glow and the landing ring. */
+const STAGE_HEX: Record<LeadStage, string> = {
+  'New Lead': '#0ea5e9',
+  Contacted: '#8b5cf6',
+  'Follow-up': '#f59e0b',
+  Negotiation: '#f97316',
+  Won: '#10b981',
+  Lost: '#ef4444',
+}
+
+const AVATAR_COLOURS = ['#2563eb', '#7c3aed', '#0d9488', '#db2777', '#ea580c', '#4f46e5']
+
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('')
+}
+
+function avatarColour(name: string): string {
+  let hash = 0
+  for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) >>> 0
+  return AVATAR_COLOURS[hash % AVATAR_COLOURS.length]
+}
+
+/** A short burst of confetti, shown when a lead lands in Won. */
+function Confetti() {
+  const colours = ['#10b981', '#f59e0b', '#ed7333', '#3b82f6', '#ec4899', '#8b5cf6']
+  return (
+    <span className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center" aria-hidden="true">
+      {Array.from({ length: 18 }).map((_, index) => {
+        const angle = (index / 18) * Math.PI * 2
+        const distance = 70 + (index % 3) * 22
+        return (
+          <span
+            key={index}
+            className="confetti-bit absolute h-2 w-1.5 rounded-[2px]"
+            style={
+              {
+                background: colours[index % colours.length],
+                '--dx': `${Math.cos(angle) * distance}px`,
+                '--dy': `${Math.sin(angle) * distance - 30}px`,
+                '--rot': `${(index % 2 ? 1 : -1) * (180 + index * 25)}deg`,
+              } as React.CSSProperties
+            }
+          />
+        )
+      })}
+    </span>
+  )
 }
 
 export function LeadsPage() {
@@ -223,10 +268,12 @@ export function LeadsPage() {
       target.stage = stage
       pushActivity(draft, 'Lead', `${target.company} moved to ${stage}`)
     })
-    toast.notify(`${lead.company} moved to ${stage}.`)
+    if (stage === 'Won') toast.success(`${lead.company} won! ${formatCurrency(lead.expectedValue, true)} added to won value.`)
+    else if (stage === 'Lost') toast.error(`${lead.company} marked as Lost.`)
+    else toast.notify(`${lead.company} moved to ${stage}.`)
     setJustMoved(leadId)
     window.clearTimeout(settleTimer.current)
-    settleTimer.current = window.setTimeout(() => setJustMoved(null), 900)
+    settleTimer.current = window.setTimeout(() => setJustMoved(null), 1100)
   }
 
   const confirmDelete = () => {
@@ -350,11 +397,15 @@ export function LeadsPage() {
           {LEAD_STAGES.map((stage) => {
           const stageLeads = filtered.filter((lead) => lead.stage === stage)
           const stageValue = stageLeads.reduce((acc, lead) => acc + lead.expectedValue, 0)
+          const hex = STAGE_HEX[stage]
+          const isTarget = dragOver === stage && Boolean(draggedLead) && draggedLead?.stage !== stage
           return (
             <div
               key={stage}
+              data-flip-layer
               onDragOver={(event) => {
                 event.preventDefault()
+                event.dataTransfer.dropEffect = 'move'
                 if (dragOver !== stage) setDragOver(stage)
               }}
               onDragLeave={(event) => {
@@ -368,114 +419,139 @@ export function LeadsPage() {
                 setDragging(null)
                 setDragOver(null)
               }}
+              style={
+                isTarget
+                  ? { backgroundColor: `${hex}14`, boxShadow: `inset 0 0 0 2px ${hex}99, 0 22px 44px -24px ${hex}` }
+                  : undefined
+              }
               className={cn(
-                'flex w-[286px] shrink-0 flex-col overflow-hidden rounded-2xl bg-surface/70 shadow-flat transition-[background-color,box-shadow,translate,opacity] duration-200 ease-out',
-                dragging && dragOver !== stage && 'opacity-80',
-                dragOver === stage && '-translate-y-0.5 bg-blue-50 shadow-lift ring-2 ring-blue-400 ring-inset',
+                'relative flex w-[290px] shrink-0 flex-col rounded-2xl bg-surface/60 ring-1 ring-silver-200/80 backdrop-blur-xl ring-inset transition-[background-color,box-shadow,translate,opacity,filter] duration-300 ease-out dark:ring-white/10',
+                dragging && !isTarget && dragOver !== stage && 'opacity-75 saturate-[0.8]',
+                isTarget && '-translate-y-1',
               )}
             >
-              <div className={cn('h-1 bg-linear-to-r', STAGE_GRADIENT[stage])} aria-hidden="true" />
-              <div className="flex items-center justify-between gap-2 px-3.5 py-3">
-                <div>
-                  <p className="text-[13px] font-bold tracking-[-0.01em] text-navy-900">{stage}</p>
-                  <p className="tnum text-[11px] text-silver-600">
-                    <AnimatedNumber value={stageValue} format={(v) => formatCurrency(v, true)} />
-                  </p>
+              <div className="h-[3px] rounded-t-2xl" style={{ background: `linear-gradient(90deg, ${hex}, ${hex}55)` }} aria-hidden="true" />
+              <div className="flex items-center justify-between gap-2 px-3.5 pt-3 pb-2.5">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <span className="relative flex h-2.5 w-2.5 shrink-0" aria-hidden="true">
+                    {isTarget ? <span className="absolute inset-0 animate-ping rounded-full" style={{ background: hex }} /> : null}
+                    <span className="relative h-2.5 w-2.5 rounded-full" style={{ background: hex, boxShadow: `0 0 0 3px ${hex}26` }} />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-[13.5px] font-bold tracking-[-0.01em] text-navy-900">{stage}</p>
+                    <p className="tnum text-[11px] font-medium text-silver-600">
+                      <AnimatedNumber value={stageValue} format={(v) => formatCurrency(v, true)} />
+                    </p>
+                  </div>
                 </div>
                 <span
-                  className={cn(
-                    'tnum rounded-full px-2 py-0.5 text-xs font-bold ring-1 ring-inset transition-[scale,background-color,color] duration-200',
-                    dragOver === stage
-                      ? 'scale-110 bg-blue-600 text-white ring-blue-600'
-                      : 'bg-silver-100 text-silver-600 ring-silver-200',
-                  )}
+                  key={stageLeads.length}
+                  className="count-bump tnum grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-xs font-bold"
+                  style={{ background: `${hex}1f`, color: hex }}
                 >
-                  <AnimatedNumber value={stageLeads.length} />
+                  {stageLeads.length}
                 </span>
               </div>
 
-              <div className="flex flex-1 flex-col gap-2 px-2.5 pb-3">
-                {stageLeads.map((lead) => (
-                  <article
-                    key={lead.id}
-                    data-flip={lead.id}
-                    draggable
-                    onDragStart={(event) => {
-                      // Firefox only starts a drag when data is set.
-                      event.dataTransfer.setData('text/plain', lead.id)
-                      event.dataTransfer.effectAllowed = 'move'
-                      setDragging(lead.id)
-                    }}
-                    onDragEnd={() => {
-                      setDragging(null)
-                      setDragOver(null)
-                    }}
-                    onClick={() => setDetailId(lead.id)}
-                    className={cn(
-                      'group relative cursor-grab overflow-hidden rounded-xl bg-surface py-3 pr-3 pl-4 shadow-card transition-[translate,scale,rotate,box-shadow,opacity] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lift active:cursor-grabbing active:scale-[0.99]',
-                      dragging === lead.id && 'scale-[0.96] rotate-1 opacity-40 shadow-lift',
-                      justMoved === lead.id && 'drop-settle',
-                    )}
+              <div className="flex flex-1 flex-col gap-2.5 px-2.5 pb-3">
+                {/* Opens at the top of the lane, pushing the cards down to make room. */}
+                {isTarget && draggedLead ? (
+                  <div
+                    className="slot-open rounded-xl border-2 border-dashed px-3 py-3"
+                    style={{ borderColor: `${hex}aa`, background: `${hex}12` }}
                   >
-                    <span
-                      className={cn('absolute inset-y-0 left-0 w-1 bg-linear-to-b', STAGE_ACCENT[lead.stage])}
-                      aria-hidden="true"
-                    />
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="text-[13px] leading-snug font-bold text-navy-900">{lead.company}</p>
-                      {lead.convertedCustomerId ? <Badge tone="success">Converted</Badge> : null}
-                    </div>
-                    <p className="mt-1 text-xs text-silver-600">{lead.name}</p>
-                    <p className="tnum mt-2 text-sm font-bold text-navy-900">
-                      {formatCurrency(lead.expectedValue, true)}
-                    </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                      <Badge tone="silver">{lead.source}</Badge>
-                      <Badge tone="neutral">{lead.assignedTo}</Badge>
-                    </div>
-                    {(() => {
-                      const overdue =
-                        lead.followUpDate < todayISO() && lead.stage !== 'Won' && lead.stage !== 'Lost'
-                      return (
-                        <p
-                          className={cn(
-                            'mt-2 flex items-center gap-1.5 text-[11px]',
-                            overdue ? 'font-semibold text-rose-600' : 'text-silver-600',
-                          )}
-                        >
-                          <CalendarDays className="h-3 w-3" aria-hidden="true" />
-                          Follow-up {formatDate(lead.followUpDate)}
-                          {overdue ? <span className="rounded-full bg-rose-50 px-1.5 py-px text-[10px] ring-1 ring-rose-200 ring-inset">Overdue</span> : null}
-                        </p>
-                      )
-                    })()}
-                  </article>
-                ))}
-
-                {/* The drop target stays visible even when a lane is full, so
-                    the empty space reads as somewhere to move a lead. */}
-                {dragOver === stage && draggedLead && draggedLead.stage !== stage ? (
-                  <div className="ghost-in rounded-xl border-2 border-dashed border-blue-400 bg-blue-50/80 px-3 py-3 text-center">
-                    <p className="truncate text-[12px] font-bold text-blue-700">{draggedLead.company}</p>
-                    <p className="text-[11px] text-blue-600">Drop to move to {stage}</p>
+                    <p className="truncate text-[12.5px] font-bold" style={{ color: hex }}>{draggedLead.company}</p>
+                    <p className="text-[11px] text-silver-600">Release to move to {stage}</p>
                   </div>
                 ) : null}
-                <p
-                  hidden={dragOver === stage && Boolean(draggedLead) && draggedLead?.stage !== stage}
-                  className={cn(
-                    'rounded-xl border border-dashed px-3 text-center text-[11px] transition-colors',
-                    stageLeads.length === 0 ? 'py-6' : 'py-3',
-                    dragOver === stage
-                      ? 'border-blue-400 bg-blue-50 font-semibold text-blue-700'
-                      : 'border-silver-200 text-silver-500',
-                  )}
-                >
-                  {dragOver === stage
-                    ? 'Release to move here'
-                    : stageLeads.length === 0
-                      ? 'No leads yet — drag one here'
-                      : 'Drag a lead here'}
-                </p>
+
+                {stageLeads.map((lead) => {
+                  const overdue = lead.followUpDate < todayISO() && lead.stage !== 'Won' && lead.stage !== 'Lost'
+                  const landed = justMoved === lead.id
+                  return (
+                    <article
+                      key={lead.id}
+                      data-flip={lead.id}
+                      draggable
+                      onDragStart={(event) => {
+                        // Firefox only starts a drag when data is set.
+                        event.dataTransfer.setData('text/plain', lead.id)
+                        event.dataTransfer.effectAllowed = 'move'
+                        // A tilted, lifted copy follows the pointer instead of the flat default snapshot.
+                        const card = event.currentTarget
+                        const ghost = card.cloneNode(true) as HTMLElement
+                        const holder = document.createElement('div')
+                        holder.style.cssText = 'position:fixed;top:-1000px;left:-1000px;padding:16px;pointer-events:none;'
+                        ghost.style.cssText = `width:${card.offsetWidth}px;transform:rotate(-3deg) scale(1.03);box-shadow:0 22px 40px -12px rgba(15,23,42,0.35);border-radius:14px;`
+                        holder.appendChild(ghost)
+                        document.body.appendChild(holder)
+                        const box = card.getBoundingClientRect()
+                        event.dataTransfer.setDragImage(holder, event.clientX - box.left + 16, event.clientY - box.top + 16)
+                        window.setTimeout(() => holder.remove(), 0)
+                        setDragging(lead.id)
+                      }}
+                      onDragEnd={() => {
+                        setDragging(null)
+                        setDragOver(null)
+                      }}
+                      onClick={() => setDetailId(lead.id)}
+                      style={landed ? ({ '--settle': STAGE_HEX[lead.stage] } as React.CSSProperties) : undefined}
+                      className={cn(
+                        'group relative cursor-grab rounded-xl bg-surface py-3 pr-3 pl-4 shadow-card ring-1 ring-silver-200/70 ring-inset transition-[translate,scale,box-shadow,opacity] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lift active:cursor-grabbing dark:ring-white/5',
+                        dragging === lead.id && 'scale-[0.97] opacity-35 outline-2 outline-offset-2 outline-silver-300 outline-dashed',
+                        landed && (lead.stage === 'Lost' ? 'drop-shake' : 'drop-settle'),
+                      )}
+                    >
+                      <span
+                        className={cn('absolute inset-y-0 left-0 w-1 rounded-l-xl bg-linear-to-b', STAGE_ACCENT[lead.stage])}
+                        aria-hidden="true"
+                      />
+                      {landed && lead.stage === 'Won' ? <Confetti /> : null}
+
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="truncate text-[13.5px] leading-snug font-bold text-navy-900">{lead.company}</p>
+                          <p className="mt-0.5 truncate text-xs text-silver-600">{lead.name}</p>
+                        </div>
+                        <span
+                          className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-[10.5px] font-bold text-white ring-2 ring-surface"
+                          style={{ background: avatarColour(lead.assignedTo) }}
+                          title={lead.assignedTo}
+                        >
+                          {initials(lead.assignedTo)}
+                        </span>
+                      </div>
+
+                      <div className="mt-2.5 flex items-end justify-between gap-2">
+                        <p className="tnum text-[17px] leading-none font-extrabold tracking-[-0.02em] text-navy-900">
+                          {formatCurrency(lead.expectedValue, true)}
+                        </p>
+                        {lead.convertedCustomerId ? <Badge tone="success">Converted</Badge> : <Badge tone="silver">{lead.source}</Badge>}
+                      </div>
+
+                      <div
+                        className={cn(
+                          'mt-2.5 flex items-center gap-1.5 border-t border-silver-200/70 pt-2 text-[11px]',
+                          overdue ? 'font-semibold text-rose-600' : 'text-silver-600',
+                        )}
+                      >
+                        <CalendarDays className="h-3 w-3 shrink-0" aria-hidden="true" />
+                        <span className="truncate">Follow-up {formatDate(lead.followUpDate)}</span>
+                        {overdue ? (
+                          <span className="ml-auto rounded-full bg-rose-50 px-1.5 py-px text-[10px] ring-1 ring-rose-200 ring-inset">Overdue</span>
+                        ) : null}
+                      </div>
+                    </article>
+                  )
+                })}
+
+                {stageLeads.length === 0 && !isTarget ? (
+                  <div className="flex flex-col items-center gap-1 rounded-xl border border-dashed border-silver-300 px-3 py-7 text-center">
+                    <span className="h-2 w-2 rounded-full" style={{ background: hex }} aria-hidden="true" />
+                    <p className="text-[11.5px] font-medium text-silver-600">No leads here yet</p>
+                    <p className="text-[10.5px] text-silver-500">Drag a card into this stage</p>
+                  </div>
+                ) : null}
               </div>
             </div>
           )
