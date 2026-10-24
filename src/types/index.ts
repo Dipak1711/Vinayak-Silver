@@ -363,8 +363,8 @@ export type MfgStage =
 export const MFG_STAGES: MfgStage[] = [
   'Material Procurement',
   'Cutting',
-  'Assembly',
   'Laser Cutting',
+  'Assembly',
   'Cleaning',
   'Quality Check',
 ];
@@ -400,8 +400,12 @@ export interface JobStage {
   /** Planned completion for the stage. */
   plannedDate?: string;
   completedAt?: string;
-  /** How many pieces came off this stage. */
+  /** How many good pieces came off this stage (received minus rejected). */
   completedQuantity?: number;
+  /** Pieces lost or rejected at this stage. */
+  rejectedQuantity?: number;
+  /** Why pieces were rejected; required when rejectedQuantity is above zero. */
+  lossReason?: string;
   remarks?: string;
   /** Required when status is Delayed. */
   delayReason?: string;

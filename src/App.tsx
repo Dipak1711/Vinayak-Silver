@@ -11,6 +11,7 @@ const PackagingPage = lazy(() => import('@/pages/PackagingPage').then((m) => ({ 
 const DispatchPage = lazy(() => import('@/pages/DispatchPage').then((m) => ({ default: m.DispatchPage })))
 const CustomersPage = lazy(() => import('@/pages/CustomersPage').then((m) => ({ default: m.CustomersPage })))
 const SuppliersPage = lazy(() => import('@/pages/SuppliersPage').then((m) => ({ default: m.SuppliersPage })))
+const StageWorkPage = lazy(() => import('@/pages/StageWorkPage').then((m) => ({ default: m.StageWorkPage })))
 const ReportsPage = lazy(() => import('@/pages/ReportsPage').then((m) => ({ default: m.ReportsPage })))
 
 export default function App() {
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/invoices" element={<InvoicesPage />} />
         <Route path="/inventory" element={<InventoryPage />} />
         <Route path="/manufacturing" element={<ManufacturingPage />} />
+        <Route path="/production/:slug" element={<StageWorkPage />} />
         <Route path="/packaging" element={<PackagingPage />} />
         <Route path="/dispatch" element={<DispatchPage />} />
         <Route path="/customers" element={<CustomersPage />} />

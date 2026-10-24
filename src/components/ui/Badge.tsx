@@ -18,35 +18,35 @@ export type BadgeTone =
    takes the tone's solid colour and carries a faint glow. */
 const TONES: Record<BadgeTone, { chip: string; dot: string }> = {
   neutral: {
-    chip: 'bg-linear-to-b from-silver-50 to-silver-100 text-silver-700 ring-silver-300',
+    chip: 'bg-linear-to-b from-silver-100 to-silver-200 text-silver-800 ring-silver-300',
     dot: 'bg-silver-500',
   },
   info: {
-    chip: 'bg-linear-to-b from-cyan-50 to-cyan-100/70 text-cyan-800 ring-cyan-200',
-    dot: 'bg-cyan-500 shadow-[0_0_6px_1px_rgba(14,165,233,0.55)]',
+    chip: 'bg-linear-to-b from-cyan-100 to-cyan-200/80 text-cyan-900 ring-cyan-300',
+    dot: 'bg-cyan-500 shadow-[0_0_6px_1px_rgba(14,165,233,0.6)]',
   },
   success: {
-    chip: 'bg-linear-to-b from-emerald-50 to-emerald-100/70 text-emerald-800 ring-emerald-200',
+    chip: 'bg-linear-to-b from-emerald-100 to-emerald-200/80 text-emerald-900 ring-emerald-300',
     dot: 'bg-emerald-500 shadow-[0_0_6px_1px_rgba(16,185,129,0.55)]',
   },
   warning: {
-    chip: 'bg-linear-to-b from-amber-50 to-amber-100/70 text-amber-800 ring-amber-200',
+    chip: 'bg-linear-to-b from-amber-100 to-amber-200/80 text-amber-900 ring-amber-300',
     dot: 'bg-amber-500 shadow-[0_0_6px_1px_rgba(245,158,11,0.55)]',
   },
   danger: {
-    chip: 'bg-linear-to-b from-rose-50 to-rose-100/70 text-rose-800 ring-rose-200',
+    chip: 'bg-linear-to-b from-rose-100 to-rose-200/80 text-rose-900 ring-rose-300',
     dot: 'bg-rose-500 shadow-[0_0_6px_1px_rgba(239,68,68,0.55)]',
   },
   purple: {
-    chip: 'bg-linear-to-b from-violet-50 to-violet-100/70 text-violet-800 ring-violet-200',
+    chip: 'bg-linear-to-b from-violet-100 to-violet-200/80 text-violet-900 ring-violet-300',
     dot: 'bg-violet-500 shadow-[0_0_6px_1px_rgba(139,92,246,0.55)]',
   },
   cyan: {
-    chip: 'bg-linear-to-b from-[#e6f7f5] to-[#cdeee9]/70 text-[#0f5f58] ring-[#a7ded6]',
+    chip: 'bg-linear-to-b from-[#d3f2ee] to-[#a9e3dc]/80 text-[#0b4f49] ring-[#7fd0c6]',
     dot: 'bg-[#14b8a6] shadow-[0_0_6px_1px_rgba(20,184,166,0.55)]',
   },
   gold: {
-    chip: 'bg-linear-to-b from-gold-50 to-gold-100/70 text-gold-800 ring-gold-300',
+    chip: 'bg-linear-to-b from-gold-100 to-gold-200/80 text-gold-900 ring-gold-300',
     dot: 'bg-gold-500 shadow-[0_0_6px_1px_rgba(245,158,11,0.55)]',
   },
   silver: {
@@ -74,7 +74,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-[3px] text-[11px] font-semibold whitespace-nowrap ring-1 ring-inset',
+        'inline-flex items-center gap-1.5 rounded-full px-2.5 py-[3px] text-[11px] font-bold whitespace-nowrap ring-1 ring-inset',
         spec.chip,
         className,
       )}
@@ -113,7 +113,7 @@ const STATUS_TONES: Record<string, BadgeTone> = {
   Partial: 'warning',
   Paid: 'success',
   // Manufacturing
-  Pending: 'neutral',
+  Pending: 'warning',
   'Low stock': 'danger',
   'In stock': 'success',
   Open: 'info',

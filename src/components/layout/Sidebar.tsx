@@ -4,6 +4,7 @@ import { ChevronDown, X } from 'lucide-react'
 import { NAV_ITEMS, SIDEBAR_GROUPS } from '@/config/nav'
 import { useData } from '@/store/DataContext'
 import { AnimatedNumber } from '@/components/ui/AnimatedNumber'
+import { flowCounts } from '@/lib/flow'
 import { cn } from '@/lib/utils'
 
 /* Each module keeps its own icon colour, so the menu is scannable by colour
@@ -15,6 +16,12 @@ const ICON_TONE: Record<string, string> = {
   '/invoices': 'bg-emerald-100 text-emerald-700',
   '/inventory': 'bg-amber-100 text-amber-700',
   '/manufacturing': 'bg-[#fde3d3] text-[#b4501d] dark:bg-[#ed7333]/20 dark:text-[#f8aa77]',
+  '/production/material': 'bg-amber-100 text-amber-700',
+  '/production/cutting': 'bg-[#fde3d3] text-[#b4501d] dark:bg-[#ed7333]/20 dark:text-[#f8aa77]',
+  '/production/laser-cutting': 'bg-rose-100 text-rose-700',
+  '/production/assembly': 'bg-violet-100 text-violet-700',
+  '/production/cleaning': 'bg-cyan-100 text-cyan-700',
+  '/production/quality-check': 'bg-emerald-100 text-emerald-700',
   '/packaging': 'bg-rose-100 text-rose-700',
   '/dispatch': 'bg-cyan-100 text-cyan-700',
   '/customers': 'bg-blue-100 text-blue-700',
@@ -30,10 +37,8 @@ export function Sidebar({ open, mini, onClose }: { open: boolean; mini: boolean;
     '/leads': db.leads.filter((lead) => lead.stage !== 'Won' && lead.stage !== 'Lost').length,
     '/quotations': db.quotations.filter((q) => q.status === 'Draft' || q.status === 'Sent').length,
     '/invoices': db.invoices.filter((invoice) => invoice.status !== 'Paid').length,
-    '/inventory': db.rawMaterials.filter((material) => material.quantity <= material.minStock).length,
-    '/manufacturing': db.manufacturingJobs.filter((job) => job.status !== 'Completed').length,
-    '/packaging': db.packagingJobs.filter((job) => job.status !== 'Packed').length,
-    '/dispatch': db.dispatches.filter((dispatch) => dispatch.status !== 'Delivered').length,
+    // Inventory, manufacturing, each production stage, packaging and dispatch.
+    ...flowCounts(db),
   }
 
   return (

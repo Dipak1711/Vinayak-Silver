@@ -17,7 +17,7 @@ import { PageHeader, EmptyState, SearchInput, Toolbar, DataRow } from '@/compone
 import { Card, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { StatusBadge, Badge } from '@/components/ui/Badge'
-import { Field, Input, Select, Textarea } from '@/components/ui/Form'
+import { Field, Input, Select } from '@/components/ui/Form'
 import { Modal, ConfirmDialog } from '@/components/ui/Modal'
 import { StatCard } from '@/components/ui/StatCard'
 import { TBody, THead, Td, Th, TR, Table, TableEmptyRow, TableShell } from '@/components/ui/Table'
@@ -580,9 +580,6 @@ export function InvoicesPage() {
                 <LineItemEditor items={items} onChange={setItems} products={db.products} defaultTaxRate={db.settings.defaultTaxRate} />
                 {errors.items ? <p className="mt-2 text-xs font-medium text-rose-600">{errors.items}</p> : null}
               </div>
-              <Field label="Notes">
-                <Textarea value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="PO reference, delivery instructions…" />
-              </Field>
             </div>
           )}
         </div>

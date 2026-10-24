@@ -22,6 +22,7 @@ import { Modal } from '@/components/ui/Modal'
 import { StatCard } from '@/components/ui/StatCard'
 import { SegmentedTabs } from '@/components/ui/SegmentedTabs'
 import { TBody, THead, Td, Th, TR, Table, TableEmptyRow, TableShell } from '@/components/ui/Table'
+import { FlowStrip } from '@/components/FlowStrip'
 import { useData } from '@/store/DataContext'
 import { useToast } from '@/store/ToastContext'
 import { applyStockMovement, createMaterial, pushActivity } from '@/lib/workflow'
@@ -318,6 +319,8 @@ export function InventoryPage() {
           </>
         }
       />
+
+      <FlowStrip current="/inventory" />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Raw materials" value={stats.count} hint={`${stats.categories} categories`} icon={<Layers className="h-4.5 w-4.5" />} tone="blue" />

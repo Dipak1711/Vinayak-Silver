@@ -1,8 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
   AlertTriangle,
-  ArrowDown,
-  ArrowUp,
   CheckCircle2,
   Clock,
   Factory,
@@ -11,23 +10,23 @@ import {
   RefreshCw,
   Trash2,
   Truck,
-  X,
 } from 'lucide-react'
-import type { JobStage, ManufacturingJob, MfgStage, MfgStatus } from '@/types'
+import type { JobStage, ManufacturingJob, MfgStatus } from '@/types'
 import { MFG_STAGES } from '@/types'
 import { PageHeader, EmptyState, SearchInput, Toolbar, ProgressBar, DataRow } from '@/components/ui/Layout'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge, StatusBadge } from '@/components/ui/Badge'
-import { Field, Input, Select, Textarea, Checkbox } from '@/components/ui/Form'
+import { Field, Input, Select } from '@/components/ui/Form'
 import { Modal, ConfirmDialog } from '@/components/ui/Modal'
 import { StatCard } from '@/components/ui/StatCard'
 import { TBody, THead, Td, Th, TR, Table, TableEmptyRow, TableShell } from '@/components/ui/Table'
+import { FlowStrip } from '@/components/FlowStrip'
+import { NewJobModal } from '@/components/NewJobModal'
 import { useData } from '@/store/DataContext'
 import { useToast } from '@/store/ToastContext'
-import { addJobStage, createManufacturingJob, pushActivity, updateJobStage } from '@/lib/workflow'
+import { pushActivity, updateJobStage } from '@/lib/workflow'
 import {
-  DEFAULT_JOB_STAGES,
   deriveJobStatus,
   jobCompletedQuantity,
   jobDelayReason,
@@ -36,7 +35,7 @@ import {
   jobStages,
 } from '@/lib/manufacturing'
 import { customerName, orderRefs } from '@/lib/calc'
-import { addDaysISO, cn, downloadCSV, formatDate, formatDateTime, formatNumber, todayISO } from '@/lib/utils'
+import { cn, downloadCSV, formatDate, formatDateTime, formatNumber, todayISO } from '@/lib/utils'
 
 const STATUSES: MfgStatus[] = ['Pending', 'In Progress', 'Completed', 'Delayed']
 
@@ -57,22 +56,6 @@ function reasonFromValue(value?: string): { reason: string; other: string } {
   return { reason: 'Other', other: value }
 }
 
-const emptyCreateForm = () => ({
-  orderRef: '',
-  invoiceId: '',
-  customerId: '',
-  productName: '',
-  orderQuantity: '1',
-  stockFulfilled: '0',
-  assignedTo: '',
-  plannedStart: todayISO(),
-  plannedEnd: addDaysISO(todayISO(), 14),
-  outsourced: false,
-  vendor: '',
-  notes: '',
-  stages: [...DEFAULT_JOB_STAGES] as MfgStage[],
-})
-
 export function ManufacturingPage() {
   const { db, mutate } = useData()
   const toast = useToast()
@@ -83,9 +66,6 @@ export function ManufacturingPage() {
   const [detailId, setDetailId] = useState<string | null>(null)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
-
-  const [createForm, setCreateForm] = useState(emptyCreateForm)
-  const [createErrors, setCreateErrors] = useState<Record<string, string>>({})
 
   const [stageEdit, setStageEdit] = useState<{ jobId: string; stageId: string } | null>(null)
   const [stageForm, setStageForm] = useState({
@@ -99,7 +79,6 @@ export function ManufacturingPage() {
     delayReasonOther: '',
   })
   const [stageError, setStageError] = useState('')
-  const [newStage, setNewStage] = useState<MfgStage | ''>('')
 
   const detail = db.manufacturingJobs.find((job) => job.id === detailId) ?? null
   const stageTarget = stageEdit ? db.manufacturingJobs.find((job) => job.id === stageEdit.jobId) ?? null : null
@@ -156,80 +135,16 @@ export function ManufacturingPage() {
     }
   }, [db.manufacturingJobs])
 
-  const manufactureQty = Math.max(Number(createForm.orderQuantity || 0) - Number(createForm.stockFulfilled || 0), 0)
+  const openCreate = () => setCreateOpen(true)
 
-  const orderRefList = useMemo(
-    () => [...new Set([...db.invoices.map((invoice) => invoice.orderRef), ...db.quotations.map((quotation) => quotation.number)])],
-    [db.invoices, db.quotations],
-  )
-
-  const openCreate = () => {
-    setCreateForm(emptyCreateForm())
-    setCreateErrors({})
-    setCreateOpen(true)
-  }
-
-  const onOrderRefChange = (value: string) => {
-    const invoice = db.invoices.find((item) => item.orderRef === value)
-    setCreateForm((form) => ({
-      ...form,
-      orderRef: value,
-      invoiceId: invoice?.id ?? '',
-      customerId: invoice?.customerId ?? form.customerId,
-    }))
-  }
-
-  const submitCreate = () => {
-    const next: Record<string, string> = {}
-    if (!createForm.orderRef.trim()) next.orderRef = 'Enter or select an order reference.'
-    if (!createForm.customerId) next.customerId = 'Select the customer this order belongs to.'
-    if (!createForm.productName.trim()) next.productName = 'Product name is required.'
-    if (Number(createForm.orderQuantity) <= 0) next.orderQuantity = 'Order quantity must be greater than zero.'
-    if (manufactureQty <= 0) next.stockFulfilled = 'Nothing to manufacture — the order is covered by finished stock.'
-    if (createForm.plannedEnd < createForm.plannedStart) next.plannedEnd = 'Planned end cannot be before the start date.'
-    if (createForm.outsourced && !createForm.vendor.trim()) next.vendor = 'Enter the job-work vendor name.'
-    if (createForm.stages.length === 0) next.stages = 'Select at least one manufacturing stage.'
-    setCreateErrors(next)
-    if (Object.keys(next).length > 0) return
-
-    const invoice = db.invoices.find((item) => item.id === createForm.invoiceId)
-    const quotationRef = invoice?.quotationId
-      ? db.quotations.find((quotation) => quotation.id === invoice.quotationId)?.number
-      : undefined
-
-    mutate((draft) => {
-      createManufacturingJob(draft, {
-        orderRef: createForm.orderRef.trim(),
-        invoiceId: createForm.invoiceId || undefined,
-        customerId: createForm.customerId,
-        productName: createForm.productName.trim(),
-        orderQuantity: Number(createForm.orderQuantity),
-        quantity: manufactureQty,
-        stages: createForm.stages,
-        assignedTo: createForm.assignedTo.trim(),
-        plannedStart: createForm.plannedStart,
-        plannedEnd: createForm.plannedEnd,
-        outsourced: createForm.outsourced,
-        vendor: createForm.vendor.trim(),
-        notes: createForm.notes.trim(),
-        quotationRef,
-        orderNumber: invoice?.number,
-        stockFulfilledQuantity: Number(createForm.stockFulfilled) || 0,
-      })
-    })
-    toast.success('Production job created with its own stage plan.')
-    setCreateOpen(false)
-  }
-
-  const moveCreateStage = (index: number, direction: -1 | 1) => {
-    setCreateForm((form) => {
-      const target = index + direction
-      if (target < 0 || target >= form.stages.length) return form
-      const stages = [...form.stages]
-      ;[stages[index], stages[target]] = [stages[target], stages[index]]
-      return { ...form, stages }
-    })
-  }
+  // Links that arrive with { openCreate: true } open the form straight away.
+  const location = useLocation()
+  useEffect(() => {
+    if ((location.state as { openCreate?: boolean } | null)?.openCreate) {
+      openCreate()
+      window.history.replaceState({}, '')
+    }
+  }, [location.state])
 
   const openStageUpdate = (job: ManufacturingJob, stage: JobStage) => {
     const { reason, other } = reasonFromValue(stage.delayReason)
@@ -278,15 +193,6 @@ export function ManufacturingPage() {
     setStageEdit(null)
   }
 
-  const handleAddStage = (job: ManufacturingJob, stage: MfgStage) => {
-    const result = mutate((draft) => addJobStage(draft, job.id, stage))
-    if (!result.ok) {
-      toast.error(result.error ?? 'Could not add the stage.')
-      return
-    }
-    setNewStage('')
-    toast.success(`${stage} added to ${job.jobNumber}.`)
-  }
 
   const confirmDelete = () => {
     if (!deleteId) return
@@ -346,6 +252,8 @@ export function ManufacturingPage() {
           </>
         }
       />
+
+      <FlowStrip current="/manufacturing" />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Total jobs" value={stats.total} hint={`${stats.outsourced} with outsourced stages`} icon={<Factory className="h-4.5 w-4.5" />} tone="blue" />
@@ -462,167 +370,7 @@ export function ManufacturingPage() {
       </TableShell>
 
       {/* ---------------------- Create job ---------------------- */}
-      <Modal
-        open={createOpen}
-        onClose={() => setCreateOpen(false)}
-        size="full"
-        title="New production job"
-        subtitle="Link the job to its order, then choose the stages this order actually needs."
-        footer={
-          <>
-            <div className="mr-auto text-xs text-silver-600">
-              {manufactureQty > 0 ? `${formatNumber(manufactureQty)} units to manufacture` : 'No manufacturing required'}
-            </div>
-            <Button variant="outline" onClick={() => setCreateOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={submitCreate}>Create job</Button>
-          </>
-        }
-      >
-        <div className="flex flex-col gap-5">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Field label="Order reference" required error={createErrors.orderRef} hint="Pick an order to auto-link its customer">
-              <Input
-                list="job-order-refs"
-                value={createForm.orderRef}
-                onChange={(event) => onOrderRefChange(event.target.value)}
-                invalid={Boolean(createErrors.orderRef)}
-                placeholder="QT-2026-0003 or ORD-2026-0001"
-              />
-              <datalist id="job-order-refs">
-                {orderRefList.map((ref) => (
-                  <option key={ref} value={ref} />
-                ))}
-              </datalist>
-            </Field>
-            <Field label="Customer" required error={createErrors.customerId}>
-              <Select
-                value={createForm.customerId}
-                onChange={(event) => setCreateForm({ ...createForm, customerId: event.target.value })}
-                invalid={Boolean(createErrors.customerId)}
-              >
-                <option value="">Select customer…</option>
-                {db.customers.map((customer) => (
-                  <option key={customer.id} value={customer.id}>
-                    {customer.code} · {customer.companyName}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <Field label="Product" required error={createErrors.productName}>
-              <Input
-                list="job-products"
-                value={createForm.productName}
-                onChange={(event) => setCreateForm({ ...createForm, productName: event.target.value })}
-                invalid={Boolean(createErrors.productName)}
-                placeholder="Product being made"
-              />
-              <datalist id="job-products">
-                {db.products.map((product) => (
-                  <option key={product.id} value={product.name} />
-                ))}
-              </datalist>
-            </Field>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Field label="Order quantity" required error={createErrors.orderQuantity}>
-              <Input
-                type="number"
-                min={1}
-                value={createForm.orderQuantity}
-                onChange={(event) => setCreateForm({ ...createForm, orderQuantity: event.target.value })}
-                invalid={Boolean(createErrors.orderQuantity)}
-              />
-            </Field>
-            <Field label="From finished stock" error={createErrors.stockFulfilled} hint="Met from stock — no manufacturing">
-              <Input
-                type="number"
-                min={0}
-                value={createForm.stockFulfilled}
-                onChange={(event) => setCreateForm({ ...createForm, stockFulfilled: event.target.value })}
-                invalid={Boolean(createErrors.stockFulfilled)}
-              />
-            </Field>
-            <div className="flex flex-col justify-end rounded-[11px] border border-silver-200 bg-silver-50 px-3 py-2">
-              <p className="text-[11px] font-semibold tracking-wide text-silver-600 uppercase">Quantity to manufacture</p>
-              <p className="tnum text-xl font-bold text-navy-900">{formatNumber(manufactureQty)}</p>
-            </div>
-          </div>
-
-          <div>
-            <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs font-semibold text-navy-800">Required stages (in order)</p>
-              <p className="text-[11px] text-silver-600">Cutting and Laser Cutting are separate stages — include either, both or neither.</p>
-            </div>
-            <ul className="flex flex-col gap-1.5">
-              {createForm.stages.map((stage, index) => (
-                <li key={`${stage}-${index}`} className="flex items-center gap-2 rounded-lg border border-silver-200 bg-silver-50 px-3 py-2">
-                  <span className="tnum text-[11px] font-bold text-silver-500">{index + 1}</span>
-                  <span className="flex-1 text-sm font-medium text-navy-900">{stage}</span>
-                  <button type="button" onClick={() => moveCreateStage(index, -1)} disabled={index === 0} className="rounded-md p-1 text-silver-500 hover:bg-silver-200 disabled:opacity-30" aria-label="Move up">
-                    <ArrowUp className="h-3.5 w-3.5" />
-                  </button>
-                  <button type="button" onClick={() => moveCreateStage(index, 1)} disabled={index === createForm.stages.length - 1} className="rounded-md p-1 text-silver-500 hover:bg-silver-200 disabled:opacity-30" aria-label="Move down">
-                    <ArrowDown className="h-3.5 w-3.5" />
-                  </button>
-                  <button type="button" onClick={() => setCreateForm({ ...createForm, stages: createForm.stages.filter((_, i) => i !== index) })} className="rounded-md p-1 text-silver-500 hover:bg-rose-50 hover:text-rose-600" aria-label="Remove stage">
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </li>
-              ))}
-            </ul>
-            {createErrors.stages ? <p className="mt-1 text-xs font-medium text-rose-600">{createErrors.stages}</p> : null}
-            <div className="mt-2 max-w-xs">
-              <Select
-                value=""
-                onChange={(event) => {
-                  const value = event.target.value as MfgStage
-                  if (value && !createForm.stages.includes(value)) {
-                    setCreateForm({ ...createForm, stages: [...createForm.stages, value] })
-                  }
-                }}
-              >
-                <option value="">Add a stage…</option>
-                {MFG_STAGES.filter((stage) => !createForm.stages.includes(stage)).map((stage) => (
-                  <option key={stage} value={stage}>
-                    {stage}
-                  </option>
-                ))}
-              </Select>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Field label="Assigned to">
-              <Input value={createForm.assignedTo} onChange={(event) => setCreateForm({ ...createForm, assignedTo: event.target.value })} placeholder="Artisan / supervisor" />
-            </Field>
-            <Field label="Planned start">
-              <Input type="date" value={createForm.plannedStart} onChange={(event) => setCreateForm({ ...createForm, plannedStart: event.target.value })} />
-            </Field>
-            <Field label="Planned end" error={createErrors.plannedEnd}>
-              <Input type="date" value={createForm.plannedEnd} onChange={(event) => setCreateForm({ ...createForm, plannedEnd: event.target.value })} invalid={Boolean(createErrors.plannedEnd)} />
-            </Field>
-            <div className="flex flex-col gap-3">
-              <Checkbox
-                label="At least one stage is outsourced (job work)"
-                checked={createForm.outsourced}
-                onChange={(event) => setCreateForm({ ...createForm, outsourced: event.target.checked })}
-              />
-              {createForm.outsourced ? (
-                <Field label="Job work vendor" error={createErrors.vendor}>
-                  <Input value={createForm.vendor} onChange={(event) => setCreateForm({ ...createForm, vendor: event.target.value })} invalid={Boolean(createErrors.vendor)} placeholder="e.g. Deccan Craft Works" />
-                </Field>
-              ) : null}
-            </div>
-          </div>
-
-          <Field label="Notes">
-            <Textarea value={createForm.notes} onChange={(event) => setCreateForm({ ...createForm, notes: event.target.value })} placeholder="Design reference, finishing instructions…" />
-          </Field>
-        </div>
-      </Modal>
+      <NewJobModal open={createOpen} onClose={() => setCreateOpen(false)} />
 
       {/* ---------------------- Job detail ---------------------- */}
       <Modal
@@ -643,9 +391,6 @@ export function ManufacturingPage() {
           <JobDetail
             job={detail}
             onUpdateStage={openStageUpdate}
-            onAddStage={handleAddStage}
-            newStage={newStage}
-            setNewStage={setNewStage}
           />
         ) : null}
       </Modal>
@@ -765,15 +510,9 @@ export function ManufacturingPage() {
 function JobDetail({
   job,
   onUpdateStage,
-  onAddStage,
-  newStage,
-  setNewStage,
 }: {
   job: ManufacturingJob
   onUpdateStage: (job: ManufacturingJob, stage: JobStage) => void
-  onAddStage: (job: ManufacturingJob, stage: MfgStage) => void
-  newStage: MfgStage | ''
-  setNewStage: (stage: MfgStage | '') => void
 }) {
   const { db } = useData()
   const stages = jobStages(job)
@@ -861,27 +600,6 @@ function JobDetail({
           ))}
         </ul>
 
-        <div className="mt-2 flex flex-wrap items-center gap-2">
-          <div className="max-w-xs flex-1">
-            <Select value={newStage} onChange={(event) => setNewStage(event.target.value as MfgStage | '')}>
-              <option value="">Add a stage…</option>
-              {MFG_STAGES.filter((stage) => !stages.some((item) => item.stage === stage)).map((stage) => (
-                <option key={stage} value={stage}>
-                  {stage}
-                </option>
-              ))}
-            </Select>
-          </div>
-          <Button
-            size="sm"
-            variant="outline"
-            icon={<Plus className="h-3.5 w-3.5" />}
-            disabled={!newStage}
-            onClick={() => newStage && onAddStage(job, newStage)}
-          >
-            Add stage
-          </Button>
-        </div>
       </div>
 
       {job.notes ? (

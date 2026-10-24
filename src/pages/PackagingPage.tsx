@@ -9,6 +9,7 @@ import { Field, Input, Select, Textarea } from '@/components/ui/Form'
 import { Modal, ConfirmDialog } from '@/components/ui/Modal'
 import { StatCard } from '@/components/ui/StatCard'
 import { TBody, THead, Td, Th, TR, Table, TableEmptyRow, TableShell } from '@/components/ui/Table'
+import { FlowStrip } from '@/components/FlowStrip'
 import { useData } from '@/store/DataContext'
 import { useToast } from '@/store/ToastContext'
 import { ensurePackagingJob, markReadyForDispatch, pushActivity, updatePackaging } from '@/lib/workflow'
@@ -177,6 +178,8 @@ export function PackagingPage() {
           </Button>
         }
       />
+
+      <FlowStrip current="/packaging" />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Packaging jobs" value={stats.total} hint={`${stats.units} units to pack`} icon={<PackageOpen className="h-4.5 w-4.5" />} tone="blue" />

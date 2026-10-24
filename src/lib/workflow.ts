@@ -25,6 +25,7 @@ import {
   jobProgress,
   jobStages,
   makeJobStage,
+  receivedQuantity,
 } from '@/lib/manufacturing'
 import {
   buildLineItem,
@@ -631,6 +632,9 @@ export interface JobStageUpdate {
   plannedDate?: string
   remarks?: string
   delayReason?: string
+  /** When given, the stage uses the received / rejected / OK quantity rules. */
+  rejectedQuantity?: number
+  lossReason?: string
 }
 
 /** Update one stage of a job's plan. */
@@ -651,6 +655,30 @@ export function updateJobStage(
     return { ok: false, error: 'A delay reason is required when a stage is marked Delayed.' }
   }
 
+  // Quantity rules: every piece received is either done, rejected, or still to do.
+  // A stage can only be completed once none are left, so a job never moves on half-finished.
+  const engine = input.rejectedQuantity !== undefined
+  const received = receivedQuantity(job, job.stages.indexOf(stage))
+  const rejected = engine ? Math.round(input.rejectedQuantity ?? 0) : 0
+  const done = engine ? Math.round(input.completedQuantity ?? 0) : 0
+  const lossReason = input.lossReason?.trim() ?? ''
+  if (engine) {
+    if (rejected < 0 || done < 0) return { ok: false, error: 'Quantities cannot be negative.' }
+    if (done + rejected > received) {
+      return { ok: false, error: `Done plus rejected (${done + rejected}) is more than the ${received} pieces received.` }
+    }
+    if (rejected > 0 && !lossReason) return { ok: false, error: 'Select a reason for the rejected pieces.' }
+    if (input.status === 'Completed') {
+      if (done + rejected < received) {
+        return {
+          ok: false,
+          error: `Only ${done + rejected} of ${received} pieces are accounted for. Keep it In Progress until every piece is done or rejected.`,
+        }
+      }
+      if (done < 1) return { ok: false, error: 'At least one good piece must pass on to complete this stage.' }
+    }
+  }
+
   const now = new Date().toISOString()
   const qty = Math.max(0, Math.min(job.quantity, Math.round(input.completedQuantity ?? stage.completedQuantity ?? 0)))
 
@@ -659,7 +687,13 @@ export function updateJobStage(
   stage.vendor = input.vendor?.trim() || undefined
   stage.plannedDate = input.plannedDate || stage.plannedDate
   stage.remarks = input.remarks?.trim() || undefined
-  stage.completedQuantity = input.status === 'Completed' ? qty || job.quantity : qty || stage.completedQuantity
+  if (engine) {
+    stage.rejectedQuantity = rejected
+    stage.lossReason = rejected > 0 ? lossReason : undefined
+    stage.completedQuantity = done
+  } else {
+    stage.completedQuantity = input.status === 'Completed' ? qty || job.quantity : qty || stage.completedQuantity
+  }
   if (input.status === 'Completed') {
     stage.completedAt = now
     stage.delayReason = undefined
@@ -669,7 +703,13 @@ export function updateJobStage(
   }
 
   const noteParts = [`${stage.stage} · ${input.status}`]
-  if (stage.completedQuantity) noteParts.push(`${stage.completedQuantity}/${job.quantity} pcs`)
+  if (engine && input.status === 'Completed') {
+    noteParts.push(`${received} received · ${rejected} rejected${rejected > 0 ? ` (${lossReason})` : ''} · ${done} passed on`)
+  } else if (engine) {
+    noteParts.push(`${done} of ${received} done${rejected > 0 ? ` · ${rejected} rejected` : ''}`)
+  } else if (stage.completedQuantity) {
+    noteParts.push(`${stage.completedQuantity}/${job.quantity} pcs`)
+  }
   if (stage.remarks) noteParts.push(stage.remarks)
   if (input.status === 'Delayed') noteParts.push(`Delayed — ${delayReason}`)
   job.history.push({
