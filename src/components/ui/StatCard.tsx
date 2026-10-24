@@ -19,9 +19,9 @@ interface ToneSpec {
    gradient, so a row of cards reads as calm colour, not loud swatches. */
 const soft = (bg: string, fg: string, ring: string) => `${bg} ${fg} ring-1 ring-inset ${ring}`
 const TONES: Record<StatTone, ToneSpec> = {
-  sapphire: { tile: soft('bg-blue-100/70', 'text-blue-700', 'ring-blue-200'), glow: '#ed7333', spark: 'sapphire' },
+  sapphire: { tile: 'bg-[#dbeafe] text-[#1d4ed8] ring-1 ring-inset ring-[#bfdbfe] dark:bg-[#1e3a8a]/40 dark:text-[#93c5fd] dark:ring-[#1e3a8a]', glow: '#3b82f6', spark: 'sapphire' },
   // `blue` is the same system as `sapphire`; both names are accepted.
-  blue: { tile: soft('bg-blue-100/70', 'text-blue-700', 'ring-blue-200'), glow: '#ed7333', spark: 'sapphire' },
+  blue: { tile: 'bg-[#dbeafe] text-[#1d4ed8] ring-1 ring-inset ring-[#bfdbfe] dark:bg-[#1e3a8a]/40 dark:text-[#93c5fd] dark:ring-[#1e3a8a]', glow: '#3b82f6', spark: 'sapphire' },
   emerald: { tile: soft('bg-emerald-100/70', 'text-emerald-700', 'ring-emerald-200'), glow: '#10b981', spark: 'emerald' },
   amber: { tile: soft('bg-amber-100/70', 'text-amber-700', 'ring-amber-200'), glow: '#f59e0b', spark: 'gold' },
   rose: { tile: soft('bg-rose-100/70', 'text-rose-700', 'ring-rose-200'), glow: '#ef4444', spark: 'rose' },
@@ -83,14 +83,14 @@ export function StatCard({
     <>
       {/* Tone-coloured light drifting behind the glass. */}
       <span
-        className="orb-drift pointer-events-none absolute -top-10 -right-8 h-28 w-28 rounded-full opacity-45 blur-2xl dark:opacity-70"
+        className="orb-drift pointer-events-none absolute -top-10 -right-8 h-28 w-28 rounded-full opacity-25 blur-2xl dark:opacity-45"
         style={{ background: spec.glow }}
         aria-hidden="true"
       />
       <span
         className="pointer-events-none absolute inset-0"
         style={{
-          backgroundImage: `linear-gradient(160deg, ${spec.glow}33 0%, ${spec.glow}12 55%, transparent 100%)`,
+          backgroundImage: `linear-gradient(160deg, ${spec.glow}1f 0%, ${spec.glow}0a 55%, transparent 100%)`,
         }}
         aria-hidden="true"
       />

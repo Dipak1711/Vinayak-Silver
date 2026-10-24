@@ -16,7 +16,7 @@ export function Table({ children, className }: { children: ReactNode; className?
 
 export function THead({ children }: { children: ReactNode }) {
   return (
-    <thead className="border-b border-silver-200 bg-linear-to-b from-blue-50 to-blue-50/30 text-left">
+    <thead className="border-b border-silver-200 bg-silver-50 text-left">
       {children}
     </thead>
   )
@@ -43,7 +43,7 @@ export function TR({
       aria-selected={selected || undefined}
       className={cn(
         'row-hover transition-colors',
-        selected ? 'bg-blue-50/70' : 'hover:bg-blue-50/60 hover:shadow-[inset_3px_0_0_0_var(--color-blue-500)]',
+        selected ? 'bg-silver-100' : 'hover:bg-silver-50 hover:shadow-[inset_3px_0_0_0_#ed7333]',
         onClick && 'cursor-pointer',
         className,
       )}

@@ -19,7 +19,7 @@ export function PageHeader({
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div className="flex items-start gap-3.5">
         {icon ? (
-          <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-[16px] bg-linear-to-br from-[#f58a4e] to-[#e0662a] text-white shadow-[0_12px_24px_-8px_rgba(237,115,51,0.6),inset_0_1px_0_0_rgba(255,255,255,0.3)]">
+          <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-[16px] bg-linear-to-br from-[#334155] to-[#0f172a] text-white shadow-[0_12px_24px_-10px_rgba(15,23,42,0.55),inset_0_1px_0_0_rgba(255,255,255,0.18)]">
             {icon}
           </span>
         ) : null}
